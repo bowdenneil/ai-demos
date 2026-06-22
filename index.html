@@ -539,17 +539,25 @@ let MODEL = 'z-ai/glm-5.1';
 const statusDot = document.getElementById('apiStatus');
 const keyInput = document.getElementById('apiKeyInput');
 
+// Show masked indicator if key exists, but don't put masked text in the input
 if (API_KEY) {
-  keyInput.value = '••••••••••••';
+  keyInput.placeholder = 'Key saved •••••••• (type new key to replace)';
   statusDot.classList.add('connected');
 }
 
 function saveApiKey() {
-  const val = keyInput.value.trim();
-  if (!val || val === '••••••••••••') { showToast('Enter a valid API key', true); return; }
+  let val = keyInput.value.trim();
+  // Ignore if user didn't type anything new (key already saved)
+  if (!val) {
+    if (API_KEY) { showToast('Using saved API key'); return; }
+    showToast('Enter your API key', true); return;
+  }
+  // Don't accept masked text as a key
+  if (val.includes('•')) { showToast('Type your actual API key, not dots', true); return; }
   API_KEY = val;
   localStorage.setItem('ai_demo_api_key', val);
-  keyInput.value = '••••••••••••';
+  keyInput.value = '';
+  keyInput.placeholder = 'Key saved •••••••• (type new key to replace)';
   statusDot.classList.add('connected');
   showToast('API key saved — connected!');
 }
