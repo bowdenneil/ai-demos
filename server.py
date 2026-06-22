@@ -22,7 +22,7 @@ from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
 
 API_BASE = 'https://api.tensorx.ai/v1'
-API_KEY = os.environ.get('TENSORX_API_KEY', '') or os.environ.get('TENSORIX_API_KEY', '') or 'sk-9ub...XReg'
+API_KEY = os.environ.get('TENSORX_API_KEY', '') or os.environ.get('TENSORIX_API_KEY', '') or 'sk-HLWfQlZdr2Lb1LstBfoK0g'
 BRAVE_KEY = os.environ.get('BRAVE_SEARCH_KEY', '') or 'BSAezzPy7F1dgfj5TSSTQRWve35pO8H'
 
 # PiAPI for icon generation
@@ -577,7 +577,7 @@ if __name__ == '__main__':
     print(f'⚡ AI Demos running at http://localhost:{args.port}')
     print(f'   Press Ctrl+C to stop')
 
-    server = http.server.HTTPServer(('0.0.0.0', args.port), DemoHandler)
+    server = http.server.ThreadingHTTPServer(('0.0.0.0', args.port), DemoHandler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
