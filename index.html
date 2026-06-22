@@ -532,34 +532,52 @@
 
 <script>
 // ─── API CONFIG ───
-let API_KEY = localStorage.getItem('ai_demo_api_key') || '';
+let API_KEY=*** || '';
 let API_BASE = 'https://api.tensorix.ai/v1';
 let MODEL = 'z-ai/glm-5.1';
 
 const statusDot = document.getElementById('apiStatus');
 const keyInput = document.getElementById('apiKeyInput');
 
-// Show masked indicator if key exists, but don't put masked text in the input
+// Show masked indicator if key exists
 if (API_KEY) {
   keyInput.placeholder = 'Key saved •••••••• (type new key to replace)';
   statusDot.classList.add('connected');
 }
 
-function saveApiKey() {
+async function saveApiKey() {
   let val = keyInput.value.trim();
-  // Ignore if user didn't type anything new (key already saved)
   if (!val) {
     if (API_KEY) { showToast('Using saved API key'); return; }
     showToast('Enter your API key', true); return;
   }
-  // Don't accept masked text as a key
   if (val.includes('•')) { showToast('Type your actual API key, not dots', true); return; }
-  API_KEY = val;
-  localStorage.setItem('ai_demo_api_key', val);
+
+  // Test the key with a non-streaming request
+  statusDot.classList.remove('connected');
+  try {
+    const testRes = await fetch(`${API_BASE}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${val}` },
+      body: JSON.stringify({ model: MODEL, messages: [{ role: 'user', content: 'test' }], max_tokens: 5, stream: false })
+    });
+    if (!testRes.ok) {
+      let errMsg = `Key rejected (${testRes.status})`;
+      try { const j = await testRes.json(); errMsg = j.error?.message || errMsg; } catch {}
+      showToast(errMsg, true);
+      return;
+    }
+    await testRes.json();
+  } catch (e) {
+    showToast('Cannot reach Tensorix API from this browser. Try running locally instead.', true);
+    return;
+  }
+
+  API_KEY=***  localStorage.setItem('ai_demo_api_key', val);
   keyInput.value = '';
   keyInput.placeholder = 'Key saved •••••••• (type new key to replace)';
   statusDot.classList.add('connected');
-  showToast('API key saved — connected!');
+  showToast('API key verified — connected!');
 }
 
 async function callLLM(messages, onChunk) {
