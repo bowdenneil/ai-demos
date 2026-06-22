@@ -149,6 +149,7 @@
     .card-header-img.churn { background: linear-gradient(135deg, rgba(249,115,22,0.12) 0%, rgba(249,115,22,0.04) 100%); }
     .card-header-img.rfp { background: linear-gradient(135deg, rgba(6,182,212,0.12) 0%, rgba(6,182,212,0.04) 100%); }
     .card-header-img.image { background: linear-gradient(135deg, rgba(124,92,252,0.12) 0%, rgba(83,216,251,0.08) 100%); }
+    .card-header-img.onprem { background: linear-gradient(135deg, rgba(139,92,246,0.12) 0%, rgba(59,130,246,0.08) 100%); }
     .card-icon {
       width: 56px; height: 56px;
       border-radius: 14px;
@@ -167,6 +168,7 @@
     .card-icon.churn { background: rgba(249,115,22,0.15); }
     .card-icon.rfp { background: rgba(6,182,212,0.15); }
     .card-icon.image { background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(83,216,251,0.15)); }
+    .card-icon.onprem { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.15)); }
     .card-icon.hidden { display: none; }
     .card-body {
       padding: 1.5rem;
@@ -189,6 +191,7 @@
     .tag.churn { background: rgba(249,115,22,0.15); color: var(--accent6); }
     .tag.rfp { background: rgba(6,182,212,0.15); color: var(--accent7); }
     .tag.image { background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(83,216,251,0.15)); color: var(--accent2); }
+    .tag.onprem { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.15)); color: #8b5cf6; }
     /* Icon generating overlay */
     .card-gen-overlay {
       position: absolute;
@@ -476,6 +479,8 @@
     .btn-rfp:hover:not(:disabled) { background: #22d3ee; }
     .btn-image { background: linear-gradient(135deg, #7c5cfc, #53d8fb); color: #fff; }
     .btn-image:hover:not(:disabled) { background: linear-gradient(135deg, #9678ff, #70e4ff); }
+    .btn-onprem { background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: #fff; }
+    .btn-onprem:hover:not(:disabled) { background: linear-gradient(135deg, #a78bfa, #60a5fa); }
     .btn-secondary {
       background: var(--surface2);
       color: var(--text-dim);
@@ -883,6 +888,134 @@
     }
     .btn-guest:hover { border-color: var(--accent2); color: var(--accent2); }
 
+    /* ─── ON-PREM ASSESSMENT ─── */
+    .assess-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .assess-dim {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .assess-dim-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .assess-dim-header h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #8b5cf6;
+      margin: 0;
+    }
+    .assess-dim-header .score-badge {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #8b5cf6;
+      background: rgba(139,92,246,0.15);
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+    }
+    .assess-dim p {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin: 0.25rem 0 0.5rem;
+    }
+    .assess-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .assess-slider-row input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+      outline: none;
+    }
+    .assess-slider-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+      cursor: pointer;
+      border: 2px solid #1a1a3a;
+    }
+    .assess-slider-row input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+      cursor: pointer;
+      border: 2px solid #1a1a3a;
+    }
+    .assess-level-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      margin-top: 0.2rem;
+      padding: 0 2px;
+    }
+    .assess-result-card {
+      background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(59,130,246,0.1));
+      border: 1px solid rgba(139,92,246,0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      margin: 1rem 0;
+    }
+    .assess-result-card .maturity-level {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .assess-result-card .maturity-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 0.25rem;
+    }
+    .assess-result-card .maturity-score {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-top: 0.25rem;
+    }
+    .assess-radar-wrap {
+      max-width: 350px;
+      margin: 1rem auto;
+    }
+    .assess-next-steps {
+      text-align: left;
+    }
+    .assess-next-steps h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #8b5cf6;
+      margin: 1rem 0 0.5rem;
+    }
+    .assess-next-steps ol {
+      padding-left: 1.5rem;
+      margin: 0;
+    }
+    .assess-next-steps li {
+      font-size: 0.85rem;
+      margin: 0.3rem 0;
+      line-height: 1.5;
+    }
+
     @media (max-width: 768px) {
       .cards { grid-template-columns: 1fr; }
       .demo-input { flex-direction: column; }
@@ -1055,6 +1188,18 @@
       <h2>Image Generator</h2>
       <p>Enter a text prompt and select a style — the AI generates a high-quality image using gpt-image-1.</p>
       <span class="tag image">Image Generation</span>
+    </div>
+  </div>
+  <div class="card" onclick="openDemo('onprem')">
+    <div class="card-header-img onprem" id="card-header-onprem">
+      <img src="/icons/onprem.png" alt="" id="card-img-onprem">
+      <div class="card-icon onprem" id="card-emoji-onprem">🏗️</div>
+      <div class="card-gen-overlay" id="card-gen-onprem">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>On-Prem AI Readiness</h2>
+      <p>Assess your organisation's maturity for on-premise AI deployment. Interactive 6-dimension assessment with EU regulatory focus, Dell/AI Factory reference architectures, and AI-powered next steps.</p>
+      <span class="tag onprem">Infrastructure</span>
     </div>
   </div>
 </div>
@@ -1460,6 +1605,121 @@
         <h3>Generated Image <div class="output-spinner" id="image-spinner"></div></h3>
         <div id="image-output" class="output-content">
           <div class="output-placeholder">Enter a prompt and click Generate to create an image</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ON-PREM AI READINESS DEMO -->
+<div class="demo-overlay" id="demo-onprem">
+  <div class="demo-panel">
+    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
+    <h2 class="demo-title">🏗️ On-Premise AI Readiness Assessment</h2>
+    <p class="demo-desc">Score your organisation on 6 dimensions. The assessment maps your maturity level, highlights regulatory obligations (GDPR, EU AI Act, NIS2), and generates AI-powered next steps.</p>
+    <div class="demo-body">
+      <div class="demo-input" style="flex-direction:column;align-items:stretch">
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
+          <div class="input-group" style="flex:2;min-width:160px">
+            <label>Organisation</label>
+            <input type="text" id="onprem-org" placeholder="e.g. Acme Financial Services">
+          </div>
+          <div class="input-group" style="flex:1;min-width:130px">
+            <label>Sector</label>
+            <select id="onprem-sector">
+              <option value="financial">Financial Services</option>
+              <option value="healthcare">Healthcare</option>
+              <option value="public">Public Sector</option>
+              <option value="manufacturing">Manufacturing</option>
+              <option value="technology">Technology</option>
+              <option value="energy">Energy & Utilities</option>
+              <option value="retail">Retail & E-commerce</option>
+              <option value="telecom">Telecommunications</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="input-group" style="flex:1;min-width:130px">
+            <label>Employees</label>
+            <select id="onprem-size">
+              <option value="50">Under 250</option>
+              <option value="500">250-1,000</option>
+              <option value="2500">1,000-5,000</option>
+              <option value="7500">5,000-10,000</option>
+              <option value="20000">10,000+</option>
+            </select>
+          </div>
+          <div class="input-group" style="flex:1;min-width:130px">
+            <label>Annual AI Spend</label>
+            <select id="onprem-spend">
+              <option value="under500k">Under €500K</option>
+              <option value="500k-2m">€500K - €2M</option>
+              <option value="2m-5m">€2M - €5M</option>
+              <option value="5m-plus">€5M+</option>
+            </select>
+          </div>
+        </div>
+        <div class="assess-grid" id="onprem-assess-grid">
+          <div class="assess-dim">
+            <div class="assess-dim-header"><h4>D1: Strategy & Business Alignment</h4><span class="score-badge" id="badge-d1">1</span></div>
+            <p>AI strategy, executive sponsorship, use case prioritisation, value tracking</p>
+            <div class="assess-slider-row">
+              <input type="range" min="1" max="5" value="1" id="slider-d1" oninput="onpremUpdateSlider('d1')">
+            </div>
+            <div class="assess-level-labels"><span>Experimental</span><span>Emerging</span><span>Operational</span><span>Scaled</span><span>Transformative</span></div>
+          </div>
+          <div class="assess-dim">
+            <div class="assess-dim-header"><h4>D2: Data Readiness</h4><span class="score-badge" id="badge-d2">1</span></div>
+            <p>Data quality, cataloguing, pipelines, feature store, governance</p>
+            <div class="assess-slider-row">
+              <input type="range" min="1" max="5" value="1" id="slider-d2" oninput="onpremUpdateSlider('d2')">
+            </div>
+            <div class="assess-level-labels"><span>Experimental</span><span>Emerging</span><span>Operational</span><span>Scaled</span><span>Transformative</span></div>
+          </div>
+          <div class="assess-dim">
+            <div class="assess-dim-header"><h4>D3: Infrastructure & Platform</h4><span class="score-badge" id="badge-d3">1</span></div>
+            <p>GPU infrastructure, MLOps tooling, on-prem capacity, hybrid orchestration</p>
+            <div class="assess-slider-row">
+              <input type="range" min="1" max="5" value="1" id="slider-d3" oninput="onpremUpdateSlider('d3')">
+            </div>
+            <div class="assess-level-labels"><span>Experimental</span><span>Emerging</span><span>Operational</span><span>Scaled</span><span>Transformative</span></div>
+          </div>
+          <div class="assess-dim">
+            <div class="assess-dim-header"><h4>D4: Governance, Risk & Compliance</h4><span class="score-badge" id="badge-d4">1</span></div>
+            <p>AI governance, GDPR DPIAs, EU AI Act risk mapping, NIS2 compliance, model audit</p>
+            <div class="assess-slider-row">
+              <input type="range" min="1" max="5" value="1" id="slider-d4" oninput="onpremUpdateSlider('d4')">
+            </div>
+            <div class="assess-level-labels"><span>Experimental</span><span>Emerging</span><span>Operational</span><span>Scaled</span><span>Transformative</span></div>
+          </div>
+          <div class="assess-dim">
+            <div class="assess-dim-header"><h4>D5: Skills & Organisation</h4><span class="score-badge" id="badge-d5">1</span></div>
+            <p>AI team size, platform engineering, centre of excellence, training programmes</p>
+            <div class="assess-slider-row">
+              <input type="range" min="1" max="5" value="1" id="slider-d5" oninput="onpremUpdateSlider('d5')">
+            </div>
+            <div class="assess-level-labels"><span>Experimental</span><span>Emerging</span><span>Operational</span><span>Scaled</span><span>Transformative</span></div>
+          </div>
+          <div class="assess-dim">
+            <div class="assess-dim-header"><h4>D6: Operations & Lifecycle</h4><span class="score-badge" id="badge-d6">1</span></div>
+            <p>Model deployment, monitoring, drift detection, retraining, AIOps</p>
+            <div class="assess-slider-row">
+              <input type="range" min="1" max="5" value="1" id="slider-d6" oninput="onpremUpdateSlider('d6')">
+            </div>
+            <div class="assess-level-labels"><span>Experimental</span><span>Emerging</span><span>Operational</span><span>Scaled</span><span>Transformative</span></div>
+          </div>
+        </div>
+        <button class="btn btn-onprem" onclick="onpremAssess()" style="align-self:center;margin-top:0.5rem">🏗️ Assess & Generate Report</button>
+      </div>
+      <div class="demo-output">
+        <h3>Assessment Results <div class="output-spinner" id="onprem-spinner"></div></h3>
+        <div id="onprem-output" class="output-content">
+          <div class="output-placeholder">Adjust the sliders above and click Assess to generate your maturity report</div>
+        </div>
+        <div id="onprem-radar" class="chart-container single" style="display:none;max-width:400px;margin:1rem auto">
+          <div class="chart-box">
+            <h4>Maturity Radar</h4>
+            <canvas id="onprem-radar-chart"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -3479,7 +3739,7 @@ window.fetch = function(url, options = {}) {
 };
 
 // ─── ICON LOADING ───
-const ICON_DEMOS = ['rag', 'market', 'finance', 'regulatory', 'earnings', 'churn', 'rfp', 'image'];
+const ICON_DEMOS = ['rag', 'market', 'finance', 'regulatory', 'earnings', 'churn', 'rfp', 'image', 'onprem'];
 
 async function loadIcons() {
   for (const demo of ICON_DEMOS) {
@@ -3557,6 +3817,177 @@ function showIcon(demo) {
   img.classList.add('loaded');
   if (emoji) emoji.classList.add('hidden');
   if (overlay) overlay.classList.remove('active');
+}
+
+// ─── ON-PREM ASSESSMENT ───
+const ONPREM_DIMS = [
+  { id: 'd1', name: 'Strategy & Business Alignment', short: 'Strategy' },
+  { id: 'd2', name: 'Data Readiness', short: 'Data' },
+  { id: 'd3', name: 'Infrastructure & Platform', short: 'Infrastructure' },
+  { id: 'd4', name: 'Governance, Risk & Compliance', short: 'Governance' },
+  { id: 'd5', name: 'Skills & Organisation', short: 'Skills' },
+  { id: 'd6', name: 'Operations & Lifecycle', short: 'Operations' },
+];
+
+const ONPREM_LEVELS = [
+  { name: 'Experimental', range: [6, 10], color: '#f87171' },
+  { name: 'Emerging', range: [11, 15], color: '#fbbf24' },
+  { name: 'Operational', range: [16, 20], color: '#34d399' },
+  { name: 'Scaled', range: [21, 25], color: '#53d8fb' },
+  { name: 'Transformative', range: [26, 30], color: '#8b5cf6' },
+];
+
+let onpremRadarChart = null;
+
+function onpremUpdateSlider(dim) {
+  const val = document.getElementById(`slider-${dim}`).value;
+  document.getElementById(`badge-${dim}`).textContent = val;
+}
+
+function onpremGetScores() {
+  const scores = {};
+  ONPREM_DIMS.forEach(d => { scores[d.id] = parseInt(document.getElementById(`slider-${d.id}`).value); });
+  return scores;
+}
+
+function onpremGetLevel(total) {
+  for (const lvl of ONPREM_LEVELS) {
+    if (total >= lvl.range[0] && total <= lvl.range[1]) return lvl;
+  }
+  return ONPREM_LEVELS[0];
+}
+
+function onpremDrawRadar(scores) {
+  const wrap = document.getElementById('onprem-radar');
+  wrap.style.display = 'block';
+  const ctx = document.getElementById('onprem-radar-chart').getContext('2d');
+  if (onpremRadarChart) onpremRadarChart.destroy();
+
+  const labels = ONPREM_DIMS.map(d => d.short);
+  const values = ONPREM_DIMS.map(d => scores[d.id]);
+
+  onpremRadarChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Your Maturity',
+        data: values,
+        backgroundColor: 'rgba(139,92,246,0.15)',
+        borderColor: '#8b5cf6',
+        borderWidth: 2,
+        pointBackgroundColor: '#8b5cf6',
+        pointRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        r: {
+          min: 0, max: 5,
+          ticks: { stepSize: 1, color: '#8888aa', backdropColor: 'transparent', font: { size: 10 } },
+          grid: { color: '#2a2a5a' },
+          angleLines: { color: '#2a2a5a' },
+          pointLabels: { color: '#e8e8f0', font: { size: 12, weight: '600' } }
+        }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+async function onpremAssess() {
+  const scores = onpremGetScores();
+  const total = Object.values(scores).reduce((a, b) => a + b, 0);
+  const level = onpremGetLevel(total);
+  const org = document.getElementById('onprem-org').value.trim() || 'Your Organisation';
+  const sector = document.getElementById('onprem-sector').selectedOptions[0].text;
+  const size = document.getElementById('onprem-size').selectedOptions[0].text;
+  const spend = document.getElementById('onprem-spend').selectedOptions[0].text;
+
+  // Draw radar immediately
+  onpremDrawRadar(scores);
+
+  // Show immediate result card
+  const output = document.getElementById('onprem-output');
+  output.innerHTML = `
+    <div class="assess-result-card">
+      <div class="maturity-level">Level ${level.range[0] <= 10 ? 1 : level.range[0] <= 15 ? 2 : level.range[0] <= 20 ? 3 : level.range[0] <= 25 ? 4 : 5}</div>
+      <div class="maturity-name">${level.name}</div>
+      <div class="maturity-score">${total} / 30</div>
+    </div>
+    <div style="text-align:center;color:var(--text-dim);font-size:0.85rem">Generating AI-powered recommendations...</div>
+  `;
+
+  // Build prompt for LLM
+  const dimBreakdown = ONPREM_DIMS.map(d => `- ${d.name}: ${scores[d.id]}/5`).join('\n');
+  const weakDims = ONPREM_DIMS.filter(d => scores[d.id] <= 2).map(d => d.name);
+
+  const prompt = `You are an expert AI infrastructure consultant specialising in European on-premise AI deployments. Based on the following maturity assessment, provide a detailed, actionable report.
+
+**Organisation:** ${org}
+**Sector:** ${sector}
+**Size:** ${size} employees
+**Annual AI Spend:** ${spend}
+**Total Maturity Score:** ${total}/30
+**Maturity Level:** ${level.name}
+
+**Dimension Scores:**
+${dimBreakdown}
+
+${weakDims.length > 0 ? `**Weak Dimensions (≤2):** ${weakDims.join(', ')}` : '**No critically weak dimensions.**'}
+
+**European Regulatory Context:**
+- GDPR: ${sector === 'Healthcare' || sector === 'Public Sector' || sector === 'Financial Services' ? 'HIGH impact — personal data at scale, DPIA mandatory' : 'MODERATE impact — standard compliance required'}
+- EU AI Act: ${sector === 'Financial Services' || sector === 'Healthcare' || sector === 'Public Sector' ? 'HIGH — likely high-risk systems under Annex III' : 'MODERATE — depends on specific use cases'}
+- NIS2: ${sector === 'Financial Services' || sector === 'Energy & Utilities' || sector === 'Healthcare' || sector === 'Telecommunications' ? 'IN SCOPE — mandatory cybersecurity measures' : 'Check applicability — may be in scope as digital provider'}
+
+**Provide the following in your response:**
+
+1. **Executive Summary** — 2-3 sentences on current state and what it means
+
+2. **Regulatory Obligations** — Specific EU regulations that apply to this organisation's sector and AI plans, with concrete compliance actions and deadlines
+
+3. **Deployment Recommendation** — Cloud-only, hybrid, or on-prem-first? Justify based on their scores, sector, and spend. Reference Dell AI Factory with NVIDIA or Dell APEX if on-prem is recommended.
+
+4. **Next Steps (prioritised)** — 5-7 specific, actionable next steps ordered by impact and urgency. For each, specify:
+   - What to do
+   - Who should own it
+   - Approximate timeline
+   - If it addresses a weak dimension or regulatory requirement
+
+5. **Infrastructure Sizing Guidance** — Based on their spend and sector, suggest a starting GPU configuration (e.g., "2x PowerEdge XE8640 with 4x L40S each for inference, expanding to fine-tuning later")
+
+6. **Key Risks** — Top 3 risks for this maturity level and how to mitigate them
+
+Format the response with clear headers and use tables where appropriate. Be specific and practical — not generic advice. Reference specific Dell products (PowerEdge XE9680, XE8640, R760xa, PowerScale, APEX, Omnia) and NVIDIA stack (NIM, Triton, NeMo) where relevant. Use EUR for all costs.`;
+
+  const spinner = document.getElementById('onprem-spinner');
+  spinner.classList.add('active');
+
+  try {
+    const messages = [
+      { role: 'system', content: 'You are an expert AI infrastructure consultant specialising in European on-premise AI deployment. You combine deep knowledge of Dell AI infrastructure, NVIDIA AI Enterprise, EU regulations (GDPR, EU AI Act, NIS2), and industry best practices from Gartner, Forrester, IDC, and McKinsey. Be specific, practical, and European-focused. Use EUR for all costs.' },
+      { role: 'user', content: prompt }
+    ];
+
+    let fullText = '';
+    await callLLM(messages, (chunk) => {
+      fullText += chunk;
+      output.innerHTML = `
+        <div class="assess-result-card">
+          <div class="maturity-level">Level ${level.range[0] <= 10 ? 1 : level.range[0] <= 15 ? 2 : level.range[0] <= 20 ? 3 : level.range[0] <= 25 ? 4 : 5}</div>
+          <div class="maturity-name">${level.name}</div>
+          <div class="maturity-score">${total} / 30</div>
+        </div>
+        <div class="assess-next-steps">${formatMarkdown(fullText)}</div>
+      `;
+    });
+  } catch (e) {
+    output.innerHTML += `<p style="color:var(--danger);margin-top:1rem">Error: ${e.message}</p>`;
+  } finally {
+    spinner.classList.remove('active');
+  }
 }
 
 // Check auth on page load
