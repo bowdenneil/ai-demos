@@ -1055,41 +1055,17 @@
   <div class="demo-panel">
     <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
     <h2 class="demo-title">💰 Financial Analysis</h2>
-    <p class="demo-desc">Input financial data and get AI-powered analysis of performance, ratios, and investment outlook.</p>
+    <p class="demo-desc">Enter a company name — the system searches for the latest public financials and AI analyses them with live market context.</p>
     <div class="demo-body">
       <div class="demo-input">
-        <div class="input-group" style="flex:1;min-width:110px">
+        <div class="input-group" style="flex:2;min-width:180px">
           <label>Company</label>
-          <input type="text" id="fin-company" placeholder="e.g. Acme Corp">
+          <input type="text" id="fin-company" placeholder="e.g. SAP, ASML, Ryanair">
         </div>
         <div class="presets">
-          <button class="preset-btn" onclick="finPreset('tech')">💻 Tech</button>
-          <button class="preset-btn" onclick="finPreset('retail')">🛒 Retail</button>
-          <button class="preset-btn" onclick="finPreset('startup')">🚀 Startup</button>
-        </div>
-        <div class="input-group" style="flex:1;min-width:80px">
-          <label>Revenue €M</label>
-          <input type="text" id="fin-revenue" placeholder="50">
-        </div>
-        <div class="input-group" style="flex:1;min-width:80px">
-          <label>COGS €M</label>
-          <input type="text" id="fin-cogs" placeholder="30">
-        </div>
-        <div class="input-group" style="flex:1;min-width:80px">
-          <label>OpEx €M</label>
-          <input type="text" id="fin-opex" placeholder="12">
-        </div>
-        <div class="input-group" style="flex:1;min-width:80px">
-          <label>Net Income €M</label>
-          <input type="text" id="fin-net" placeholder="5">
-        </div>
-        <div class="input-group" style="flex:1;min-width:80px">
-          <label>Assets €M</label>
-          <input type="text" id="fin-assets" placeholder="80">
-        </div>
-        <div class="input-group" style="flex:1;min-width:80px">
-          <label>Liabilities €M</label>
-          <input type="text" id="fin-liabilities" placeholder="25">
+          <button class="preset-btn" onclick="document.getElementById('fin-company').value='SAP SE'">🏢 SAP</button>
+          <button class="preset-btn" onclick="document.getElementById('fin-company').value='ASML Holding'">🔬 ASML</button>
+          <button class="preset-btn" onclick="document.getElementById('fin-company').value='Ryanair'">✈️ Ryanair</button>
         </div>
         <div class="input-group" style="flex:1;min-width:130px">
           <label>Focus</label>
@@ -1105,7 +1081,7 @@
       <div class="demo-output">
         <h3>Financial Report <div class="output-spinner" id="fin-spinner"></div></h3>
         <div id="fin-output" class="output-content" style="margin-top:1rem">
-          <div class="output-placeholder">Enter financial data and click Analyse</div>
+          <div class="output-placeholder">Enter a company name and click Analyse</div>
         </div>
         <div id="fin-metrics" class="metric-grid" style="display:none"></div>
         <div id="fin-charts" class="chart-container" style="display:none">
@@ -2264,65 +2240,19 @@ function renderMarketChart(llmText) {
 }
 // ─── FINANCIAL ANALYSIS DEMO ───
 const FIN_PRESETS = {
-  tech: { company: 'TechNova Ltd', revenue: '85', cogs: '32', opex: '28', net: '18', assets: '220', liabilities: '65' },
-  retail: { company: 'EuroMart Group', revenue: '340', cogs: '245', opex: '62', net: '22', assets: '410', liabilities: '180' },
-  startup: { company: 'CloudLeap AI', revenue: '8.5', cogs: '3.2', opex: '12', net: '-6.7', assets: '15', liabilities: '4' }
+  sap: 'SAP SE',
+  asml: 'ASML Holding',
+  ryanair: 'Ryanair'
 };
 
 function finPreset(name) {
-  const p = FIN_PRESETS[name];
-  document.getElementById('fin-company').value = p.company;
-  document.getElementById('fin-revenue').value = p.revenue;
-  document.getElementById('fin-cogs').value = p.cogs;
-  document.getElementById('fin-opex').value = p.opex;
-  document.getElementById('fin-net').value = p.net;
-  document.getElementById('fin-assets').value = p.assets;
-  document.getElementById('fin-liabilities').value = p.liabilities;
+  document.getElementById('fin-company').value = FIN_PRESETS[name] || name;
 }
 
 async function finQuery() {
   const company = document.getElementById('fin-company').value.trim();
-  const revenue = parseFloat(document.getElementById('fin-revenue').value);
-  const cogs = parseFloat(document.getElementById('fin-cogs').value);
-  const opex = parseFloat(document.getElementById('fin-opex').value);
-  const net = parseFloat(document.getElementById('fin-net').value);
-  const assets = parseFloat(document.getElementById('fin-assets').value);
-  const liabilities = parseFloat(document.getElementById('fin-liabilities').value);
   const focus = document.getElementById('fin-focus').value;
-
-  if (!company || isNaN(revenue)) { showToast('Fill in company and financial data', true); return; }
-
-  // Calculate key ratios
-  const grossProfit = revenue - (cogs || 0);
-  const grossMargin = revenue > 0 ? ((grossProfit / revenue) * 100).toFixed(1) : 'N/A';
-  const netMargin = revenue > 0 ? ((net / revenue) * 100).toFixed(1) : 'N/A';
-  const opMargin = revenue > 0 ? (((revenue - (cogs || 0) - (opex || 0)) / revenue) * 100).toFixed(1) : 'N/A';
-  const debtToEquity = (assets - liabilities) > 0 ? (liabilities / (assets - liabilities)).toFixed(2) : 'N/A';
-  const roe = (assets - liabilities) > 0 ? ((net / (assets - liabilities)) * 100).toFixed(1) : 'N/A';
-
-  // Show metrics
-  const metricsEl = document.getElementById('fin-metrics');
-  metricsEl.style.display = 'grid';
-  metricsEl.innerHTML = `
-    <div class="metric-box ${grossMargin > 40 ? 'positive' : grossMargin < 20 ? 'negative' : ''}">
-      <div class="value">${grossMargin}%</div><div class="label">Gross Margin</div>
-    </div>
-    <div class="metric-box ${netMargin > 0 ? 'positive' : 'negative'}">
-      <div class="value">${netMargin}%</div><div class="label">Net Margin</div>
-    </div>
-    <div class="metric-box ${opMargin > 0 ? 'positive' : 'negative'}">
-      <div class="value">${opMargin}%</div><div class="label">Op Margin</div>
-    </div>
-    <div class="metric-box ${debtToEquity < 1 ? 'positive' : debtToEquity > 2 ? 'negative' : ''}">
-      <div class="value">${debtToEquity}x</div><div class="label">Debt/Equity</div>
-    </div>
-    <div class="metric-box ${roe > 15 ? 'positive' : roe < 0 ? 'negative' : ''}">
-      <div class="value">${roe}%</div><div class="label">ROE</div>
-    </div>
-    <div class="metric-box">
-      <div class="value">€${(revenue).toFixed(1)}M</div><div class="label">Revenue</div>
-    </div>
-  `;
+  if (!company) { showToast('Enter a company name', true); return; }
 
   const focusLabels = {
     full: 'Full Financial Health Check',
@@ -2335,45 +2265,153 @@ async function finQuery() {
   const output = document.getElementById('fin-output');
   const sourcesEl = document.getElementById('fin-sources');
   spinner.classList.add('active');
-  output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching web for market context...</span>';
+  output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)\">Searching for latest financial data...</span>';
 
-  // Search for company financial news and industry benchmarks
-  const searchQ = `${company} financial performance revenue 2025 2026 industry benchmarks`;
-  const webResults = await webSearch(searchQ);
+  // Search 1: Latest annual/quarterly financial report
+  const searchQ1 = `${company} annual report 2025 2026 revenue profit financial results`;
+  const webResults1 = await webSearch(searchQ1);
+
+  // Search 2: Key financial ratios and stock data
+  const searchQ2 = `${company} financial ratios margins ROE debt equity 2025 2026`;
+  const webResults2 = await webSearch(searchQ2);
+
+  // Merge and deduplicate
+  const allResults = [...webResults1, ...webResults2];
+  const seen = new Set();
+  const webResults = allResults.filter(r => {
+    if (seen.has(r.url)) return false;
+    seen.add(r.url);
+    return true;
+  });
+
   const webCtx = searchContext(webResults);
   renderSearchResults(webResults, 'fin-sources');
-  output.innerHTML = '<span class="typing-cursor"></span>';
+  output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)\">AI is extracting financial data from search results...</span>';
 
-  const webSection = webResults.length
-    ? `\n\nWeb Search Results (use these for industry benchmarks and recent news, cite as [web N]):\n${webCtx}`
-    : '';
+  // Step 1: Extract financial data from search results using the LLM
+  const extractMessages = [
+    { role: 'system', content: `You are a financial data extraction assistant. Given web search results about a company, extract the most recent financial figures. Return ONLY a JSON object with these fields (use the most recent annual/quarterly data available, all amounts in millions of EUR unless the company reports in another currency — in that case convert to EUR at 1.08 USD/EUR or 1.0 for EUR):
 
+{
+  "company": "Company Name",
+  "reporting_period": "FY2025" or "Q1 2026" etc,
+  "currency": "EUR" or "USD",
+  "revenue_m": 0,
+  "cogs_m": 0,
+  "opex_m": 0,
+  "net_income_m": 0,
+  "total_assets_m": 0,
+  "total_liabilities_m": 0,
+  "gross_margin_pct": 0,
+  "operating_margin_pct": 0,
+  "net_margin_pct": 0,
+  "roe_pct": 0,
+  "debt_to_equity": 0,
+  "current_ratio": 0,
+  "revenue_growth_pct": 0,
+  "stock_price": "€123.45" or null,
+  "market_cap_m": 0 or null,
+  "pe_ratio": 0 or null,
+  "free_cash_flow_m": 0 or null
+}
+
+If a field cannot be found, use 0 (not null, except for stock_price/market_cap/pe_ratio/fcf which can be null). Estimate COGS and OpEx from gross/operating margins if not directly stated. Return ONLY the JSON, no other text.` },
+    { role: 'user', content: `Company: ${company}\n\nWeb Search Results:\n${webCtx}` }
+  ];
+
+  let financialData = null;
+  try {
+    let extractText = '';
+    await callLLM(extractMessages, (text) => { extractText = text; });
+    // Parse JSON from the response
+    const jsonMatch = extractText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      financialData = JSON.parse(jsonMatch[0]);
+    }
+  } catch (e) {
+    console.warn('Financial data extraction failed:', e);
+  }
+
+  // Fallback defaults
+  if (!financialData) {
+    financialData = {
+      company, reporting_period: 'N/A', currency: 'EUR',
+      revenue_m: 0, cogs_m: 0, opex_m: 0, net_income_m: 0,
+      total_assets_m: 0, total_liabilities_m: 0,
+      gross_margin_pct: 0, operating_margin_pct: 0, net_margin_pct: 0,
+      roe_pct: 0, debt_to_equity: 0, current_ratio: 0, revenue_growth_pct: 0,
+      stock_price: null, market_cap_m: null, pe_ratio: null, free_cash_flow_m: null
+    };
+  }
+
+  // Store extracted data for chart rendering
+  window._finData = financialData;
+
+  // Show metrics from extracted data
+  const metricsEl = document.getElementById('fin-metrics');
+  metricsEl.style.display = 'grid';
+  const d = financialData;
+  metricsEl.innerHTML = `
+    <div class="metric-box ${d.gross_margin_pct > 40 ? 'positive' : d.gross_margin_pct < 20 ? 'negative' : ''}">
+      <div class="value">${d.gross_margin_pct || 'N/A'}%</div><div class="label">Gross Margin</div>
+    </div>
+    <div class="metric-box ${(d.net_margin_pct || 0) > 0 ? 'positive' : 'negative'}">
+      <div class="value">${d.net_margin_pct || 'N/A'}%</div><div class="label">Net Margin</div>
+    </div>
+    <div class="metric-box ${(d.operating_margin_pct || 0) > 0 ? 'positive' : 'negative'}">
+      <div class="value">${d.operating_margin_pct || 'N/A'}%</div><div class="label">Op Margin</div>
+    </div>
+    <div class="metric-box ${(d.debt_to_equity || 0) < 1 ? 'positive' : d.debt_to_equity > 2 ? 'negative' : ''}">
+      <div class="value">${d.debt_to_equity || 'N/A'}x</div><div class="label">Debt/Equity</div>
+    </div>
+    <div class="metric-box ${(d.roe_pct || 0) > 15 ? 'positive' : d.roe_pct < 0 ? 'negative' : ''}">
+      <div class="value">${d.roe_pct || 'N/A'}%</div><div class="label">ROE</div>
+    </div>
+    <div class="metric-box ${d.revenue_growth_pct > 10 ? 'positive' : d.revenue_growth_pct < 0 ? 'negative' : ''}">
+      <div class="value">${d.revenue_growth_pct || 'N/A'}%</div><div class="label">Revenue Growth</div>
+    </div>
+  `;
+
+  output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)\">Generating financial analysis...</span>';
+
+  // Step 2: Full LLM analysis using extracted data + web context
   const messages = [
-    { role: 'system', content: `You are a senior financial analyst. Analyse the provided financial data and give actionable insights. Use EUR for all figures. Be specific with recommendations. When web search results are provided, use them for industry benchmarks, recent news, and market context. Format with markdown headers, bullets, and bold highlights. Highlight risks in red and opportunities in green context.` },
-    { role: 'user', content: `Analyse ${company} — ${focusLabels[focus]}
+    { role: 'system', content: `You are a senior financial analyst. Analyse the provided financial data and give actionable insights. Use the company's reporting currency (convert to EUR if needed at 1 USD = 0.92 EUR). Be specific with recommendations. When web search results are provided, use them for industry benchmarks, recent news, and market context. Format with markdown headers, bullets, bold highlights, and tables where appropriate. Include a SWOT analysis section.` },
+    { role: 'user', content: `Analyse ${d.company} — ${focusLabels[focus]}
 
-Financial Data (€M):
-- Revenue: €${revenue}M
-- Cost of Goods Sold: €${cogs || 0}M
-- Operating Expenses: €${opex || 0}M
-- Net Income: €${net}M
-- Total Assets: €${assets || 0}M
-- Total Liabilities: €${liabilities || 0}M
+Reporting Period: ${d.reporting_period}
+Currency: ${d.currency}
+
+Financial Data (€M unless noted):
+- Revenue: €${d.revenue_m}M
+- Cost of Goods Sold: €${d.cogs_m}M
+- Operating Expenses: €${d.opex_m}M
+- Net Income: €${d.net_income_m}M
+- Total Assets: €${d.total_assets_m}M
+- Total Liabilities: €${d.total_liabilities_m}M
+- Free Cash Flow: €${d.free_cash_flow_m || 'N/A'}M
 
 Key Ratios:
-- Gross Margin: ${grossMargin}%
-- Net Margin: ${netMargin}%
-- Operating Margin: ${opMargin}%
-- Debt-to-Equity: ${debtToEquity}x
-- ROE: ${roe}%
+- Gross Margin: ${d.gross_margin_pct}%
+- Operating Margin: ${d.operating_margin_pct}%
+- Net Margin: ${d.net_margin_pct}%
+- Debt-to-Equity: ${d.debt_to_equity}x
+- ROE: ${d.roe_pct}%
+- Current Ratio: ${d.current_ratio}
+- Revenue Growth: ${d.revenue_growth_pct}%
+${d.stock_price ? `- Stock Price: ${d.stock_price}` : ''}
+${d.market_cap_m ? `- Market Cap: €${d.market_cap_m}M` : ''}
+${d.pe_ratio ? `- P/E Ratio: ${d.pe_ratio}` : ''}
 
 Provide:
 1. Executive Summary
 2. Financial Health Assessment
-3. Key Strengths & Concerns
+3. SWOT Analysis
 4. Comparison to industry benchmarks
 5. Strategic recommendations
-6. Risk factors${webSection}` }
+6. Risk factors
+
+${webResults.length ? `\nWeb Search Results (use for benchmarks, recent news, market context, cite as [web N]):\n${webCtx}` : ''}` }
   ];
 
   try {
@@ -2400,24 +2438,16 @@ function renderFinCharts(llmText) {
   const container = document.getElementById('fin-charts');
   container.style.display = 'block';
 
-  const revenue = parseFloat(document.getElementById('fin-revenue').value) || 0;
-  const cogs = parseFloat(document.getElementById('fin-cogs').value) || 0;
-  const opex = parseFloat(document.getElementById('fin-opex').value) || 0;
-  const net = parseFloat(document.getElementById('fin-net').value) || 0;
+  // Use extracted financial data (from LLM data extraction step)
+  const d = window._finData || {};
+  const revenue = d.revenue_m || 0;
+  const cogs = d.cogs_m || 0;
+  const opex = d.opex_m || 0;
+  const net = d.net_income_m || 0;
 
-  let grossMargin = revenue > 0 ? ((revenue - cogs) / revenue * 100) : 0;
-  let opMargin = revenue > 0 ? ((revenue - cogs - opex) / revenue * 100) : 0;
-  let netMargin = revenue > 0 ? (net / revenue * 100) : 0;
-
-  // --- Parse LLM output for margin data ---
-  if (llmText) {
-    const gmMatch = llmText.match(/Gross\s*Margin[:\s]+(\d+(?:\.\d+)?)\s*%/i);
-    const omMatch = llmText.match(/Operating\s*Margin[:\s]+(\d+(?:\.\d+)?)\s*%/i);
-    const nmMatch = llmText.match(/Net\s*Margin[:\s]+(\d+(?:\.\d+)?)\s*%/i);
-    if (gmMatch) grossMargin = parseFloat(gmMatch[1]);
-    if (omMatch) opMargin = parseFloat(omMatch[1]);
-    if (nmMatch) netMargin = parseFloat(nmMatch[1]);
-  }
+  let grossMargin = d.gross_margin_pct || (revenue > 0 ? ((revenue - cogs) / revenue * 100) : 0);
+  let opMargin = d.operating_margin_pct || (revenue > 0 ? ((revenue - cogs - opex) / revenue * 100) : 0);
+  let netMargin = d.net_margin_pct || (revenue > 0 ? (net / revenue * 100) : 0);
 
   // Revenue & Profit Bar Chart
   if (window.finRevenueChart) window.finRevenueChart.destroy();
