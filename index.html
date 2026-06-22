@@ -413,10 +413,127 @@
       margin-bottom: 0.5rem;
       font-weight: 500;
     }
+    /* LOGIN OVERLAY */
+    .login-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    .login-overlay.hidden { display: none; }
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .login-card h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+    .login-card > p {
+      color: var(--text-dim);
+      margin-bottom: 1.5rem;
+    }
+    .login-field {
+      text-align: left;
+      margin-bottom: 1rem;
+    }
+    .login-field label {
+      display: block;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      margin-bottom: 0.3rem;
+    }
+    .login-field input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+    .login-field input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .login-error {
+      color: var(--danger);
+      font-size: 0.85rem;
+      min-height: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .btn-login {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-login:hover { opacity: 0.9; }
+    .btn-login:disabled { opacity: 0.5; cursor: not-allowed; }
+    .login-footer {
+      margin-top: 1.5rem;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+    }
+    .login-footer a { color: var(--accent); text-decoration: none; }
+    /* SIGN OUT BUTTON */
+    .btn-signout {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-signout:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
+<div id="login-overlay" class="login-overlay">
+  <div class="login-card">
+    <h1>⚡ AI Solutions Demo</h1>
+    <p>Sign in to access the demo portal</p>
+    <form id="login-form" onsubmit="handleLogin(event)">
+      <div class="login-field">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="your@email.com" required>
+      </div>
+      <div class="login-field">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="Enter password" required>
+      </div>
+      <div id="login-error" class="login-error"></div>
+      <button type="submit" class="btn btn-login">Sign In</button>
+    </form>
+    <p class="login-footer">Powered by <a href="https://tensorx.ai" target="_blank">Tensorx</a></p>
+  </div>
+</div>
 
 <div class="header">
   <h1>⚡ AI Solutions Demo</h1>
@@ -425,6 +542,7 @@
     <div class="api-status" id="apiStatus"></div>
     <input type="password" id="apiKeyInput" placeholder="Enter your API key (OpenAI-compatible endpoint)">
     <button class="btn btn-secondary" onclick="saveApiKey()" style="margin-top:0">Connect</button>
+    <button class="btn-signout" onclick="handleLogout()">Sign Out</button>
   </div>
 </div>
 
@@ -2052,6 +2170,95 @@ Tone: ${tone}. Be specific and reference our differentiators throughout.` }
   }
   spinner.classList.remove('active');
 }
+
+// ─── AUTH ───
+const AUTH_TOKEN_KEY = 'ai_demo_token';
+
+async function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errorEl = document.getElementById('login-error');
+  const btn = e.target.querySelector('button');
+  
+  errorEl.textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'Signing in...';
+  
+  try {
+    const resp = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email, password})
+    });
+    const data = await resp.json();
+    if (data.success) {
+      localStorage.setItem(AUTH_TOKEN_KEY, data.token);
+      document.getElementById('login-overlay').classList.add('hidden');
+    } else {
+      errorEl.textContent = data.error || 'Login failed';
+    }
+  } catch(err) {
+    errorEl.textContent = 'Connection error';
+  }
+  
+  btn.disabled = false;
+  btn.textContent = 'Sign In';
+}
+
+async function checkAuth() {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  if (!token) {
+    document.getElementById('login-overlay').classList.remove('hidden');
+    return false;
+  }
+  try {
+    const resp = await fetch('/api/auth/check', {
+      headers: {'Authorization': 'Bearer ' + token}
+    });
+    const data = await resp.json();
+    if (data.authenticated) {
+      document.getElementById('login-overlay').classList.add('hidden');
+      return true;
+    }
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    document.getElementById('login-overlay').classList.remove('hidden');
+    return false;
+  } catch {
+    document.getElementById('login-overlay').classList.remove('hidden');
+    return false;
+  }
+}
+
+async function handleLogout() {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  if (token) {
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      headers: {'Authorization': 'Bearer ' + token}
+    });
+  }
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+  document.getElementById('login-overlay').classList.remove('hidden');
+}
+
+// Add auth header to all API calls
+const originalFetch = window.fetch;
+window.fetch = function(url, options = {}) {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  if (token && typeof url === 'string' && url.startsWith('/api/')) {
+    options.headers = options.headers || {};
+    if (options.headers instanceof Headers) {
+      options.headers.set('Authorization', 'Bearer ' + token);
+    } else {
+      options.headers['Authorization'] = 'Bearer ' + token;
+    }
+  }
+  return originalFetch(url, options);
+};
+
+// Check auth on page load
+checkAuth();
 
 // ─── KEY INPUT: Enter to submit ───
 document.getElementById('rag-question').addEventListener('keydown', e => { if (e.key === 'Enter') ragQuery(); });
