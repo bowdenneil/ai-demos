@@ -3375,6 +3375,16 @@ function guestLogin() {
 // ─── AUTH ───
 const AUTH_TOKEN_KEY = 'ai_demo_token';
 
+function applyGuestRestrictions(email) {
+  const sel = document.getElementById('modelSelect');
+  if (!sel) return;
+  if (email === 'guest@aidemos.com') {
+    sel.style.display = 'none';
+  } else {
+    sel.style.display = '';
+  }
+}
+
 async function handleLogin(e) {
   e.preventDefault();
   const email = document.getElementById('login-email').value.trim();
@@ -3395,7 +3405,9 @@ async function handleLogin(e) {
     const data = await resp.json();
     if (data.success) {
       localStorage.setItem(AUTH_TOKEN_KEY, data.token);
+      localStorage.setItem('ai_demo_email', email);
       document.getElementById('login-overlay').classList.add('hidden');
+      applyGuestRestrictions(email);
     } else {
       errorEl.textContent = data.error || 'Login failed';
     }
@@ -3420,6 +3432,10 @@ async function checkAuth() {
     const data = await resp.json();
     if (data.authenticated) {
       document.getElementById('login-overlay').classList.add('hidden');
+      if (data.email) {
+        localStorage.setItem('ai_demo_email', data.email);
+        applyGuestRestrictions(data.email);
+      }
       return true;
     }
     localStorage.removeItem(AUTH_TOKEN_KEY);
@@ -3440,6 +3456,9 @@ async function handleLogout() {
     });
   }
   localStorage.removeItem(AUTH_TOKEN_KEY);
+  localStorage.removeItem('ai_demo_email');
+  const sel = document.getElementById('modelSelect');
+  if (sel) sel.style.display = '';
   document.getElementById('login-overlay').classList.remove('hidden');
 }
 
