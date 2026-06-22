@@ -386,19 +386,19 @@
   <div class="card" onclick="openDemo('rag')">
     <div class="card-icon rag">📚</div>
     <h2>Retrieval-Augmented Generation</h2>
-    <p>Upload documents and ask questions — the AI retrieves relevant context and generates grounded answers with source citations.</p>
+    <p>Upload documents and ask questions — the AI retrieves relevant context from your docs and the web, generating grounded answers with source citations.</p>
     <span class="tag rag">Knowledge Base</span>
   </div>
   <div class="card" onclick="openDemo('market')">
     <div class="card-icon market">📊</div>
     <h2>Market Research</h2>
-    <p>Analyse competitors, market trends, and industry dynamics. Get structured reports with SWOT analysis and strategic recommendations.</p>
+    <p>Analyse competitors, market trends, and industry dynamics with live web data. Get structured reports with SWOT analysis and strategic recommendations.</p>
     <span class="tag market">Competitive Intel</span>
   </div>
   <div class="card" onclick="openDemo('finance')">
     <div class="card-icon finance">💰</div>
     <h2>Financial Analysis</h2>
-    <p>Process financial data, calculate key ratios, and generate investment insights. AI-powered analysis of revenue, margins, and valuation.</p>
+    <p>Process financial data, fetch live market context, and generate investment insights. AI-powered analysis of revenue, margins, and valuation.</p>
     <span class="tag finance">Investment Intel</span>
   </div>
 </div>
@@ -425,10 +425,14 @@
         <div id="rag-docs-list"></div>
         <label>Ask a Question</label>
         <input type="text" id="rag-question" placeholder="e.g. What are the key deliverables for Q3?">
+        <label style="display:flex;align-items:center;gap:0.5rem;margin-top:0.5rem;cursor:pointer">
+          <input type="checkbox" id="rag-web-search" checked style="width:auto;margin:0"> 🌐 Supplement with web search
+        </label>
         <button class="btn btn-rag" onclick="ragQuery()">🔍 Search & Answer</button>
       </div>
       <div class="demo-output">
         <h3>AI Response <div class="output-spinner" id="rag-spinner"></div></h3>
+        <div id="rag-sources"></div>
         <div id="rag-output" class="output-content">
           <div class="output-placeholder">Add documents and ask a question to see RAG in action</div>
         </div>
@@ -468,6 +472,7 @@
       </div>
       <div class="demo-output">
         <h3>Market Analysis <div class="output-spinner" id="market-spinner"></div></h3>
+        <div id="market-sources"></div>
         <div id="market-output" class="output-content">
           <div class="output-placeholder">Configure parameters and generate an analysis</div>
         </div>
@@ -515,6 +520,7 @@
       </div>
       <div class="demo-output">
         <h3>Financial Report <div class="output-spinner" id="fin-spinner"></div></h3>
+        <div id="fin-sources"></div>
         <div id="fin-metrics" class="metric-grid" style="display:none"></div>
         <div id="fin-output" class="output-content" style="margin-top:1rem">
           <div class="output-placeholder">Enter financial data and click Analyse</div>
@@ -532,12 +538,16 @@
 
 <script>
 // ─── API CONFIG ───
-let API_KEY="local-auto";  // server proxy handles auth
+let API_KEY=***  // server proxy handles auth
 // Use local proxy if served from localhost, otherwise direct API
 let API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? window.location.origin + '/api'   // local proxy — no CORS issues
   : 'https://api.tensorx.ai/v1';     // direct — may have CORS issues on errors
 let MODEL = 'z-ai/glm-5.2';
+let SEARCH_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? window.location.origin + '/api/search'   // local proxy
+  : 'https://api.search.brave.com/res/v1/web/search';  // direct
+let BRAVE_KEY = '';  // only needed for non-localhost (GitHub Pages)
 
 const statusDot = document.getElementById('apiStatus');
 const keyInput = document.getElementById('apiKeyInput');
@@ -641,6 +651,49 @@ async function callLLM(messages, onChunk) {
       console.warn('Streaming failed, trying non-streaming:', e);
     }
   }
+}
+
+// ─── WEB SEARCH ───
+async function webSearch(query, count = 8) {
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  let url;
+  const headers = {};
+
+  if (isLocal) {
+    // Local proxy handles auth
+    url = `${SEARCH_BASE}?q=${encodeURIComponent(query)}&count=${count}`;
+  } else {
+    // Direct Brave API (GitHub Pages) — needs key
+    if (!BRAVE_KEY) { console.warn('Brave key not set — skipping web search'); return []; }
+    url = `${SEARCH_BASE}?q=${encodeURIComponent(query)}&count=${count}`;
+    headers['X-Subscription-Token'] = BRAVE_KEY;
+  }
+
+  try {
+    const res = await fetch(url, { headers });
+    if (!res.ok) { console.warn('Search failed:', res.status); return []; }
+    const data = await res.json();
+    return (data.web?.results || []).map(r => ({
+      title: r.title,
+      url: r.url,
+      description: r.description || ''
+    }));
+  } catch (e) {
+    console.warn('Search error:', e);
+    return [];
+  }
+}
+
+function renderSearchResults(results, containerId) {
+  const el = document.getElementById(containerId);
+  if (!results.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-dim);margin-bottom:0.5rem">🌐 Web Sources Used</div>' +
+    results.map(r => `<div class="source-doc"><a href="${r.url}" target="_blank" style="color:var(--accent);font-weight:600;font-size:0.85rem">${r.title}</a><div style="color:var(--text-dim);font-size:0.8rem;margin-top:0.25rem">${r.description.slice(0,150)}</div></div>`).join('');
+}
+
+function searchContext(results) {
+  // Format search results as context for the LLM
+  return results.map((r, i) => `[${i+1}] ${r.title}\n${r.description}`).join('\n\n');
 }
 
 // ─── UI HELPERS ───
@@ -795,15 +848,37 @@ async function ragQuery() {
 
   const spinner = document.getElementById('rag-spinner');
   const output = document.getElementById('rag-output');
+  const sourcesEl = document.getElementById('rag-sources');
+  const useWeb = document.getElementById('rag-web-search').checked;
   spinner.classList.add('active');
   output.innerHTML = '<span class="typing-cursor"></span>';
 
   // Simple retrieval: include all docs as context (for demo — real RAG would use embeddings)
   const context = ragDocs.map(d => `--- ${d.title} ---\n${d.content}`).join('\n\n');
 
+  // Optionally supplement with web search
+  let webResults = [];
+  let webCtx = '';
+  if (useWeb) {
+    output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching web...</span>';
+    webResults = await webSearch(question);
+    webCtx = searchContext(webResults);
+    renderSearchResults(webResults, 'rag-sources');
+  } else {
+    sourcesEl.innerHTML = '';
+  }
+
+  const sysPrompt = webResults.length
+    ? `You are a RAG assistant. Answer questions based on the provided documents AND web search results. Prioritise information from the uploaded documents, and use web results to supplement or update where needed. Cite which source (document name or [web N]) your answer comes from. Format with markdown headers and bullet points.`
+    : `You are a RAG assistant. Answer questions based ONLY on the provided documents. Cite which document and section your answer comes from. If the answer is not in the documents, say so clearly. Format with markdown headers and bullet points.`;
+
+  const userContent = webResults.length
+    ? `Documents:\n${context}\n\nWeb Search Results:\n${webCtx}\n\nQuestion: ${question}`
+    : `Documents:\n${context}\n\nQuestion: ${question}`;
+
   const messages = [
-    { role: 'system', content: `You are a RAG assistant. Answer questions based ONLY on the provided documents. Cite which document and section your answer comes from. If the answer is not in the documents, say so clearly. Format with markdown headers and bullet points.` },
-    { role: 'user', content: `Documents:\n${context}\n\nQuestion: ${question}` }
+    { role: 'system', content: sysPrompt },
+    { role: 'user', content: userContent }
   ];
 
   try {
@@ -848,12 +923,24 @@ async function marketQuery() {
 
   const spinner = document.getElementById('market-spinner');
   const output = document.getElementById('market-output');
+  const sourcesEl = document.getElementById('market-sources');
   spinner.classList.add('active');
+  output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching web for latest data...</span>';
+
+  // Search for company + industry data
+  const searchQ = `${company} ${industry} ${typeLabels[type].toLowerCase()} 2025 2026`;
+  const webResults = await webSearch(searchQ);
+  const webCtx = searchContext(webResults);
+  renderSearchResults(webResults, 'market-sources');
   output.innerHTML = '<span class="typing-cursor"></span>';
 
+  const webSection = webResults.length
+    ? `\n\nWeb Search Results (use these for current data and cite as [web N]):\n${webCtx}`
+    : '';
+
   const messages = [
-    { role: 'system', content: `You are a senior market research analyst at a top strategy consultancy. Produce detailed, structured analysis with specific data points, estimates, and strategic recommendations. Use EUR for all financial figures. Be specific, not generic. Format with markdown headers, bullets, and bold highlights.` },
-    { role: 'user', content: `Produce a ${typeLabels[type]} for ${company} in the ${industry} market.${context ? ' Additional context: ' + context : ''}
+    { role: 'system', content: `You are a senior market research analyst at a top strategy consultancy. Produce detailed, structured analysis with specific data points, estimates, and strategic recommendations. Use EUR for all financial figures. Be specific, not generic. When web search results are provided, use them for current data and cite sources. Format with markdown headers, bullets, and bold highlights.` },
+    { role: 'user', content: `Produce a ${typeLabels[type]} for ${company} in the ${industry} market.${context ? ' Additional context: ' + context : ''}${webSection}
 
 Structure the analysis with:
 1. Executive Summary
@@ -948,11 +1035,23 @@ async function finQuery() {
 
   const spinner = document.getElementById('fin-spinner');
   const output = document.getElementById('fin-output');
+  const sourcesEl = document.getElementById('fin-sources');
   spinner.classList.add('active');
+  output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching web for market context...</span>';
+
+  // Search for company financial news and industry benchmarks
+  const searchQ = `${company} financial performance revenue 2025 2026 industry benchmarks`;
+  const webResults = await webSearch(searchQ);
+  const webCtx = searchContext(webResults);
+  renderSearchResults(webResults, 'fin-sources');
   output.innerHTML = '<span class="typing-cursor"></span>';
 
+  const webSection = webResults.length
+    ? `\n\nWeb Search Results (use these for industry benchmarks and recent news, cite as [web N]):\n${webCtx}`
+    : '';
+
   const messages = [
-    { role: 'system', content: `You are a senior financial analyst. Analyse the provided financial data and give actionable insights. Use EUR for all figures. Be specific with recommendations. Format with markdown headers, bullets, and bold highlights. Highlight risks in red and opportunities in green context.` },
+    { role: 'system', content: `You are a senior financial analyst. Analyse the provided financial data and give actionable insights. Use EUR for all figures. Be specific with recommendations. When web search results are provided, use them for industry benchmarks, recent news, and market context. Format with markdown headers, bullets, and bold highlights. Highlight risks in red and opportunities in green context.` },
     { role: 'user', content: `Analyse ${company} — ${focusLabels[focus]}
 
 Financial Data (€M):
@@ -976,7 +1075,7 @@ Provide:
 3. Key Strengths & Concerns
 4. Comparison to industry benchmarks
 5. Strategic recommendations
-6. Risk factors` }
+6. Risk factors${webSection}` }
   ];
 
   try {

@@ -16,6 +16,7 @@ from pathlib import Path
 
 API_BASE = 'https://api.tensorx.ai/v1'
 API_KEY = os.environ.get('TENSORX_API_KEY', '') or os.environ.get('TENSORIX_API_KEY', '') or 'sk-9ub...XReg'
+BRAVE_KEY = os.environ.get('BRAVE_SEARCH_KEY', '') or 'BSAezzPy7F1dgfj5TSSTQRWve35pO8H'
 
 class DemoHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -33,9 +34,12 @@ class DemoHandler(http.server.SimpleHTTPRequestHandler):
             self.send_error(404)
 
     def do_GET(self):
-        if self.path == '/api/models':
+        path = self.path.split('?')[0]
+        if self.path.startswith('/api/search'):
+            self.handle_search()
+        elif self.path == '/api/models':
             self.handle_proxy_get()
-        elif self.path.split('?')[0] in ('/', '/index.html'):
+        elif path in ('/', '/index.html'):
             self.serve_index()
         else:
             super().do_GET()
@@ -48,7 +52,7 @@ class DemoHandler(http.server.SimpleHTTPRequestHandler):
         # On localhost, the server proxy handles auth — just give JS a truthy key
         # and fix the broken line where patch redacted 'val' to '***'
         html = re.sub(
-            r'let API_KEY=.*?;.*?// server proxy handles auth',
+            r'let API_KEY=.*?// server proxy handles auth',
             'let API_KEY="server-proxied";  // auth handled by localhost proxy',
             html
         )
@@ -125,6 +129,55 @@ class DemoHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(error_body)
 
+        except Exception as e:
+            self.send_response(502)
+            self.send_cors_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps({'error': str(e)}).encode())
+
+    def handle_search(self):
+        """Proxy Brave Search API requests."""
+        from urllib.parse import urlparse, parse_qs
+        parsed = urlparse(self.path)
+        params = parse_qs(parsed.query)
+        query = params.get('q', [''])[0]
+        count = min(int(params.get('count', ['8'])[0]), 20)
+
+        if not query:
+            self.send_response(400)
+            self.send_cors_headers()
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({'error': 'Missing q parameter'}).encode())
+            return
+
+        if not BRAVE_KEY:
+            self.send_response(503)
+            self.send_cors_headers()
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({'error': 'No Brave API key configured'}).encode())
+            return
+
+        target = f'https://api.search.brave.com/res/v1/web/search?q={urllib.parse.quote(query)}&count={count}'
+        try:
+            req = urllib.request.Request(target, headers={
+                'Accept': 'application/json',
+                'X-Subscription-Token': BRAVE_KEY
+            })
+            resp = urllib.request.urlopen(req, timeout=15)
+            data = resp.read()
+            self.send_response(200)
+            self.send_cors_headers()
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(data)
+        except urllib.error.HTTPError as e:
+            self.send_response(e.code)
+            self.send_cors_headers()
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(e.read())
         except Exception as e:
             self.send_response(502)
             self.send_cors_headers()
