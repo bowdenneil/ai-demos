@@ -1028,12 +1028,13 @@
       font-size: 0.88rem;
       line-height: 1.7;
       max-width: 72ch;
+    .assess-report { font-size: 0.88rem; line-height: 1.7; max-width: 72ch; }
+    .assess-report h1, .assess-report h2, .assess-report h3,
+    .assess-report .md-h1, .assess-report .md-h2, .assess-report .md-h3 {
+      color: var(--text); margin-top: 1.5rem; margin-bottom: 0.5rem; font-weight: 600;
     }
-    .assess-report h1, .assess-report h2, .assess-report h3 {
-      color: var(--text); margin-top: 1.5rem; margin-bottom: 0.5rem;
-    }
-    .assess-report h2 { font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35rem; }
-    .assess-report h3 { font-size: 1rem; }
+    .assess-report h2, .assess-report .md-h2 { font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35rem; }
+    .assess-report h3, .assess-report .md-h3 { font-size: 1rem; }
     .assess-report ul, .assess-report ol { padding-left: 1.25rem; margin: 0.5rem 0; }
     .assess-report li { margin: 0.3rem 0; }
     .assess-report strong { color: #a78bfa; }
@@ -4078,7 +4079,7 @@ async function onpremAssess() {
   // Draw radar immediately
   onpremDrawRadar(scores);
 
-  // Show result header with gauge + scorecards
+  // Show result header with gauge + scorecards (rendered once)
   const output = document.getElementById('onprem-output');
   output.innerHTML = `
     <div class="assess-result-header">
@@ -4089,7 +4090,9 @@ async function onpremAssess() {
       </div>
     </div>
     ${onpremDrawDimScorecards(scores)}
-    <div style="text-align:center;color:var(--text-dim);font-size:0.85rem;margin-top:0.75rem">Researching ${org !== 'Your Organisation' ? org : sector + ' sector'}...</div>
+    <div id="onprem-report" class="assess-report" style="margin-top:1rem">
+      <div style="text-align:center;color:var(--text-dim);font-size:0.85rem">Generating report...</div>
+    </div>
   `;
 
   // Build prompt for LLM
@@ -4167,19 +4170,11 @@ Keep the report under 800 words. Write with authority and specificity — no fil
     ];
 
     let fullText = '';
+    // Only update the report div during streaming — don't re-render gauge/scorecards
     await callLLM(messages, (chunk) => {
       fullText += chunk;
-      output.innerHTML = `
-        <div class="assess-result-header">
-          ${onpremDrawGauge(total)}
-          <div class="assess-result-meta">
-            <div class="maturity-name">Level ${lvlNum}: ${level.name}</div>
-            <div class="maturity-subtitle">${org} — ${sector}</div>
-          </div>
-        </div>
-        ${onpremDrawDimScorecards(scores)}
-        <div class="assess-report" style="margin-top:1rem">${formatMarkdown(fullText)}</div>
-      `;
+      const reportDiv = document.getElementById('onprem-report');
+      if (reportDiv) reportDiv.innerHTML = formatMarkdown(fullText) + '<span class="typing-cursor"></span>';
     });
   } catch (e) {
     output.innerHTML += `<p style="color:var(--danger);margin-top:1rem">Error: ${e.message}</p>`;
