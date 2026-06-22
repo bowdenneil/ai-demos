@@ -99,7 +99,8 @@
       transition: background 0.3s;
     }
     .api-status.connected { background: var(--success); }
-    /* CARDS */
+
+    /* CARDS — Modern Stripe/Linear style with header images */
     .cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
@@ -112,7 +113,6 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 2rem;
       cursor: pointer;
       transition: all 0.3s ease;
       position: relative;
@@ -123,6 +123,31 @@
       transform: translateY(-4px);
       box-shadow: 0 8px 32px rgba(83,216,251,0.1);
     }
+    .card-header-img {
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-header-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      inset: 0;
+      display: none;
+    }
+    .card-header-img img.loaded { display: block; }
+    .card-header-img img.loaded ~ .card-icon { display: none; }
+    .card-header-img.rag { background: linear-gradient(135deg, rgba(83,216,251,0.12) 0%, rgba(83,216,251,0.04) 100%); }
+    .card-header-img.market { background: linear-gradient(135deg, rgba(124,92,252,0.12) 0%, rgba(124,92,252,0.04) 100%); }
+    .card-header-img.finance { background: linear-gradient(135deg, rgba(249,83,186,0.12) 0%, rgba(249,83,186,0.04) 100%); }
+    .card-header-img.regulatory { background: linear-gradient(135deg, rgba(52,211,153,0.12) 0%, rgba(52,211,153,0.04) 100%); }
+    .card-header-img.earnings { background: linear-gradient(135deg, rgba(251,191,36,0.12) 0%, rgba(251,191,36,0.04) 100%); }
+    .card-header-img.churn { background: linear-gradient(135deg, rgba(249,115,22,0.12) 0%, rgba(249,115,22,0.04) 100%); }
+    .card-header-img.rfp { background: linear-gradient(135deg, rgba(6,182,212,0.12) 0%, rgba(6,182,212,0.04) 100%); }
     .card-icon {
       width: 56px; height: 56px;
       border-radius: 14px;
@@ -130,7 +155,8 @@
       align-items: center;
       justify-content: center;
       font-size: 1.8rem;
-      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
     }
     .card-icon.rag { background: rgba(83,216,251,0.15); }
     .card-icon.market { background: rgba(124,92,252,0.15); }
@@ -139,8 +165,12 @@
     .card-icon.earnings { background: rgba(251,191,36,0.15); }
     .card-icon.churn { background: rgba(249,115,22,0.15); }
     .card-icon.rfp { background: rgba(6,182,212,0.15); }
-    .card h2 { font-size: 1.3rem; margin-bottom: 0.5rem; }
-    .card p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; }
+    .card-icon.hidden { display: none; }
+    .card-body {
+      padding: 1.5rem;
+    }
+    .card-body h2 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+    .card-body p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; }
     .card .tag {
       display: inline-block;
       margin-top: 1rem;
@@ -156,6 +186,22 @@
     .tag.earnings { background: rgba(251,191,36,0.15); color: var(--accent5); }
     .tag.churn { background: rgba(249,115,22,0.15); color: var(--accent6); }
     .tag.rfp { background: rgba(6,182,212,0.15); color: var(--accent7); }
+    /* Icon generating overlay */
+    .card-gen-overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10,10,26,0.7);
+      color: var(--accent);
+      font-size: 0.9rem;
+      backdrop-filter: blur(2px);
+      z-index: 5;
+      letter-spacing: 0.02em;
+    }
+    .card-gen-overlay.active { display: flex; }
+
     /* DEMO PANEL */
     .demo-overlay {
       display: none;
@@ -172,6 +218,8 @@
       max-width: 1100px;
       min-height: 100vh;
       padding: 2rem;
+      display: flex;
+      flex-direction: column;
     }
     .demo-back {
       display: inline-flex;
@@ -191,31 +239,172 @@
       font-weight: 700;
       margin: 1rem 0 0.5rem;
     }
-    .demo-desc { color: var(--text-dim); margin-bottom: 1.5rem; }
-    .demo-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
+    .demo-desc { color: var(--text-dim); margin-bottom: 1rem; }
+
+    /* Demo body: input strip on top, output below */
+    .demo-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      flex: 1;
     }
-    @media (max-width: 768px) {
-      .demo-layout { grid-template-columns: 1fr; }
-      .cards { grid-template-columns: 1fr; }
+
+    /* Input strip — horizontal toolbar */
+    .demo-input {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      border-bottom: 2px solid var(--border);
     }
-    .demo-input, .demo-output {
+    .demo-input h3 {
+      display: none; /* hide the section headers in compact mode */
+    }
+
+    /* Input groups — compact inline */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 100px;
+      flex: 1;
+    }
+    .input-group label {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      font-weight: 500;
+    }
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+      width: 100%;
+    }
+
+    /* Compact inputs inside demo-input */
+    .demo-input textarea,
+    .demo-input input[type="text"],
+    .demo-input input[type="number"],
+    .demo-input select {
+      padding: 0.45rem 0.7rem;
+      font-size: 0.85rem;
+      min-width: 80px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      font-family: var(--font);
+    }
+    .demo-input textarea {
+      min-height: 38px;
+      max-height: 60px;
+      resize: none;
+    }
+    .demo-input textarea:focus,
+    .demo-input input:focus,
+    .demo-input select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* Presets — inline */
+    .demo-input .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      align-self: flex-end;
+    }
+    .preset-btn {
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .preset-btn:hover { color: var(--text); border-color: var(--text-dim); }
+
+    /* Inline docs list for RAG */
+    .docs-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      align-self: flex-end;
+    }
+    .doc-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      background: rgba(83,216,251,0.1);
+      border: 1px solid rgba(83,216,251,0.2);
+      font-size: 0.75rem;
+      color: var(--accent);
+    }
+    .doc-tag button {
+      background: none;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 0.7rem;
+      padding: 0;
+    }
+
+    /* Toggle label for checkboxes */
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      align-self: flex-end;
+      padding-bottom: 0.15rem;
+    }
+    .toggle-label input { width: auto; margin: 0; }
+
+    /* Buttons in input strip */
+    .demo-input .btn {
+      margin-top: 0;
+      align-self: flex-end;
+      white-space: nowrap;
+    }
+    .btn-sm {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+    }
+
+    /* Output area — full width, expandable */
+    .demo-output {
+      flex: 1;
+      min-height: 500px;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 1.5rem;
+      position: relative;
+      overflow-y: auto;
     }
-    .demo-input h3, .demo-output h3 {
+    .demo-output h3 {
       font-size: 0.85rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       color: var(--text-dim);
       margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
-    .demo-output { position: relative; }
-    .demo-output h3 { display: flex; align-items: center; gap: 0.5rem; }
     .output-spinner {
       width: 14px; height: 14px;
       border: 2px solid var(--border);
@@ -226,6 +415,8 @@
     }
     .output-spinner.active { display: block; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* General label/input styles (for non-compact contexts) */
     label {
       display: block;
       font-size: 0.85rem;
@@ -250,6 +441,8 @@
       outline: none;
       border-color: var(--accent);
     }
+
+    /* Buttons */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -284,28 +477,12 @@
       border: 1px solid var(--border);
     }
     .btn-secondary:hover:not(:disabled) { color: var(--text); border-color: var(--text-dim); }
-    .presets {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
-    .preset-btn {
-      padding: 0.3rem 0.7rem;
-      border-radius: 6px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text-dim);
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .preset-btn:hover { color: var(--text); border-color: var(--text-dim); }
+
     /* OUTPUT */
     .output-content {
       white-space: pre-wrap;
       font-size: 0.9rem;
-      line-height: 1.7;
+      line-height: 1.8;
       color: var(--text);
     }
     .output-content strong { color: var(--accent); font-weight: 700; }
@@ -388,11 +565,8 @@
     }
     .footer a { color: var(--accent); text-decoration: none; }
     .footer a:hover { text-decoration: underline; }
-    /* CHARTS */
+    /* CHARTS — full width */
     .chart-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
       margin: 1rem 0;
       padding: 1rem;
       background: var(--surface);
@@ -400,8 +574,15 @@
       border: 1px solid var(--border);
     }
     .chart-container.single {
+      max-width: 600px;
+    }
+    .chart-container .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .chart-container.single .chart-grid {
       grid-template-columns: 1fr;
-      max-width: 500px;
     }
     .chart-box {
       position: relative;
@@ -510,8 +691,14 @@
       border-color: var(--danger);
       color: var(--danger);
     }
+    @media (max-width: 768px) {
+      .cards { grid-template-columns: 1fr; }
+      .demo-input { flex-direction: column; }
+      .input-group { min-width: 100%; }
+      .demo-input .presets { align-self: flex-start; }
+    }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="chart.min.js"></script>
 </head>
 <body>
 
@@ -548,46 +735,88 @@
 
 <div class="cards">
   <div class="card" onclick="openDemo('rag')">
-    <div class="card-icon rag">📚</div>
-    <h2>Retrieval-Augmented Generation</h2>
-    <p>Upload documents and ask questions — the AI retrieves relevant context from your docs and the web, generating grounded answers with source citations.</p>
-    <span class="tag rag">Knowledge Base</span>
+    <div class="card-header-img rag" id="card-header-rag">
+      <img src="/icons/rag.png" alt="" id="card-img-rag">
+      <div class="card-icon rag" id="card-emoji-rag">📚</div>
+      <div class="card-gen-overlay" id="card-gen-rag">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Retrieval-Augmented Generation</h2>
+      <p>Upload documents and ask questions — the AI retrieves relevant context from your docs and the web, generating grounded answers with source citations.</p>
+      <span class="tag rag">Knowledge Base</span>
+    </div>
   </div>
   <div class="card" onclick="openDemo('market')">
-    <div class="card-icon market">📊</div>
-    <h2>Market Research</h2>
-    <p>Analyse competitors, market trends, and industry dynamics with live web data. Get structured reports with SWOT analysis and strategic recommendations.</p>
-    <span class="tag market">Competitive Intel</span>
+    <div class="card-header-img market" id="card-header-market">
+      <img src="/icons/market.png" alt="" id="card-img-market">
+      <div class="card-icon market" id="card-emoji-market">📊</div>
+      <div class="card-gen-overlay" id="card-gen-market">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Market Research</h2>
+      <p>Analyse competitors, market trends, and industry dynamics with live web data. Get structured reports with SWOT analysis and strategic recommendations.</p>
+      <span class="tag market">Competitive Intel</span>
+    </div>
   </div>
   <div class="card" onclick="openDemo('finance')">
-    <div class="card-icon finance">💰</div>
-    <h2>Financial Analysis</h2>
-    <p>Process financial data, fetch live market context, and generate investment insights. AI-powered analysis of revenue, margins, and valuation.</p>
-    <span class="tag finance">Investment Intel</span>
+    <div class="card-header-img finance" id="card-header-finance">
+      <img src="/icons/finance.png" alt="" id="card-img-finance">
+      <div class="card-icon finance" id="card-emoji-finance">💰</div>
+      <div class="card-gen-overlay" id="card-gen-finance">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Financial Analysis</h2>
+      <p>Process financial data, fetch live market context, and generate investment insights. AI-powered analysis of revenue, margins, and valuation.</p>
+      <span class="tag finance">Investment Intel</span>
+    </div>
   </div>
   <div class="card" onclick="openDemo('regulatory')">
-    <div class="card-icon regulatory">⚖️</div>
-    <h2>Regulatory Impact Analyser</h2>
-    <p>Paste a regulation name or text — the system searches the web for latest guidance, then AI maps affected policies, identifies compliance gaps, and suggests remediation.</p>
-    <span class="tag regulatory">Compliance</span>
+    <div class="card-header-img regulatory" id="card-header-regulatory">
+      <img src="/icons/regulatory.png" alt="" id="card-img-regulatory">
+      <div class="card-icon regulatory" id="card-emoji-regulatory">⚖️</div>
+      <div class="card-gen-overlay" id="card-gen-regulatory">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Regulatory Impact Analyser</h2>
+      <p>Paste a regulation name or text — the system searches the web for latest guidance, then AI maps affected policies, identifies compliance gaps, and suggests remediation.</p>
+      <span class="tag regulatory">Compliance</span>
+    </div>
   </div>
   <div class="card" onclick="openDemo('earnings')">
-    <div class="card-icon earnings">📈</div>
-    <h2>Earnings Call Analyser</h2>
-    <p>Enter a company name to search for recent earnings call data. AI extracts key themes, quantifies sentiment, flags risk language, and generates an investor brief.</p>
-    <span class="tag earnings">Investor Intel</span>
+    <div class="card-header-img earnings" id="card-header-earnings">
+      <img src="/icons/earnings.png" alt="" id="card-img-earnings">
+      <div class="card-icon earnings" id="card-emoji-earnings">📈</div>
+      <div class="card-gen-overlay" id="card-gen-earnings">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Earnings Call Analyser</h2>
+      <p>Enter a company name to search for recent earnings call data. AI extracts key themes, quantifies sentiment, flags risk language, and generates an investor brief.</p>
+      <span class="tag earnings">Investor Intel</span>
+    </div>
   </div>
   <div class="card" onclick="openDemo('churn')">
-    <div class="card-icon churn">🔄</div>
-    <h2>Churn Prediction</h2>
-    <p>Enter customer data and the system searches for competitor offers and churn benchmarks. AI identifies at-risk customers, explains why, and recommends retention actions.</p>
-    <span class="tag churn">Customer Retention</span>
+    <div class="card-header-img churn" id="card-header-churn">
+      <img src="/icons/churn.png" alt="" id="card-img-churn">
+      <div class="card-icon churn" id="card-emoji-churn">🔄</div>
+      <div class="card-gen-overlay" id="card-gen-churn">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Churn Prediction</h2>
+      <p>Enter customer data and the system searches for competitor offers and churn benchmarks. AI identifies at-risk customers, explains why, and recommends retention actions.</p>
+      <span class="tag churn">Customer Retention</span>
+    </div>
   </div>
   <div class="card" onclick="openDemo('rfp')">
-    <div class="card-icon rfp">📝</div>
-    <h2>RFP Drafter</h2>
-    <p>Paste RFP text or describe requirements — the system searches for relevant capabilities and case studies, then AI drafts section-by-section responses.</p>
-    <span class="tag rfp">Bid &amp; Proposals</span>
+    <div class="card-header-img rfp" id="card-header-rfp">
+      <img src="/icons/rfp.png" alt="" id="card-img-rfp">
+      <div class="card-icon rfp" id="card-emoji-rfp">📝</div>
+      <div class="card-gen-overlay" id="card-gen-rfp">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>RFP Drafter</h2>
+      <p>Paste RFP text or describe requirements — the system searches for relevant capabilities and case studies, then AI drafts section-by-section responses.</p>
+      <span class="tag rfp">Bid &amp; Proposals</span>
+    </div>
   </div>
 </div>
 
@@ -597,26 +826,29 @@
     <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
     <h2 class="demo-title">📚 Retrieval-Augmented Generation</h2>
     <p class="demo-desc">Add source documents, then ask questions. The AI finds relevant passages and generates answers with citations.</p>
-    <div class="demo-layout">
+    <div class="demo-body">
       <div class="demo-input">
-        <h3>Source Documents</h3>
-        <label>Document Title</label>
-        <input type="text" id="rag-doc-title" placeholder="e.g. Q3 Product Roadmap">
-        <label>Document Content</label>
-        <textarea id="rag-doc-content" rows="5" placeholder="Paste document text here..."></textarea>
-        <div class="presets">
-          <button class="preset-btn" onclick="ragPreset('product')">📋 Product Roadmap</button>
-          <button class="preset-btn" onclick="ragPreset('policy')">🏢 Company Policy</button>
-          <button class="preset-btn" onclick="ragPreset('tech')">🔧 Tech Spec</button>
+        <div class="input-group" style="flex:1;min-width:120px">
+          <label>Doc Title</label>
+          <input type="text" id="rag-doc-title" placeholder="Document title">
         </div>
-        <button class="btn btn-rag" onclick="ragAddDoc()">+ Add Document</button>
-        <div id="rag-docs-list"></div>
-        <label>Ask a Question</label>
-        <input type="text" id="rag-question" placeholder="e.g. What are the key deliverables for Q3?">
-        <label style="display:flex;align-items:center;gap:0.5rem;margin-top:0.5rem;cursor:pointer">
-          <input type="checkbox" id="rag-web-search" checked style="width:auto;margin:0"> 🌐 Supplement with web search
-        </label>
-        <button class="btn btn-rag" onclick="ragQuery()">🔍 Search & Answer</button>
+        <div class="input-group" style="flex:2;min-width:200px">
+          <label>Content</label>
+          <textarea id="rag-doc-content" rows="2" placeholder="Paste document text..."></textarea>
+        </div>
+        <button class="btn btn-rag btn-sm" onclick="ragAddDoc()" style="margin-top:0">+ Add</button>
+        <div class="presets">
+          <button class="preset-btn" onclick="ragPreset('product')">📋 Product</button>
+          <button class="preset-btn" onclick="ragPreset('policy')">🏢 Policy</button>
+          <button class="preset-btn" onclick="ragPreset('tech')">🔧 Tech</button>
+        </div>
+        <div id="rag-docs-list" class="docs-inline"></div>
+        <div class="input-group" style="flex:3;min-width:200px">
+          <label>Question</label>
+          <input type="text" id="rag-question" placeholder="Ask about your documents...">
+        </div>
+        <label class="toggle-label"><input type="checkbox" id="rag-web-search" checked> 🌐 Web</label>
+        <button class="btn btn-rag" onclick="ragQuery()" style="margin-top:0">🔍 Analyze</button>
       </div>
       <div class="demo-output">
         <h3>AI Response <div class="output-spinner" id="rag-spinner"></div></h3>
@@ -635,28 +867,35 @@
     <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
     <h2 class="demo-title">📊 Market Research</h2>
     <p class="demo-desc">Generate competitive analysis, market sizing, and strategic recommendations powered by AI.</p>
-    <div class="demo-layout">
+    <div class="demo-body">
       <div class="demo-input">
-        <h3>Research Parameters</h3>
-        <label>Industry / Market</label>
-        <input type="text" id="market-industry" placeholder="e.g. European SaaS CRM">
-        <label>Company to Analyse</label>
-        <input type="text" id="market-company" placeholder="e.g. HubSpot">
-        <label>Analysis Type</label>
-        <select id="market-type">
-          <option value="competitor">Competitor Analysis</option>
-          <option value="swot">SWOT Analysis</option>
-          <option value="trends">Market Trends & Forecasting</option>
-          <option value="sizing">Market Sizing (TAM/SAM/SOM)</option>
-        </select>
-        <label>Additional Context (optional)</label>
-        <textarea id="market-context" rows="3" placeholder="Any specific focus areas, regions, or timeframes..."></textarea>
+        <div class="input-group" style="flex:2;min-width:160px">
+          <label>Industry / Market</label>
+          <input type="text" id="market-industry" placeholder="e.g. European SaaS CRM">
+        </div>
+        <div class="input-group" style="flex:1;min-width:120px">
+          <label>Company</label>
+          <input type="text" id="market-company" placeholder="e.g. HubSpot">
+        </div>
+        <div class="input-group" style="flex:1;min-width:140px">
+          <label>Analysis Type</label>
+          <select id="market-type">
+            <option value="competitor">Competitor Analysis</option>
+            <option value="swot">SWOT Analysis</option>
+            <option value="trends">Market Trends & Forecasting</option>
+            <option value="sizing">Market Sizing (TAM/SAM/SOM)</option>
+          </select>
+        </div>
+        <div class="input-group" style="flex:2;min-width:140px">
+          <label>Context</label>
+          <textarea id="market-context" rows="2" placeholder="Focus areas, regions, timeframes..."></textarea>
+        </div>
         <div class="presets">
-          <button class="preset-btn" onclick="marketPreset('saas')">☁️ SaaS CRM</button>
-          <button class="preset-btn" onclick="marketPreset('ev')">⚡ EV Market</button>
+          <button class="preset-btn" onclick="marketPreset('saas')">☁️ SaaS</button>
+          <button class="preset-btn" onclick="marketPreset('ev')">⚡ EV</button>
           <button class="preset-btn" onclick="marketPreset('fintech')">🏦 FinTech</button>
         </div>
-        <button class="btn btn-market" onclick="marketQuery()">📈 Generate Analysis</button>
+        <button class="btn btn-market" onclick="marketQuery()" style="margin-top:0">📈 Research</button>
       </div>
       <div class="demo-output">
         <h3>Market Analysis <div class="output-spinner" id="market-spinner"></div></h3>
@@ -681,36 +920,51 @@
     <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
     <h2 class="demo-title">💰 Financial Analysis</h2>
     <p class="demo-desc">Input financial data and get AI-powered analysis of performance, ratios, and investment outlook.</p>
-    <div class="demo-layout">
+    <div class="demo-body">
       <div class="demo-input">
-        <h3>Financial Data</h3>
-        <label>Company Name</label>
-        <input type="text" id="fin-company" placeholder="e.g. Acme Corp">
+        <div class="input-group" style="flex:1;min-width:110px">
+          <label>Company</label>
+          <input type="text" id="fin-company" placeholder="e.g. Acme Corp">
+        </div>
         <div class="presets">
-          <button class="preset-btn" onclick="finPreset('tech')">💻 Tech Co</button>
-          <button class="preset-btn" onclick="finPreset('retail')">🛒 Retail Co</button>
+          <button class="preset-btn" onclick="finPreset('tech')">💻 Tech</button>
+          <button class="preset-btn" onclick="finPreset('retail')">🛒 Retail</button>
           <button class="preset-btn" onclick="finPreset('startup')">🚀 Startup</button>
         </div>
-        <label>Revenue (€M)</label>
-        <input type="text" id="fin-revenue" placeholder="e.g. 50">
-        <label>Cost of Goods Sold (€M)</label>
-        <input type="text" id="fin-cogs" placeholder="e.g. 30">
-        <label>Operating Expenses (€M)</label>
-        <input type="text" id="fin-opex" placeholder="e.g. 12">
-        <label>Net Income (€M)</label>
-        <input type="text" id="fin-net" placeholder="e.g. 5">
-        <label>Total Assets (€M)</label>
-        <input type="text" id="fin-assets" placeholder="e.g. 80">
-        <label>Total Liabilities (€M)</label>
-        <input type="text" id="fin-liabilities" placeholder="e.g. 25">
-        <label>Analysis Focus</label>
-        <select id="fin-focus">
-          <option value="full">Full Financial Health Check</option>
-          <option value="profitability">Profitability Deep Dive</option>
-          <option value="valuation">Valuation & Growth Potential</option>
-          <option value="risk">Risk Assessment</option>
-        </select>
-        <button class="btn btn-finance" onclick="finQuery()">💰 Analyse</button>
+        <div class="input-group" style="flex:1;min-width:80px">
+          <label>Revenue €M</label>
+          <input type="text" id="fin-revenue" placeholder="50">
+        </div>
+        <div class="input-group" style="flex:1;min-width:80px">
+          <label>COGS €M</label>
+          <input type="text" id="fin-cogs" placeholder="30">
+        </div>
+        <div class="input-group" style="flex:1;min-width:80px">
+          <label>OpEx €M</label>
+          <input type="text" id="fin-opex" placeholder="12">
+        </div>
+        <div class="input-group" style="flex:1;min-width:80px">
+          <label>Net Income €M</label>
+          <input type="text" id="fin-net" placeholder="5">
+        </div>
+        <div class="input-group" style="flex:1;min-width:80px">
+          <label>Assets €M</label>
+          <input type="text" id="fin-assets" placeholder="80">
+        </div>
+        <div class="input-group" style="flex:1;min-width:80px">
+          <label>Liabilities €M</label>
+          <input type="text" id="fin-liabilities" placeholder="25">
+        </div>
+        <div class="input-group" style="flex:1;min-width:130px">
+          <label>Focus</label>
+          <select id="fin-focus">
+            <option value="full">Full Health Check</option>
+            <option value="profitability">Profitability</option>
+            <option value="valuation">Valuation</option>
+            <option value="risk">Risk Assessment</option>
+          </select>
+        </div>
+        <button class="btn btn-finance" onclick="finQuery()" style="margin-top:0">💰 Analyse</button>
       </div>
       <div class="demo-output">
         <h3>Financial Report <div class="output-spinner" id="fin-spinner"></div></h3>
@@ -719,13 +973,15 @@
         </div>
         <div id="fin-metrics" class="metric-grid" style="display:none"></div>
         <div id="fin-charts" class="chart-container" style="display:none">
-          <div class="chart-box">
-            <h4>Revenue & Profit Breakdown</h4>
-            <canvas id="fin-revenue-chart"></canvas>
-          </div>
-          <div class="chart-box">
-            <h4>Margin Trends</h4>
-            <canvas id="fin-margin-chart"></canvas>
+          <div class="chart-grid">
+            <div class="chart-box">
+              <h4>Revenue & Profit Breakdown</h4>
+              <canvas id="fin-revenue-chart"></canvas>
+            </div>
+            <div class="chart-box">
+              <h4>Margin Trends</h4>
+              <canvas id="fin-margin-chart"></canvas>
+            </div>
           </div>
         </div>
         <div id="fin-sources"></div>
@@ -740,29 +996,36 @@
     <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
     <h2 class="demo-title">⚖️ Regulatory Impact Analyser</h2>
     <p class="demo-desc">Paste a regulation name or text — the system searches the web for latest guidance, maps affected policies, identifies compliance gaps, and suggests remediation.</p>
-    <div class="demo-layout">
+    <div class="demo-body">
       <div class="demo-input">
-        <h3>Regulation Details</h3>
-        <label>Regulation Name</label>
-        <input type="text" id="reg-name" placeholder="e.g. EU DORA, Basel IV, MiCA">
-        <label>Regulation Text (optional)</label>
-        <textarea id="reg-text" rows="4" placeholder="Paste regulation text or summary..."></textarea>
-        <label>Industry</label>
-        <select id="reg-industry">
-          <option value="Banking">Banking</option>
-          <option value="Insurance">Insurance</option>
-          <option value="Telecom">Telecom</option>
-          <option value="Technology">Technology</option>
-          <option value="Healthcare">Healthcare</option>
-        </select>
-        <label>Additional Context (optional)</label>
-        <textarea id="reg-context" rows="3" placeholder="Specific areas of concern, existing policies, deadlines..."></textarea>
+        <div class="input-group" style="flex:2;min-width:180px">
+          <label>Regulation Name</label>
+          <input type="text" id="reg-name" placeholder="e.g. EU DORA, Basel IV, MiCA">
+        </div>
+        <div class="input-group" style="flex:1;min-width:120px">
+          <label>Industry</label>
+          <select id="reg-industry">
+            <option value="Banking">Banking</option>
+            <option value="Insurance">Insurance</option>
+            <option value="Telecom">Telecom</option>
+            <option value="Technology">Technology</option>
+            <option value="Healthcare">Healthcare</option>
+          </select>
+        </div>
+        <div class="input-group" style="flex:2;min-width:160px">
+          <label>Regulation Text</label>
+          <textarea id="reg-text" rows="2" placeholder="Paste regulation text (optional)..."></textarea>
+        </div>
+        <div class="input-group" style="flex:3;min-width:200px">
+          <label>Context / Concerns</label>
+          <textarea id="reg-context" rows="2" placeholder="Specific areas of concern, existing policies, deadlines..."></textarea>
+        </div>
         <div class="presets">
-          <button class="preset-btn" onclick="regPreset('dora')">🏛️ EU DORA</button>
+          <button class="preset-btn" onclick="regPreset('dora')">🏛️ DORA</button>
           <button class="preset-btn" onclick="regPreset('basel')">🏦 Basel IV</button>
           <button class="preset-btn" onclick="regPreset('mica')">💶 MiCA</button>
         </div>
-        <button class="btn btn-regulatory" onclick="regQuery()">⚖️ Analyse Impact</button>
+        <button class="btn btn-regulatory" onclick="regQuery()" style="margin-top:0">⚖️ Analyse</button>
       </div>
       <div class="demo-output">
         <h3>Impact Assessment <div class="output-spinner" id="reg-spinner"></div></h3>
@@ -781,28 +1044,35 @@
     <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
     <h2 class="demo-title">📈 Earnings Call Analyser</h2>
     <p class="demo-desc">Enter a company name to search for recent earnings call data. AI extracts key themes, quantifies sentiment, flags risk language, and generates an investor brief.</p>
-    <div class="demo-layout">
+    <div class="demo-body">
       <div class="demo-input">
-        <h3>Earnings Call Parameters</h3>
-        <label>Company Name</label>
-        <input type="text" id="earn-company" placeholder="e.g. Microsoft, NVIDIA, Salesforce">
-        <label>Quarter</label>
-        <select id="earn-quarter">
-          <option value="Q1">Q1</option>
-          <option value="Q2">Q2</option>
-          <option value="Q3">Q3</option>
-          <option value="Q4">Q4</option>
-        </select>
-        <label>Year</label>
-        <input type="text" id="earn-year" placeholder="e.g. 2026">
-        <label>Focus Area (optional)</label>
-        <input type="text" id="earn-focus" placeholder="e.g. AI growth, cloud revenue, margins">
-        <div class="presets">
-          <button class="preset-btn" onclick="earnPreset('msft')">🪟 Microsoft Q2 2026</button>
-          <button class="preset-btn" onclick="earnPreset('crm')">☁️ Salesforce Q1 2026</button>
-          <button class="preset-btn" onclick="earnPreset('nvda')">🟢 NVIDIA Q4 2025</button>
+        <div class="input-group" style="flex:2;min-width:150px">
+          <label>Company</label>
+          <input type="text" id="earn-company" placeholder="e.g. Microsoft, NVIDIA">
         </div>
-        <button class="btn btn-earnings" onclick="earnQuery()">📈 Analyse Earnings</button>
+        <div class="input-group" style="flex:1;min-width:80px">
+          <label>Quarter</label>
+          <select id="earn-quarter">
+            <option value="Q1">Q1</option>
+            <option value="Q2">Q2</option>
+            <option value="Q3">Q3</option>
+            <option value="Q4">Q4</option>
+          </select>
+        </div>
+        <div class="input-group" style="flex:1;min-width:80px">
+          <label>Year</label>
+          <input type="text" id="earn-year" placeholder="2026">
+        </div>
+        <div class="input-group" style="flex:2;min-width:140px">
+          <label>Focus Area</label>
+          <input type="text" id="earn-focus" placeholder="e.g. AI growth, cloud revenue">
+        </div>
+        <div class="presets">
+          <button class="preset-btn" onclick="earnPreset('msft')">🪟 MSFT</button>
+          <button class="preset-btn" onclick="earnPreset('crm')">☁️ CRM</button>
+          <button class="preset-btn" onclick="earnPreset('nvda')">🟢 NVDA</button>
+        </div>
+        <button class="btn btn-earnings" onclick="earnQuery()" style="margin-top:0">📈 Analyse</button>
       </div>
       <div class="demo-output">
         <h3>Investor Brief <div class="output-spinner" id="earn-spinner"></div></h3>
@@ -827,33 +1097,46 @@
     <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
     <h2 class="demo-title">🔄 Churn Prediction</h2>
     <p class="demo-desc">Enter customer data and the system searches for competitor offers and churn benchmarks. AI identifies at-risk customers, explains why, and recommends retention actions.</p>
-    <div class="demo-layout">
+    <div class="demo-body">
       <div class="demo-input">
-        <h3>Customer Data</h3>
-        <label>Customer Name</label>
-        <input type="text" id="churn-name" placeholder="e.g. Acme Corp or Customer #12345">
-        <label>Tenure (months)</label>
-        <input type="number" id="churn-tenure" placeholder="e.g. 24">
-        <label>Monthly Spend (EUR)</label>
-        <input type="number" id="churn-spend" placeholder="e.g. 450">
-        <label>Support Tickets (last 6 months)</label>
-        <input type="number" id="churn-tickets" placeholder="e.g. 3">
-        <label>Usage Drop (%)</label>
-        <input type="number" id="churn-drop" placeholder="e.g. 20">
-        <label>Contract Type</label>
-        <select id="churn-contract">
-          <option value="Monthly">Monthly</option>
-          <option value="Annual">Annual</option>
-          <option value="Multi-year">Multi-year</option>
-        </select>
-        <label>Competitor Mentioned (optional)</label>
-        <input type="text" id="churn-competitor" placeholder="e.g. Vodafone, Deutsche Telekom">
-        <div class="presets">
-          <button class="preset-btn" onclick="churnPreset('sme')">🏢 High-risk SME</button>
-          <button class="preset-btn" onclick="churnPreset('enterprise')">🏛️ At-risk Enterprise</button>
-          <button class="preset-btn" onclick="churnPreset('stable')">✅ Stable Customer</button>
+        <div class="input-group" style="flex:2;min-width:140px">
+          <label>Customer</label>
+          <input type="text" id="churn-name" placeholder="e.g. Acme Corp">
         </div>
-        <button class="btn btn-churn" onclick="churnQuery()">🔄 Predict Churn</button>
+        <div class="input-group" style="flex:1;min-width:80px">
+          <label>Tenure (mo)</label>
+          <input type="number" id="churn-tenure" placeholder="24">
+        </div>
+        <div class="input-group" style="flex:1;min-width:80px">
+          <label>Spend (EUR)</label>
+          <input type="number" id="churn-spend" placeholder="450">
+        </div>
+        <div class="input-group" style="flex:1;min-width:80px">
+          <label>Support Tickets</label>
+          <input type="number" id="churn-tickets" placeholder="3">
+        </div>
+        <div class="input-group" style="flex:1;min-width:80px">
+          <label>Usage Drop %</label>
+          <input type="number" id="churn-drop" placeholder="20">
+        </div>
+        <div class="input-group" style="flex:1;min-width:100px">
+          <label>Contract</label>
+          <select id="churn-contract">
+            <option value="Monthly">Monthly</option>
+            <option value="Annual">Annual</option>
+            <option value="Multi-year">Multi-year</option>
+          </select>
+        </div>
+        <div class="input-group" style="flex:1;min-width:110px">
+          <label>Competitor</label>
+          <input type="text" id="churn-competitor" placeholder="e.g. Vodafone">
+        </div>
+        <div class="presets">
+          <button class="preset-btn" onclick="churnPreset('sme')">🏢 High-risk</button>
+          <button class="preset-btn" onclick="churnPreset('enterprise')">🏛️ Enterprise</button>
+          <button class="preset-btn" onclick="churnPreset('stable')">✅ Stable</button>
+        </div>
+        <button class="btn btn-churn" onclick="churnQuery()" style="margin-top:0">🔄 Predict</button>
       </div>
       <div class="demo-output">
         <h3>Churn Risk Assessment <div class="output-spinner" id="churn-spinner"></div></h3>
@@ -861,13 +1144,15 @@
           <div class="output-placeholder">Enter customer data and click Predict Churn to see the risk assessment</div>
         </div>
         <div id="churn-charts" class="chart-container" style="display:none">
-          <div class="chart-box">
-            <h4>Churn Risk Gauge</h4>
-            <canvas id="churn-gauge-chart"></canvas>
-          </div>
-          <div class="chart-box">
-            <h4>Risk Factors</h4>
-            <canvas id="churn-factors-chart"></canvas>
+          <div class="chart-grid">
+            <div class="chart-box">
+              <h4>Churn Risk Gauge</h4>
+              <canvas id="churn-gauge-chart"></canvas>
+            </div>
+            <div class="chart-box">
+              <h4>Risk Factors</h4>
+              <canvas id="churn-factors-chart"></canvas>
+            </div>
           </div>
         </div>
         <div id="churn-sources"></div>
@@ -882,31 +1167,42 @@
     <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
     <h2 class="demo-title">📝 RFP Drafter</h2>
     <p class="demo-desc">Paste RFP text or describe requirements — the system searches for relevant capabilities and case studies, then AI drafts section-by-section responses.</p>
-    <div class="demo-layout">
+    <div class="demo-body">
       <div class="demo-input">
-        <h3>RFP Details</h3>
-        <label>RFP Title</label>
-        <input type="text" id="rfp-title" placeholder="e.g. Cloud Migration RFP 2026">
-        <label>RFP Requirements</label>
-        <textarea id="rfp-requirements" rows="5" placeholder="Paste the RFP text or describe the requirements..."></textarea>
-        <label>Industry</label>
-        <input type="text" id="rfp-industry" placeholder="e.g. Financial Services, Telecom, Healthcare">
-        <label>Our Company</label>
-        <input type="text" id="rfp-company" placeholder="e.g. TechNova Solutions">
-        <label>Key Differentiators</label>
-        <textarea id="rfp-diff" rows="3" placeholder="What sets us apart? Certifications, case studies, unique capabilities..."></textarea>
-        <label>Tone</label>
-        <select id="rfp-tone">
-          <option value="Professional">Professional</option>
-          <option value="Technical">Technical</option>
-          <option value="Persuasive">Persuasive</option>
-        </select>
-        <div class="presets">
-          <button class="preset-btn" onclick="rfpPreset('cloud')">☁️ Cloud Migration</button>
-          <button class="preset-btn" onclick="rfpPreset('network')">🌐 Network Infrastructure</button>
-          <button class="preset-btn" onclick="rfpPreset('data')">📊 Data Platform</button>
+        <div class="input-group" style="flex:1;min-width:120px">
+          <label>RFP Title</label>
+          <input type="text" id="rfp-title" placeholder="e.g. Cloud Migration RFP 2026">
         </div>
-        <button class="btn btn-rfp" onclick="rfpQuery()">📝 Draft Response</button>
+        <div class="input-group" style="flex:3;min-width:200px">
+          <label>Requirements</label>
+          <textarea id="rfp-requirements" rows="2" placeholder="Paste the RFP text or describe the requirements..."></textarea>
+        </div>
+        <div class="input-group" style="flex:1;min-width:120px">
+          <label>Industry</label>
+          <input type="text" id="rfp-industry" placeholder="e.g. Financial Services">
+        </div>
+        <div class="input-group" style="flex:1;min-width:120px">
+          <label>Our Company</label>
+          <input type="text" id="rfp-company" placeholder="e.g. TechNova Solutions">
+        </div>
+        <div class="input-group" style="flex:2;min-width:140px">
+          <label>Differentiators</label>
+          <textarea id="rfp-diff" rows="2" placeholder="What sets us apart..."></textarea>
+        </div>
+        <div class="input-group" style="flex:1;min-width:100px">
+          <label>Tone</label>
+          <select id="rfp-tone">
+            <option value="Professional">Professional</option>
+            <option value="Technical">Technical</option>
+            <option value="Persuasive">Persuasive</option>
+          </select>
+        </div>
+        <div class="presets">
+          <button class="preset-btn" onclick="rfpPreset('cloud')">☁️ Cloud</button>
+          <button class="preset-btn" onclick="rfpPreset('network')">🌐 Network</button>
+          <button class="preset-btn" onclick="rfpPreset('data')">📊 Data</button>
+        </div>
+        <button class="btn btn-rfp" onclick="rfpQuery()" style="margin-top:0">📝 Draft</button>
       </div>
       <div class="demo-output">
         <h3>Drafted Response <div class="output-spinner" id="rfp-spinner"></div></h3>
@@ -994,12 +1290,14 @@ async function callLLM(messages, onChunk) {
     try {
       const res = await fetch(`${API_BASE}/chat/completions`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: MODEL, messages, stream, max_tokens: 4096 })
       });
       if (!res.ok) {
         const err = await res.text();
-        showToast(`API error: ${res.status} — check your API key`, true);
+        let msg = `API error: ${res.status}`;
+        try { const e = JSON.parse(err); if (e.error) msg += ' — ' + e.error; } catch {}
+        showToast(msg, true);
         throw new Error(err);
       }
 
@@ -1080,7 +1378,7 @@ async function webSearch(query, count = 8) {
 function renderSearchResults(results, containerId) {
   const el = document.getElementById(containerId);
   if (!results.length) { el.innerHTML = ''; return; }
-  el.innerHTML = '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-dim);margin-bottom:0.5rem">🌐 Web Sources Used</div>' +
+  el.innerHTML = '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-dim);margin-bottom:0.5rem;margin-top:1rem">🌐 Web Sources Used</div>' +
     results.map(r => `<div class="source-doc"><a href="${r.url}" target="_blank" style="color:var(--accent);font-weight:600;font-size:0.85rem">${r.title}</a><div style="color:var(--text-dim);font-size:0.8rem;margin-top:0.25rem">${r.description.slice(0,150)}</div></div>`).join('');
 }
 
@@ -1223,15 +1521,9 @@ function ragRemoveDoc(i) {
 function renderRagDocs() {
   const el = document.getElementById('rag-docs-list');
   if (!ragDocs.length) { el.innerHTML = ''; return; }
-  el.innerHTML = ragDocs.map((d, i) => `
-    <div class="source-doc">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <span class="source-title">${d.title}</span>
-        <button onclick="ragRemoveDoc(${i})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:0.8rem">✕</button>
-      </div>
-      <div style="color:var(--text-dim);margin-top:0.25rem">${d.content.slice(0, 120)}...</div>
-    </div>
-  `).join('');
+  el.innerHTML = ragDocs.map((d, i) =>
+    `<span class="doc-tag">${d.title}<button onclick="ragRemoveDoc(${i})">✕</button></span>`
+  ).join('');
 }
 
 async function ragQuery() {
@@ -1360,10 +1652,12 @@ Be specific with numbers, market shares, growth rates, and competitive positioni
 
 // ─── CHART: MARKET RESEARCH ───
 function renderMarketChart() {
+  if (typeof Chart === 'undefined') return;
+  try {
   const canvas = document.getElementById('market-radar-chart');
   if (!canvas) return;
   const container = document.getElementById('market-charts');
-  container.style.display = 'grid';
+  container.style.display = 'block';
 
   if (window.marketRadarChart) window.marketRadarChart.destroy();
 
@@ -1420,6 +1714,7 @@ function renderMarketChart() {
       }
     }
   });
+  } catch(e) { console.warn('Chart error:', e); }
 }
 // ─── FINANCIAL ANALYSIS DEMO ───
 const FIN_PRESETS = {
@@ -1551,11 +1846,13 @@ Provide:
 
 // ─── CHART: FINANCIAL ANALYSIS ───
 function renderFinCharts() {
+  if (typeof Chart === 'undefined') return;
+  try {
   const canvas1 = document.getElementById('fin-revenue-chart');
   const canvas2 = document.getElementById('fin-margin-chart');
   if (!canvas1 || !canvas2) return;
   const container = document.getElementById('fin-charts');
-  container.style.display = 'grid';
+  container.style.display = 'block';
 
   const revenue = parseFloat(document.getElementById('fin-revenue').value) || 0;
   const cogs = parseFloat(document.getElementById('fin-cogs').value) || 0;
@@ -1651,6 +1948,7 @@ function renderFinCharts() {
       }
     }
   });
+  } catch(e) { console.warn('Chart error:', e); }
 }
 
 // ─── REGULATORY IMPACT ANALYSER DEMO ───
@@ -1802,10 +2100,12 @@ Provide:
 
 // ─── CHART: EARNINGS SENTIMENT ───
 function renderEarningsChart() {
+  if (typeof Chart === 'undefined') return;
+  try {
   const canvas = document.getElementById('earn-sentiment-chart');
   if (!canvas) return;
   const container = document.getElementById('earn-charts');
-  container.style.display = 'grid';
+  container.style.display = 'block';
 
   if (window.earnSentimentChart) window.earnSentimentChart.destroy();
 
@@ -1851,6 +2151,7 @@ function renderEarningsChart() {
       }
     }]
   });
+  } catch(e) { console.warn('Chart error:', e); }
 }
 
 // ─── CHURN PREDICTION DEMO ───
@@ -1946,11 +2247,13 @@ Provide:
 
 // ─── CHART: CHURN PREDICTION ───
 function renderChurnCharts() {
+  if (typeof Chart === 'undefined') return;
+  try {
   const canvas1 = document.getElementById('churn-gauge-chart');
   const canvas2 = document.getElementById('churn-factors-chart');
   if (!canvas1 || !canvas2) return;
   const container = document.getElementById('churn-charts');
-  container.style.display = 'grid';
+  container.style.display = 'block';
 
   // Extract input values
   const tenure = parseInt(document.getElementById('churn-tenure').value) || 12;
@@ -2068,6 +2371,7 @@ function renderChurnCharts() {
       }
     }
   });
+  } catch(e) { console.warn('Chart error:', e); }
 }
 
 // ─── RFP DRAFTER DEMO ───
@@ -2246,7 +2550,8 @@ async function handleLogout() {
 const originalFetch = window.fetch;
 window.fetch = function(url, options = {}) {
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  if (token && typeof url === 'string' && url.startsWith('/api/')) {
+  const urlStr = typeof url === 'string' ? url : url?.url || '';
+  if (token && urlStr.includes('/api/')) {
     options.headers = options.headers || {};
     if (options.headers instanceof Headers) {
       options.headers.set('Authorization', 'Bearer ' + token);
@@ -2257,12 +2562,95 @@ window.fetch = function(url, options = {}) {
   return originalFetch(url, options);
 };
 
+// ─── ICON LOADING ───
+const ICON_DEMOS = ['rag', 'market', 'finance', 'regulatory', 'earnings', 'churn', 'rfp'];
+
+async function loadIcons() {
+  for (const demo of ICON_DEMOS) {
+    checkAndLoadIcon(demo);
+  }
+}
+
+function checkAndLoadIcon(demo) {
+  const img = document.getElementById(`card-img-${demo}`);
+  const emoji = document.getElementById(`card-emoji-${demo}`);
+  const overlay = document.getElementById(`card-gen-${demo}`);
+  if (!img) return;
+
+  // Try loading the existing icon
+  const testImg = new Image();
+  testImg.onload = () => {
+    // Icon exists — show it
+    img.src = `/icons/${demo}.png`;
+    img.classList.add('loaded');
+    if (emoji) emoji.classList.add('hidden');
+    if (overlay) overlay.classList.remove('active');
+  };
+  testImg.onerror = () => {
+    // Icon doesn't exist yet — show emoji, trigger generation
+    if (overlay) overlay.classList.add('active');
+    generateIcon(demo);
+  };
+  testImg.src = `/icons/${demo}.png?t=${Date.now()}`;
+}
+
+async function generateIcon(demo) {
+  try {
+    const resp = await fetch(`/api/generate-icon?demo=${demo}`);
+    const data = await resp.json();
+
+    if (data.status === 'exists') {
+      showIcon(demo);
+    } else if (data.status === 'generating') {
+      pollForIcon(demo);
+    }
+  } catch (e) {
+    console.warn(`Icon generation failed for ${demo}:`, e);
+    const overlay = document.getElementById(`card-gen-${demo}`);
+    if (overlay) overlay.classList.remove('active');
+  }
+}
+
+function pollForIcon(demo, attempts) {
+  attempts = attempts || 0;
+  if (attempts > 20) {
+    const overlay = document.getElementById(`card-gen-${demo}`);
+    if (overlay) overlay.classList.remove('active');
+    return;
+  }
+
+  setTimeout(() => {
+    const testImg = new Image();
+    testImg.onload = () => {
+      showIcon(demo);
+    };
+    testImg.onerror = () => {
+      pollForIcon(demo, attempts + 1);
+    };
+    testImg.src = `/icons/${demo}.png?t=${Date.now()}`;
+  }, 3000);
+}
+
+function showIcon(demo) {
+  const img = document.getElementById(`card-img-${demo}`);
+  const emoji = document.getElementById(`card-emoji-${demo}`);
+  const overlay = document.getElementById(`card-gen-${demo}`);
+  if (!img) return;
+
+  img.src = `/icons/${demo}.png?t=${Date.now()}`;
+  img.classList.add('loaded');
+  if (emoji) emoji.classList.add('hidden');
+  if (overlay) overlay.classList.remove('active');
+}
+
 // Check auth on page load
 checkAuth();
+
+// Load icons after auth
+loadIcons();
 
 // ─── KEY INPUT: Enter to submit ───
 document.getElementById('rag-question').addEventListener('keydown', e => { if (e.key === 'Enter') ragQuery(); });
 </script>
 </body>
 </html>
-

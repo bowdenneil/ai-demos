@@ -16,12 +16,27 @@ import sqlite3
 import hashlib
 import secrets
 import threading
+import base64
 from pathlib import Path
 from datetime import datetime, timedelta
+from urllib.parse import urlparse, parse_qs
 
 API_BASE = 'https://api.tensorx.ai/v1'
 API_KEY = os.environ.get('TENSORX_API_KEY', '') or os.environ.get('TENSORIX_API_KEY', '') or 'sk-9ub...XReg'
 BRAVE_KEY = os.environ.get('BRAVE_SEARCH_KEY', '') or 'BSAezzPy7F1dgfj5TSSTQRWve35pO8H'
+
+# PiAPI for icon generation
+PIAPI_KEY = '9a0588af7e500eba894f58c2c37a4d9fb011da7c1f6e3eccb561416a6b060be3'
+ICON_DIR = Path(__file__).parent / 'icons'
+ICON_PROMPTS = {
+    'rag': 'Minimalist flat icon of an open book with digital data particles floating out, dark navy background, cyan glowing accents, simple clean vector style',
+    'market': 'Minimalist flat icon of a magnifying glass over a growth chart, dark purple background, bright purple glowing accents, simple clean vector style',
+    'finance': 'Minimalist flat icon of a euro symbol with upward trend arrow, dark rose background, pink glowing accents, simple clean vector style',
+    'regulatory': 'Minimalist flat icon of a balance scale with a shield, dark emerald background, green glowing accents, simple clean vector style',
+    'earnings': 'Minimalist flat icon of a rising bar chart with a microphone, dark amber background, orange glowing accents, simple clean vector style',
+    'churn': 'Minimalist flat icon of circular arrows around a customer silhouette, dark orange background, bright orange glowing accents, simple clean vector style',
+    'rfp': 'Minimalist flat icon of a document with a pen and checkmark, dark teal background, teal glowing accents, simple clean vector style',
+}
 
 # ─── AUTH DATABASE ───
 AUTH_DB_DIR = Path.home() / '.ai-demos'
@@ -89,6 +104,60 @@ def session_cleanup_timer():
     timer.daemon = True
     timer.start()
 
+def generate_icon_file(demo):
+    """Generate an icon for the given demo using PiAPI gpt-image-1."""
+    prompt = ICON_PROMPTS.get(demo)
+    if not prompt:
+        return
+
+    icon_path = ICON_DIR / f'{demo}.png'
+    if icon_path.exists():
+        return
+
+    try:
+        print(f'  Generating icon for {demo}...')
+        req_data = json.dumps({
+            'model': 'gpt-image-1',
+            'prompt': prompt,
+            'size': '1024x1024',
+            'n': 1,
+            'response_format': 'b64_json'
+        }).encode()
+
+        req = urllib.request.Request(
+            'https://api.piapi.ai/v1/images/generations',
+            data=req_data,
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {PIAPI_KEY}'
+            },
+            method='POST'
+        )
+
+        resp = urllib.request.urlopen(req, timeout=120)
+        data = json.loads(resp.read())
+
+        # Extract base64 image data
+        img_data = None
+        if 'data' in data and len(data['data']) > 0:
+            item = data['data'][0]
+            if 'b64_json' in item:
+                img_data = base64.b64decode(item['b64_json'])
+            elif 'url' in item:
+                # If URL format, download the image
+                img_resp = urllib.request.urlopen(item['url'], timeout=30)
+                img_data = img_resp.read()
+
+        if img_data:
+            ICON_DIR.mkdir(parents=True, exist_ok=True)
+            icon_path.write_bytes(img_data)
+            print(f'✓ Icon generated: {demo}.png ({len(img_data)} bytes)')
+        else:
+            print(f'⚠ No image data in response for {demo}')
+
+    except Exception as e:
+        print(f'⚠ Icon generation failed for {demo}: {e}')
+
 class DemoHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(Path(__file__).parent), **kwargs)
@@ -113,22 +182,65 @@ class DemoHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         path = self.path.split('?')[0]
-        if self.path == '/api/auth/check':
+        if path == '/api/auth/check':
             self.handle_auth_check()
-        elif self.path.startswith('/api/search'):
+        elif path == '/api/generate-icon':
+            if not self.get_authenticated_user():
+                self.send_auth_error()
+                return
+            self.handle_generate_icon()
+        elif path.startswith('/api/search'):
             if not self.get_authenticated_user():
                 self.send_auth_error()
                 return
             self.handle_search()
-        elif self.path == '/api/models':
+        elif path == '/api/models':
             if not self.get_authenticated_user():
                 self.send_auth_error()
                 return
             self.handle_proxy_get()
+        elif path.startswith('/icons/') and path.endswith('.png'):
+            self.serve_icon(path)
+        elif path == '/chart.min.js':
+            self.serve_static(path)
         elif path in ('/', '/index.html'):
             self.serve_index()
         else:
             super().do_GET()
+
+    def serve_icon(self, path):
+        """Serve an icon image from the icons directory."""
+        filename = path.split('/')[-1]
+        icon_path = ICON_DIR / filename
+        if icon_path.exists():
+            data = icon_path.read_bytes()
+            self.send_response(200)
+            self.send_header('Content-Type', 'image/png')
+            self.send_header('Content-Length', str(len(data)))
+            self.send_header('Cache-Control', 'public, max-age=86400')
+            self.end_headers()
+            self.wfile.write(data)
+        else:
+            self.send_response(404)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(b'{"error":"Icon not found"}')
+
+    def serve_static(self, path):
+        """Serve a static file from the project directory."""
+        file_path = Path(__file__).parent / path.lstrip('/')
+        if file_path.exists():
+            data = file_path.read_bytes()
+            content_type = 'application/javascript' if path.endswith('.js') else 'application/octet-stream'
+            self.send_response(200)
+            self.send_header('Content-Type', content_type)
+            self.send_header('Content-Length', str(len(data)))
+            self.send_header('Cache-Control', 'public, max-age=86400')
+            self.end_headers()
+            self.wfile.write(data)
+        else:
+            self.send_response(404)
+            self.end_headers()
 
     def serve_index(self):
         """Serve index.html with API key injected for local use."""
@@ -261,6 +373,28 @@ class DemoHandler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    # ─── ICON GENERATION ───
+
+    def handle_generate_icon(self):
+        """Handle GET /api/generate-icon?demo=NAME"""
+        parsed = urlparse(self.path)
+        params = parse_qs(parsed.query)
+        demo = params.get('demo', [''])[0]
+
+        if demo not in ICON_PROMPTS:
+            self.send_json_response(400, {'error': f'Invalid demo name. Valid: {", ".join(ICON_PROMPTS.keys())}'})
+            return
+
+        icon_path = ICON_DIR / f'{demo}.png'
+        if icon_path.exists():
+            self.send_json_response(200, {'status': 'exists', 'url': f'/icons/{demo}.png'})
+            return
+
+        # Start generation in background thread
+        t = threading.Thread(target=generate_icon_file, args=(demo,), daemon=True)
+        t.start()
+        self.send_json_response(202, {'status': 'generating', 'demo': demo})
+
     def handle_proxy(self):
         content_length = int(self.headers.get('Content-Length', 0))
         body = self.rfile.read(content_length) if content_length else b''
@@ -329,7 +463,6 @@ class DemoHandler(http.server.SimpleHTTPRequestHandler):
 
     def handle_search(self):
         """Proxy Brave Search API requests."""
-        from urllib.parse import urlparse, parse_qs
         parsed = urlparse(self.path)
         params = parse_qs(parsed.query)
         query = params.get('q', [''])[0]
@@ -432,6 +565,11 @@ if __name__ == '__main__':
     # Initialize auth database
     init_db()
     cleanup_sessions()
+
+    # Create icons directory
+    ICON_DIR.mkdir(parents=True, exist_ok=True)
+    existing = list(ICON_DIR.glob('*.png'))
+    print(f'✓ Icons directory ready ({len(existing)} icons cached)')
 
     # Start periodic session cleanup
     session_cleanup_timer()
