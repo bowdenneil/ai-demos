@@ -36,6 +36,7 @@ ICON_PROMPTS = {
     'earnings': 'Minimalist flat icon of a rising bar chart with a microphone, dark amber background, orange glowing accents, simple clean vector style',
     'churn': 'Minimalist flat icon of circular arrows around a customer silhouette, dark orange background, bright orange glowing accents, simple clean vector style',
     'rfp': 'Minimalist flat icon of a document with a pen and checkmark, dark teal background, teal glowing accents, simple clean vector style',
+    'image': 'Minimalist flat icon of an artists paint palette with a glowing brush stroke, dark purple-teal gradient background, teal and purple glowing accents, simple clean vector style',
 }
 
 # ─── AUTH DATABASE ───
@@ -78,6 +79,22 @@ def init_db():
         print(f'✓ Admin user created: {admin_email}')
     else:
         print(f'✓ Admin user exists: {admin_email}')
+
+    # Seed guest user if not exists
+    guest_email = 'guest@aidemos.com'
+    row = conn.execute('SELECT id FROM users WHERE email = ?', (guest_email,)).fetchone()
+    if not row:
+        salt = secrets.token_hex(16)
+        password = 'guest2026'
+        password_hash = hashlib.sha256((salt + password).encode()).hexdigest()
+        conn.execute(
+            'INSERT INTO users (email, password_hash, salt) VALUES (?, ?, ?)',
+            (guest_email, password_hash, salt)
+        )
+        conn.commit()
+        print(f'✓ Guest user created: {guest_email}')
+    else:
+        print(f'✓ Guest user exists: {guest_email}')
 
     conn.close()
 
@@ -129,7 +146,8 @@ def generate_icon_file(demo):
             data=req_data,
             headers={
                 'Content-Type': 'application/json',
-                'Authorization': f'Bearer {PIAPI_KEY}'
+                'Authorization': f'Bearer {PIAPI_KEY}',
+                'User-Agent': 'AI-Demos-Portal/1.0'
             },
             method='POST'
         )
@@ -177,6 +195,11 @@ class DemoHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_auth_error()
                 return
             self.handle_proxy()
+        elif self.path == '/api/generate-image':
+            if not self.get_authenticated_user():
+                self.send_auth_error()
+                return
+            self.handle_generate_image()
         else:
             self.send_error(404)
 
@@ -526,6 +549,80 @@ class DemoHandler(http.server.SimpleHTTPRequestHandler):
             self.send_cors_headers()
             self.end_headers()
             self.wfile.write(e.read())
+
+    def handle_generate_image(self):
+        """Handle POST /api/generate-image — proxy to PiAPI gpt-image-1."""
+        content_length = int(self.headers.get('Content-Length', 0))
+        body = self.rfile.read(content_length) if content_length else b''
+        try:
+            data = json.loads(body)
+            prompt = data.get('prompt', '').strip()
+            style = data.get('style', 'Photorealistic')
+            size = data.get('size', '1024x1024')
+        except Exception:
+            self.send_json_response(400, {'success': False, 'error': 'Invalid request body'})
+            return
+
+        if not prompt:
+            self.send_json_response(400, {'success': False, 'error': 'Prompt is required'})
+            return
+
+        full_prompt = f"A {style} image of: {prompt}. High quality, detailed."
+
+        try:
+            req_data = json.dumps({
+                'model': 'gpt-image-1',
+                'prompt': full_prompt,
+                'size': size,
+                'n': 1,
+                'response_format': 'b64_json'
+            }).encode()
+
+            req = urllib.request.Request(
+                'https://api.piapi.ai/v1/images/generations',
+                data=req_data,
+                headers={
+                    'Content-Type': 'application/json',
+                    'Authorization': f'Bearer {PIAPI_KEY}',
+                    'User-Agent': 'AI-Demos-Portal/1.0'
+                },
+                method='POST'
+            )
+
+            resp = urllib.request.urlopen(req, timeout=120)
+            resp_data = json.loads(resp.read())
+
+            # Extract base64 image and revised prompt
+            image_b64 = None
+            revised_prompt = ''
+            if 'data' in resp_data and len(resp_data['data']) > 0:
+                item = resp_data['data'][0]
+                image_b64 = item.get('b64_json', '')
+                revised_prompt = item.get('revised_prompt', full_prompt)
+
+            if image_b64:
+                self.send_json_response(200, {
+                    'success': True,
+                    'image': image_b64,
+                    'revised_prompt': revised_prompt
+                })
+            else:
+                self.send_json_response(500, {
+                    'success': False,
+                    'error': 'No image data in response'
+                })
+
+        except urllib.error.HTTPError as e:
+            error_body = e.read()
+            try:
+                error_json = json.loads(error_body)
+                error_msg = error_json.get('error', {}).get('message', str(error_json))
+            except Exception:
+                error_msg = error_body.decode()[:200]
+            self.send_json_response(e.code, {'success': False, 'error': error_msg})
+
+        except Exception as e:
+            self.send_json_response(500, {'success': False, 'error': str(e)})
 
     def send_cors_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')

@@ -148,6 +148,7 @@
     .card-header-img.earnings { background: linear-gradient(135deg, rgba(251,191,36,0.12) 0%, rgba(251,191,36,0.04) 100%); }
     .card-header-img.churn { background: linear-gradient(135deg, rgba(249,115,22,0.12) 0%, rgba(249,115,22,0.04) 100%); }
     .card-header-img.rfp { background: linear-gradient(135deg, rgba(6,182,212,0.12) 0%, rgba(6,182,212,0.04) 100%); }
+    .card-header-img.image { background: linear-gradient(135deg, rgba(124,92,252,0.12) 0%, rgba(83,216,251,0.08) 100%); }
     .card-icon {
       width: 56px; height: 56px;
       border-radius: 14px;
@@ -165,6 +166,7 @@
     .card-icon.earnings { background: rgba(251,191,36,0.15); }
     .card-icon.churn { background: rgba(249,115,22,0.15); }
     .card-icon.rfp { background: rgba(6,182,212,0.15); }
+    .card-icon.image { background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(83,216,251,0.15)); }
     .card-icon.hidden { display: none; }
     .card-body {
       padding: 1.5rem;
@@ -186,6 +188,7 @@
     .tag.earnings { background: rgba(251,191,36,0.15); color: var(--accent5); }
     .tag.churn { background: rgba(249,115,22,0.15); color: var(--accent6); }
     .tag.rfp { background: rgba(6,182,212,0.15); color: var(--accent7); }
+    .tag.image { background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(83,216,251,0.15)); color: var(--accent2); }
     /* Icon generating overlay */
     .card-gen-overlay {
       position: absolute;
@@ -471,6 +474,8 @@
     .btn-churn:hover:not(:disabled) { background: #fb923c; }
     .btn-rfp { background: var(--accent7); color: #fff; }
     .btn-rfp:hover:not(:disabled) { background: #22d3ee; }
+    .btn-image { background: linear-gradient(135deg, #7c5cfc, #53d8fb); color: #fff; }
+    .btn-image:hover:not(:disabled) { background: linear-gradient(135deg, #9678ff, #70e4ff); }
     .btn-secondary {
       background: var(--surface2);
       color: var(--text-dim);
@@ -825,6 +830,59 @@
     .comparison-card .comp-label { color: var(--text-dim); }
     .comparison-card .comp-value { color: var(--text); font-weight: 600; }
 
+    /* Model select dropdown */
+    #modelSelect {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.4rem 0.6rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-family: var(--font);
+      cursor: pointer;
+      max-width: 180px;
+    }
+    #modelSelect:focus { outline: none; border-color: var(--accent); }
+    #modelSelect option { background: var(--surface2); color: var(--text); }
+    #modelSelect optgroup { color: var(--text-dim); font-style: normal; font-weight: 600; }
+
+    /* Image output */
+    .image-output-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    .image-output-container img {
+      max-width: 100%;
+      max-height: 600px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .image-revised-prompt {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      font-style: italic;
+      text-align: center;
+      max-width: 700px;
+    }
+
+    /* Guest login button */
+    .btn-guest {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 0.75rem;
+      width: 100%;
+      font-family: var(--font);
+    }
+    .btn-guest:hover { border-color: var(--accent2); color: var(--accent2); }
+
     @media (max-width: 768px) {
       .cards { grid-template-columns: 1fr; }
       .demo-input { flex-direction: column; }
@@ -853,6 +911,7 @@
       </div>
       <div id="login-error" class="login-error"></div>
       <button type="submit" class="btn btn-login">Sign In</button>
+      <button type="button" class="btn-guest" onclick="guestLogin()">Try as Guest →</button>
     </form>
     <p class="login-footer">Powered by <a href="https://tensorx.ai" target="_blank">Tensorx</a></p>
   </div>
@@ -864,6 +923,38 @@
   <div class="api-bar">
     <div class="api-status" id="apiStatus"></div>
     <input type="password" id="apiKeyInput" placeholder="Enter your API key (OpenAI-compatible endpoint)">
+    <select id="modelSelect">
+      <optgroup label="Tensorx GLM">
+        <option value="z-ai/glm-5.2" selected>GLM-5.2</option>
+        <option value="z-ai/glm-5.1">GLM-5.1</option>
+        <option value="z-ai/glm-5-turbo">GLM-5 Turbo</option>
+        <option value="z-ai/glm-5v-turbo">GLM-5V Turbo</option>
+        <option value="z-ai/glm-4.6">GLM-4.6</option>
+      </optgroup>
+      <optgroup label="DeepSeek">
+        <option value="deepseek/deepseek-v4-pro">DeepSeek V4 Pro</option>
+        <option value="deepseek/deepseek-v4-flash">DeepSeek V4 Flash</option>
+        <option value="deepseek/deepseek-r1-0528">DeepSeek R1</option>
+        <option value="deepseek/deepseek-chat-v3.1">DeepSeek V3.1</option>
+        <option value="deepseek/deepseek-v3.2">DeepSeek V3.2</option>
+      </optgroup>
+      <optgroup label="Qwen">
+        <option value="qwen/qwen3-235b-a22b-2507">Qwen3-235B</option>
+        <option value="qwen/qwen3.5-122b-a10b">Qwen3.5-122B</option>
+        <option value="qwen/qwen3.5-9b">Qwen3.5-9B</option>
+        <option value="qwen/qwen3-coder-30b-a3b-instruct">Qwen3 Coder 30B</option>
+      </optgroup>
+      <optgroup label="Llama">
+        <option value="meta-llama/llama-4-maverick">Llama 4 Maverick</option>
+        <option value="meta-llama/llama-3.3-70b-instruct">Llama 3.3 70B</option>
+      </optgroup>
+      <optgroup label="Other">
+        <option value="moonshotai/kimi-k2.5">Kimi K2.5</option>
+        <option value="minimax/minimax-m3">MiniMax M3</option>
+        <option value="nvidia/nemotron-3-super-120b-a12b">Nemotron 3 Super</option>
+        <option value="openai/gpt-oss-120b">GPT-OSS 120B</option>
+      </optgroup>
+    </select>
     <button class="btn btn-secondary" onclick="saveApiKey()" style="margin-top:0">Connect</button>
     <button class="btn-signout" onclick="handleLogout()">Sign Out</button>
   </div>
@@ -952,6 +1043,18 @@
       <h2>RFP Drafter</h2>
       <p>Paste RFP text or describe requirements — the system searches for relevant capabilities and case studies, then AI drafts section-by-section responses.</p>
       <span class="tag rfp">Bid &amp; Proposals</span>
+    </div>
+  </div>
+  <div class="card" onclick="openDemo('image')">
+    <div class="card-header-img image" id="card-header-image">
+      <img src="/icons/image.png" alt="" id="card-img-image">
+      <div class="card-icon image" id="card-emoji-image">🎨</div>
+      <div class="card-gen-overlay" id="card-gen-image">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Image Generator</h2>
+      <p>Enter a text prompt and select a style — the AI generates a high-quality image using gpt-image-1.</p>
+      <span class="tag image">Image Generation</span>
     </div>
   </div>
 </div>
@@ -1327,6 +1430,42 @@
   </div>
 </div>
 
+<!-- IMAGE GENERATOR DEMO -->
+<div class="demo-overlay" id="demo-image">
+  <div class="demo-panel">
+    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
+    <h2 class="demo-title">🎨 Image Generator</h2>
+    <p class="demo-desc">Enter a text prompt and select a style — the AI generates a high-quality image using gpt-image-1.</p>
+    <div class="demo-body">
+      <div class="demo-input">
+        <div class="input-group" style="flex:3;min-width:200px">
+          <label>Prompt</label>
+          <input type="text" id="image-prompt" placeholder="Describe the image you want to generate...">
+        </div>
+        <div class="input-group" style="flex:1;min-width:140px">
+          <label>Style</label>
+          <select id="image-style">
+            <option value="Photorealistic">Photorealistic</option>
+            <option value="Digital Art">Digital Art</option>
+            <option value="Oil Painting">Oil Painting</option>
+            <option value="Watercolor">Watercolor</option>
+            <option value="Anime">Anime</option>
+            <option value="Pixel Art">Pixel Art</option>
+            <option value="3D Render">3D Render</option>
+          </select>
+        </div>
+        <button class="btn btn-image" onclick="imageQuery()" style="margin-top:0">🎨 Generate</button>
+      </div>
+      <div class="demo-output">
+        <h3>Generated Image <div class="output-spinner" id="image-spinner"></div></h3>
+        <div id="image-output" class="output-content">
+          <div class="output-placeholder">Enter a prompt and click Generate to create an image</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="footer">
   <p>AI Solutions Demo Portal — Powered by <a href="https://tensorx.ai" target="_blank">Tensorx</a> — Built with ❤️ by <a href="https://github.com/bowdenneil" target="_blank">Pug</a></p>
 </div>
@@ -1344,7 +1483,25 @@ let API_KEY=***  // server proxy handles auth
 let API_BASE = (window.location.hostname !== 'bowdenneil.github.io')
   ? window.location.origin + '/api'     // same-origin proxy (localhost, Hetzner, any custom domain)
   : 'https://api.tensorx.ai/v1';        // GitHub Pages — direct (needs CORS)
-let MODEL = 'z-ai/glm-5.2';
+let MODEL = document.getElementById('modelSelect')?.value || 'z-ai/glm-5.2';
+
+// Restore saved model from localStorage
+(function() {
+  const saved = localStorage.getItem('ai_demo_model');
+  if (saved) {
+    const sel = document.getElementById('modelSelect');
+    if (sel) {
+      const opt = sel.querySelector(`option[value="${saved}"]`);
+      if (opt) { sel.value = saved; MODEL = saved; }
+    }
+  }
+})();
+
+// Model select change handler
+document.getElementById('modelSelect')?.addEventListener('change', function() {
+  MODEL = this.value;
+  localStorage.setItem('ai_demo_model', MODEL);
+});
 let SEARCH_BASE = (window.location.hostname !== 'bowdenneil.github.io')
   ? window.location.origin + '/api/search'  // same-origin proxy
   : 'https://api.search.brave.com/res/v1/web/search';  // direct
@@ -3171,6 +3328,50 @@ Tone: ${tone}. Be specific and reference our differentiators throughout.` }
   spinner.classList.remove('active');
 }
 
+// ─── IMAGE GENERATOR ───
+async function imageQuery() {
+  const prompt = document.getElementById('image-prompt').value.trim();
+  const style = document.getElementById('image-style').value;
+  const output = document.getElementById('image-output');
+  const spinner = document.getElementById('image-spinner');
+
+  if (!prompt) { showToast('Enter a prompt first', true); return; }
+
+  spinner.classList.add('active');
+  output.innerHTML = '<div class="output-placeholder">Generating image... This may take 30-60 seconds.</div>';
+
+  try {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    const resp = await fetch('/api/generate-image', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + (token || '')
+      },
+      body: JSON.stringify({ prompt, style, size: '1024x1024' })
+    });
+    const data = await resp.json();
+    if (data.success) {
+      output.innerHTML = `<div class="image-output-container">
+        <img src="data:image/png;base64,${data.image}" alt="Generated image">
+        <div class="image-revised-prompt">Prompt: ${escapeHtml(data.revised_prompt || '')}</div>
+      </div>`;
+    } else {
+      output.innerHTML = `<span style="color:var(--danger)">Error: ${escapeHtml(data.error || 'Unknown error')}</span>`;
+    }
+  } catch (e) {
+    output.innerHTML = `<span style="color:var(--danger)">Error: ${escapeHtml(e.message)}</span>`;
+  }
+  spinner.classList.remove('active');
+}
+
+// ─── GUEST LOGIN ───
+function guestLogin() {
+  document.getElementById('login-email').value = 'guest@aidemos.com';
+  document.getElementById('login-password').value = 'guest2026';
+  document.getElementById('login-form').requestSubmit();
+}
+
 // ─── AUTH ───
 const AUTH_TOKEN_KEY = 'ai_demo_token';
 
@@ -3259,7 +3460,7 @@ window.fetch = function(url, options = {}) {
 };
 
 // ─── ICON LOADING ───
-const ICON_DEMOS = ['rag', 'market', 'finance', 'regulatory', 'earnings', 'churn', 'rfp'];
+const ICON_DEMOS = ['rag', 'market', 'finance', 'regulatory', 'earnings', 'churn', 'rfp', 'image'];
 
 async function loadIcons() {
   for (const demo of ICON_DEMOS) {
@@ -3347,6 +3548,7 @@ loadIcons();
 
 // ─── KEY INPUT: Enter to submit ───
 document.getElementById('rag-question').addEventListener('keydown', e => { if (e.key === 'Enter') ragQuery(); });
+document.getElementById('image-prompt').addEventListener('keydown', e => { if (e.key === 'Enter') imageQuery(); });
 </script>
 </body>
 </html>
