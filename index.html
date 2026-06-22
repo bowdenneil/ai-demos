@@ -4083,51 +4083,45 @@ async function onpremAssess() {
       </div>
     </div>
     ${onpremDrawDimScorecards(scores)}
-    <div style="text-align:center;color:var(--text-dim);font-size:0.85rem;margin-top:0.75rem">Generating AI-powered recommendations...</div>
+    <div style="text-align:center;color:var(--text-dim);font-size:0.85rem;margin-top:0.75rem">Researching ${org !== 'Your Organisation' ? org : sector + ' sector'}...</div>
   `;
 
   // Build prompt for LLM
   const dimBreakdown = ONPREM_DIMS.map(d => `- ${d.name}: ${scores[d.id]}/5 (${d.levels[scores[d.id]-1].title})`).join('\n');
   const weakDims = ONPREM_DIMS.filter(d => scores[d.id] <= 2).map(d => `${d.name} (${d.levels[scores[d.id]-1].title})`);
 
-  const prompt = `You are an expert AI infrastructure consultant specialising in European on-premise AI deployments. Based on the following maturity assessment, provide a detailed, actionable report.
+  const prompt = `Produce an executive-level AI readiness report for the following organisation. Write as a senior consultant briefing a C-suite audience — narrative prose, not numbered Q&A. Weave insights throughout rather than listing them in sections.
 
-**Organisation:** ${org}
+**Client:** ${org}
 **Sector:** ${sector}
 **Size:** ${size} employees
 **Annual AI Spend:** ${spend}
-**Total Maturity Score:** ${total}/30
-**Maturity Level:** Level ${lvlNum} — ${level.name}
+**Maturity Score:** ${total}/30 — Level ${lvlNum} (${level.name})
 
-**Dimension Scores:**
+**Assessment Profile:**
 ${dimBreakdown}
 
-${weakDims.length > 0 ? `**Weak Dimensions (≤2):** ${weakDims.join(', ')}` : '**No critically weak dimensions.**'}
+${weakDims.length > 0 ? `**Critical Gaps:** ${weakDims.join(', ')}` : '**No critical gaps (all dimensions ≥3).**'}
+${searchContext}
 
-**European Regulatory Context:**
-- GDPR: ${sector === 'Healthcare' || sector === 'Public Sector' || sector === 'Financial Services' ? 'HIGH impact — personal data at scale, DPIA mandatory' : 'MODERATE impact — standard compliance required'}
-- EU AI Act: ${sector === 'Financial Services' || sector === 'Healthcare' || sector === 'Public Sector' ? 'HIGH — likely high-risk systems under Annex III' : 'MODERATE — depends on specific use cases'}
-- NIS2: ${sector === 'Financial Services' || sector === 'Energy & Utilities' || sector === 'Healthcare' || sector === 'Telecommunications' ? 'IN SCOPE — mandatory cybersecurity measures' : 'Check applicability — may be in scope as digital provider'}
+**Regulatory Landscape:**
+- GDPR: ${sector === 'Healthcare' || sector === 'Public Sector' || sector === 'Financial Services' ? 'HIGH — personal data at scale, DPIA mandatory' : 'MODERATE — standard compliance required'}
+- EU AI Act: ${sector === 'Financial Services' || sector === 'Healthcare' || sector === 'Public Sector' ? 'HIGH — likely high-risk systems under Annex III' : 'MODERATE — depends on use cases'}
+- NIS2: ${sector === 'Financial Services' || sector === 'Energy & Utilities' || sector === 'Healthcare' || sector === 'Telecommunications' ? 'IN SCOPE — mandatory cybersecurity measures' : 'Check applicability as digital provider'}
 
-**Provide the following in your response:**
+**Structure your report as:**
 
-1. **Executive Summary** — 2-3 sentences on current state and what it means
+1. **Opening assessment** — 2-3 sentences that a CEO would remember. Where does this organisation stand, and what does it mean for their competitive position?
 
-2. **Regulatory Obligations** — Specific EU regulations that apply to this organisation's sector and AI plans, with concrete compliance actions and deadlines
+2. **The case for action** — Connect their maturity scores and sector context to specific regulatory obligations, competitive pressures, and opportunities. Reference the web research where relevant. Be direct about what happens if they don't act.
 
-3. **Deployment Recommendation** — Cloud-only, hybrid, or on-prem-first? Justify based on their scores, sector, and spend. Reference Dell AI Factory with NVIDIA or Dell APEX if on-prem is recommended.
+3. **Recommended deployment path** — Cloud-only, hybrid, or on-prem-first? Justify the recommendation against their scores, sector, and spend. If on-prem is recommended, reference Dell AI Factory with NVIDIA (PowerEdge XE9680, XE8640, R760xa, PowerScale, APEX, Omnia) and NVIDIA stack (NIM, Triton, NeMo) with specific configurations and indicative EUR pricing.
 
-4. **Next Steps (prioritised)** — 5-7 specific, actionable next steps ordered by impact and urgency. For each, specify:
-   - What to do
-   - Who should own it
-   - Approximate timeline
-   - If it addresses a weak dimension or regulatory requirement
+4. **Priority roadmap** — 5-7 actions ordered by impact and urgency. Each should read as a sentence, not a bullet: what to do, who owns it, and by when. Mark any that address critical gaps or regulatory deadlines.
 
-5. **Infrastructure Sizing Guidance** — Based on their spend and sector, suggest a starting GPU configuration (e.g., "2x PowerEdge XE8640 with 4x L40S each for inference, expanding to fine-tuning later")
+5. **Risk register** — Top 3 risks for this maturity level with mitigations. Frame as board-level concerns, not operational details.
 
-6. **Key Risks** — Top 3 risks for this maturity level and how to mitigate them
-
-Format the response with clear headers and use tables where appropriate. Be specific and practical — not generic advice. Reference specific Dell products (PowerEdge XE9680, XE8640, R760xa, PowerScale, APEX, Omnia) and NVIDIA stack (NIM, Triton, NeMo) where relevant. Use EUR for all costs.`;
+Keep the report under 800 words. Write with authority and specificity — no filler, no hedging, no "it depends." Use tables sparingly and only when they add clarity over prose.`;
 
   const spinner = document.getElementById('onprem-spinner');
   spinner.classList.add('active');
@@ -4136,9 +4130,32 @@ Format the response with clear headers and use tables where appropriate. Be spec
   const savedModel = MODEL;
   MODEL = 'z-ai/glm-5.2';
 
+  // Web search for company and sector context
+  let searchContext = '';
+  try {
+    const searchOrg = org !== 'Your Organisation' ? org : '';
+    const searchQueries = [
+      `${searchOrg} ${sector} AI strategy infrastructure 2025 2026`,
+      `${sector} sector EU AI Act GDPR on-premise AI deployment 2025`
+    ].filter(q => q.trim().length > 30);
+
+    const allResults = [];
+    for (const q of searchQueries) {
+      const results = await webSearch(q, 5);
+      allResults.push(...results);
+    }
+
+    if (allResults.length > 0) {
+      const unique = allResults.filter((r, i, arr) => arr.findIndex(x => x.url === r.url) === i).slice(0, 8);
+      searchContext = '\n\n**Web Research Context:**\n' + unique.map(r => `- ${r.title}: ${r.description}`).join('\n');
+    }
+  } catch (e) {
+    console.warn('Search failed for onprem assessment:', e);
+  }
+
   try {
     const messages = [
-      { role: 'system', content: 'You are an expert AI infrastructure consultant specialising in European on-premise AI deployment. You combine deep knowledge of Dell AI infrastructure, NVIDIA AI Enterprise, EU regulations (GDPR, EU AI Act, NIS2), and industry best practices from Gartner, Forrester, IDC, and McKinsey. Be specific, practical, and European-focused. Use EUR for all costs.' },
+      { role: 'system', content: 'You are a senior AI strategy consultant at a top-tier European advisory firm. You write concise, authoritative executive reports for C-suite audiences. You combine deep knowledge of Dell AI infrastructure, NVIDIA AI Enterprise, EU regulations (GDPR, EU AI Act, NIS2), and industry best practices from Gartner, Forrester, IDC, and McKinsey. Write as a polished consultant — not a chatbot answering numbered questions. Use EUR for all costs.' },
       { role: 'user', content: prompt }
     ];
 
