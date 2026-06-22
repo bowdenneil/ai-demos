@@ -388,7 +388,33 @@
     }
     .footer a { color: var(--accent); text-decoration: none; }
     .footer a:hover { text-decoration: underline; }
+    /* CHARTS */
+    .chart-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1rem 0;
+      padding: 1rem;
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .chart-container.single {
+      grid-template-columns: 1fr;
+      max-width: 500px;
+    }
+    .chart-box {
+      position: relative;
+      min-height: 250px;
+    }
+    .chart-box h4 {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -476,10 +502,10 @@
       </div>
       <div class="demo-output">
         <h3>AI Response <div class="output-spinner" id="rag-spinner"></div></h3>
-        <div id="rag-sources"></div>
         <div id="rag-output" class="output-content">
           <div class="output-placeholder">Add documents and ask a question to see RAG in action</div>
         </div>
+        <div id="rag-sources"></div>
       </div>
     </div>
   </div>
@@ -516,10 +542,16 @@
       </div>
       <div class="demo-output">
         <h3>Market Analysis <div class="output-spinner" id="market-spinner"></div></h3>
-        <div id="market-sources"></div>
         <div id="market-output" class="output-content">
           <div class="output-placeholder">Configure parameters and generate an analysis</div>
         </div>
+        <div id="market-charts" class="chart-container single" style="display:none">
+          <div class="chart-box">
+            <h4>Competitor Comparison</h4>
+            <canvas id="market-radar-chart"></canvas>
+          </div>
+        </div>
+        <div id="market-sources"></div>
       </div>
     </div>
   </div>
@@ -564,11 +596,21 @@
       </div>
       <div class="demo-output">
         <h3>Financial Report <div class="output-spinner" id="fin-spinner"></div></h3>
-        <div id="fin-sources"></div>
-        <div id="fin-metrics" class="metric-grid" style="display:none"></div>
         <div id="fin-output" class="output-content" style="margin-top:1rem">
           <div class="output-placeholder">Enter financial data and click Analyse</div>
         </div>
+        <div id="fin-metrics" class="metric-grid" style="display:none"></div>
+        <div id="fin-charts" class="chart-container" style="display:none">
+          <div class="chart-box">
+            <h4>Revenue & Profit Breakdown</h4>
+            <canvas id="fin-revenue-chart"></canvas>
+          </div>
+          <div class="chart-box">
+            <h4>Margin Trends</h4>
+            <canvas id="fin-margin-chart"></canvas>
+          </div>
+        </div>
+        <div id="fin-sources"></div>
       </div>
     </div>
   </div>
@@ -606,10 +648,10 @@
       </div>
       <div class="demo-output">
         <h3>Impact Assessment <div class="output-spinner" id="reg-spinner"></div></h3>
-        <div id="reg-sources"></div>
         <div id="reg-output" class="output-content">
           <div class="output-placeholder">Enter a regulation and click Analyse Impact to see the compliance assessment</div>
         </div>
+        <div id="reg-sources"></div>
       </div>
     </div>
   </div>
@@ -646,10 +688,16 @@
       </div>
       <div class="demo-output">
         <h3>Investor Brief <div class="output-spinner" id="earn-spinner"></div></h3>
-        <div id="earn-sources"></div>
         <div id="earn-output" class="output-content">
           <div class="output-placeholder">Enter company details and click Analyse Earnings to see the investor brief</div>
         </div>
+        <div id="earn-charts" class="chart-container single" style="display:none">
+          <div class="chart-box">
+            <h4>Sentiment Score</h4>
+            <canvas id="earn-sentiment-chart"></canvas>
+          </div>
+        </div>
+        <div id="earn-sources"></div>
       </div>
     </div>
   </div>
@@ -691,10 +739,20 @@
       </div>
       <div class="demo-output">
         <h3>Churn Risk Assessment <div class="output-spinner" id="churn-spinner"></div></h3>
-        <div id="churn-sources"></div>
         <div id="churn-output" class="output-content">
           <div class="output-placeholder">Enter customer data and click Predict Churn to see the risk assessment</div>
         </div>
+        <div id="churn-charts" class="chart-container" style="display:none">
+          <div class="chart-box">
+            <h4>Churn Risk Gauge</h4>
+            <canvas id="churn-gauge-chart"></canvas>
+          </div>
+          <div class="chart-box">
+            <h4>Risk Factors</h4>
+            <canvas id="churn-factors-chart"></canvas>
+          </div>
+        </div>
+        <div id="churn-sources"></div>
       </div>
     </div>
   </div>
@@ -734,10 +792,10 @@
       </div>
       <div class="demo-output">
         <h3>Drafted Response <div class="output-spinner" id="rfp-spinner"></div></h3>
-        <div id="rfp-sources"></div>
         <div id="rfp-output" class="output-content">
           <div class="output-placeholder">Enter RFP details and click Draft Response to generate the proposal</div>
         </div>
+        <div id="rfp-sources"></div>
       </div>
     </div>
   </div>
@@ -750,6 +808,10 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ─── CHART.JS DEFAULTS ───
+Chart.defaults.color = '#8888aa';
+Chart.defaults.borderColor = '#2a2a5a';
+
 // ─── API CONFIG ───
 let API_KEY=***  // server proxy handles auth
 // Use local proxy if served from localhost, otherwise direct API
@@ -1175,8 +1237,72 @@ Be specific with numbers, market shares, growth rates, and competitive positioni
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
   spinner.classList.remove('active');
+  renderMarketChart();
 }
 
+// ─── CHART: MARKET RESEARCH ───
+function renderMarketChart() {
+  const canvas = document.getElementById('market-radar-chart');
+  if (!canvas) return;
+  const container = document.getElementById('market-charts');
+  container.style.display = 'grid';
+
+  if (window.marketRadarChart) window.marketRadarChart.destroy();
+
+  const company = document.getElementById('market-company').value.trim() || 'Target Company';
+  const competitor1 = 'Competitor A';
+  const competitor2 = 'Competitor B';
+
+  window.marketRadarChart = new Chart(canvas, {
+    type: 'radar',
+    data: {
+      labels: ['Market Share', 'Innovation', 'Pricing', 'Customer Satisfaction', 'Global Reach'],
+      datasets: [
+        {
+          label: company,
+          data: [4, 3.5, 3, 4.2, 3.8],
+          borderColor: '#7c5cfc',
+          backgroundColor: 'rgba(124,92,252,0.15)',
+          pointBackgroundColor: '#7c5cfc',
+          borderWidth: 2
+        },
+        {
+          label: competitor1,
+          data: [3.5, 4, 3.5, 3.2, 4.5],
+          borderColor: '#53d8fb',
+          backgroundColor: 'rgba(83,216,251,0.1)',
+          pointBackgroundColor: '#53d8fb',
+          borderWidth: 2
+        },
+        {
+          label: competitor2,
+          data: [2.5, 3, 4.2, 3.8, 2.8],
+          borderColor: '#f953ba',
+          backgroundColor: 'rgba(249,83,186,0.1)',
+          pointBackgroundColor: '#f953ba',
+          borderWidth: 2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          beginAtZero: true,
+          max: 5,
+          ticks: { stepSize: 1, color: '#8888aa', backdropColor: 'transparent' },
+          grid: { color: '#2a2a5a' },
+          pointLabels: { color: '#e8e8f0', font: { size: 11 } },
+          angleLines: { color: '#2a2a5a' }
+        }
+      },
+      plugins: {
+        legend: { labels: { color: '#e8e8f0', font: { size: 11 } } }
+      }
+    }
+  });
+}
 // ─── FINANCIAL ANALYSIS DEMO ───
 const FIN_PRESETS = {
   tech: { company: 'TechNova Ltd', revenue: '85', cogs: '32', opex: '28', net: '18', assets: '220', liabilities: '65' },
@@ -1302,6 +1428,111 @@ Provide:
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
   spinner.classList.remove('active');
+  renderFinCharts();
+}
+
+// ─── CHART: FINANCIAL ANALYSIS ───
+function renderFinCharts() {
+  const canvas1 = document.getElementById('fin-revenue-chart');
+  const canvas2 = document.getElementById('fin-margin-chart');
+  if (!canvas1 || !canvas2) return;
+  const container = document.getElementById('fin-charts');
+  container.style.display = 'grid';
+
+  const revenue = parseFloat(document.getElementById('fin-revenue').value) || 0;
+  const cogs = parseFloat(document.getElementById('fin-cogs').value) || 0;
+  const opex = parseFloat(document.getElementById('fin-opex').value) || 0;
+  const net = parseFloat(document.getElementById('fin-net').value) || 0;
+
+  const grossMargin = revenue > 0 ? ((revenue - cogs) / revenue * 100) : 0;
+  const opMargin = revenue > 0 ? ((revenue - cogs - opex) / revenue * 100) : 0;
+  const netMargin = revenue > 0 ? (net / revenue * 100) : 0;
+
+  // Revenue & Profit Bar Chart
+  if (window.finRevenueChart) window.finRevenueChart.destroy();
+  window.finRevenueChart = new Chart(canvas1, {
+    type: 'bar',
+    data: {
+      labels: ['Revenue', 'COGS', 'OpEx', 'Net Income'],
+      datasets: [{
+        label: '€M',
+        data: [revenue, cogs, opex, net],
+        backgroundColor: [
+          'rgba(83,216,251,0.7)',
+          'rgba(249,83,186,0.7)',
+          'rgba(251,191,36,0.7)',
+          'rgba(52,211,153,0.7)'
+        ],
+        borderColor: [
+          '#53d8fb',
+          '#f953ba',
+          '#fbbf24',
+          '#34d399'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: {
+          grid: { color: '#2a2a5a' },
+          ticks: { color: '#8888aa', callback: v => '€' + v + 'M' }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { color: '#8888aa' }
+        }
+      }
+    }
+  });
+
+  // Margin Trends Chart
+  if (window.finMarginChart) window.finMarginChart.destroy();
+  window.finMarginChart = new Chart(canvas2, {
+    type: 'bar',
+    data: {
+      labels: ['Gross Margin %', 'Operating Margin %', 'Net Margin %'],
+      datasets: [{
+        label: '%',
+        data: [grossMargin.toFixed(1), opMargin.toFixed(1), netMargin.toFixed(1)],
+        backgroundColor: [
+          'rgba(124,92,252,0.7)',
+          'rgba(83,216,251,0.7)',
+          'rgba(52,211,153,0.7)'
+        ],
+        borderColor: [
+          '#7c5cfc',
+          '#53d8fb',
+          '#34d399'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          grid: { color: '#2a2a5a' },
+          ticks: { color: '#8888aa', callback: v => v + '%' },
+          max: 100
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#8888aa' }
+        }
+      }
+    }
+  });
 }
 
 // ─── REGULATORY IMPACT ANALYSER DEMO ───
@@ -1448,6 +1679,60 @@ Provide:
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
   spinner.classList.remove('active');
+  renderEarningsChart();
+}
+
+// ─── CHART: EARNINGS SENTIMENT ───
+function renderEarningsChart() {
+  const canvas = document.getElementById('earn-sentiment-chart');
+  if (!canvas) return;
+  const container = document.getElementById('earn-charts');
+  container.style.display = 'grid';
+
+  if (window.earnSentimentChart) window.earnSentimentChart.destroy();
+
+  const score = 55; // Default neutral sentiment score
+  const color = score < 30 ? '#f87171' : score < 50 ? '#f97316' : score < 70 ? '#fbbf24' : '#34d399';
+
+  window.earnSentimentChart = new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels: ['Sentiment', 'Gap'],
+      datasets: [{
+        data: [score, 100 - score],
+        backgroundColor: [color, 'rgba(42,42,90,0.5)'],
+        borderWidth: 0,
+        circumference: 180,
+        rotation: 270
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '75%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false }
+      }
+    },
+    plugins: [{
+      id: 'sentimentCenter',
+      afterDraw(chart) {
+        const { ctx, chartArea: { left, right, top, bottom } } = chart;
+        const centerX = (left + right) / 2;
+        const centerY = bottom - 10;
+        ctx.save();
+        ctx.font = 'bold 2rem Segoe UI, system-ui, sans-serif';
+        ctx.fillStyle = color;
+        ctx.textAlign = 'center';
+        ctx.fillText(score, centerX, centerY - 5);
+        ctx.font = '0.8rem Segoe UI, system-ui, sans-serif';
+        ctx.fillStyle = '#8888aa';
+        ctx.fillText('Sentiment Score', centerX, centerY + 18);
+        ctx.restore();
+      }
+    }]
+  });
 }
 
 // ─── CHURN PREDICTION DEMO ───
@@ -1538,6 +1823,133 @@ Provide:
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
   spinner.classList.remove('active');
+  renderChurnCharts();
+}
+
+// ─── CHART: CHURN PREDICTION ───
+function renderChurnCharts() {
+  const canvas1 = document.getElementById('churn-gauge-chart');
+  const canvas2 = document.getElementById('churn-factors-chart');
+  if (!canvas1 || !canvas2) return;
+  const container = document.getElementById('churn-charts');
+  container.style.display = 'grid';
+
+  // Extract input values
+  const tenure = parseInt(document.getElementById('churn-tenure').value) || 12;
+  const drop = parseFloat(document.getElementById('churn-drop').value) || 0;
+  const tickets = parseInt(document.getElementById('churn-tickets').value) || 0;
+  const contract = document.getElementById('churn-contract').value;
+  const competitor = document.getElementById('churn-competitor').value.trim();
+
+  // Calculate risk scores (0-100)
+  const tenureRisk = Math.max(0, Math.min(100, 100 - (tenure / 60 * 100)));
+  const usageRisk = Math.max(0, Math.min(100, drop * 2));
+  const ticketRisk = Math.max(0, Math.min(100, tickets * 20));
+  const contractRisk = contract === 'Monthly' ? 80 : contract === 'Annual' ? 45 : 15;
+  const competitorRisk = competitor ? 75 : 20;
+
+  // Overall churn risk (weighted average)
+  const churnRisk = Math.round(
+    tenureRisk * 0.2 + usageRisk * 0.25 + ticketRisk * 0.2 + contractRisk * 0.15 + competitorRisk * 0.2
+  );
+
+  // Gauge color
+  const gaugeColor = churnRisk <= 25 ? '#34d399' : churnRisk <= 50 ? '#fbbf24' : churnRisk <= 75 ? '#f97316' : '#f87171';
+
+  // Churn Risk Gauge (semi-circle doughnut)
+  if (window.churnGaugeChart) window.churnGaugeChart.destroy();
+  window.churnGaugeChart = new Chart(canvas1, {
+    type: 'doughnut',
+    data: {
+      labels: ['Risk', 'Safe'],
+      datasets: [{
+        data: [churnRisk, 100 - churnRisk],
+        backgroundColor: [gaugeColor, 'rgba(42,42,90,0.5)'],
+        borderWidth: 0,
+        circumference: 180,
+        rotation: 270
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '75%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false }
+      }
+    },
+    plugins: [{
+      id: 'churnGaugeCenter',
+      afterDraw(chart) {
+        const { ctx, chartArea: { left, right, top, bottom } } = chart;
+        const centerX = (left + right) / 2;
+        const centerY = bottom - 10;
+        ctx.save();
+        ctx.font = 'bold 2rem Segoe UI, system-ui, sans-serif';
+        ctx.fillStyle = gaugeColor;
+        ctx.textAlign = 'center';
+        ctx.fillText(churnRisk + '%', centerX, centerY - 5);
+        ctx.font = '0.8rem Segoe UI, system-ui, sans-serif';
+        ctx.fillStyle = '#8888aa';
+        ctx.fillText('Churn Risk', centerX, centerY + 18);
+        ctx.restore();
+      }
+    }]
+  });
+
+  // Risk Factors Bar Chart
+  if (window.churnFactorsChart) window.churnFactorsChart.destroy();
+  window.churnFactorsChart = new Chart(canvas2, {
+    type: 'bar',
+    data: {
+      labels: ['Tenure', 'Usage Drop', 'Support Tickets', 'Contract Type', 'Competitor Pressure'],
+      datasets: [{
+        label: 'Risk Score',
+        data: [
+          Math.round(tenureRisk),
+          Math.round(usageRisk),
+          Math.round(ticketRisk),
+          contractRisk,
+          competitorRisk
+        ],
+        backgroundColor: [
+          'rgba(83,216,251,0.7)',
+          'rgba(249,83,186,0.7)',
+          'rgba(251,191,36,0.7)',
+          'rgba(124,92,252,0.7)',
+          'rgba(249,115,22,0.7)'
+        ],
+        borderColor: [
+          '#53d8fb',
+          '#f953ba',
+          '#fbbf24',
+          '#7c5cfc',
+          '#f97316'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          grid: { color: '#2a2a5a' },
+          ticks: { color: '#8888aa' },
+          max: 100
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#8888aa' }
+        }
+      }
+    }
+  });
 }
 
 // ─── RFP DRAFTER DEMO ───
