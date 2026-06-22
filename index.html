@@ -1341,12 +1341,12 @@ Chart.defaults.borderColor = '#2a2a5a';
 // ─── API CONFIG ───
 let API_KEY=***  // server proxy handles auth
 // Use local proxy if served from localhost, otherwise direct API
-let API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? window.location.origin + '/api'   // local proxy — no CORS issues
-  : 'https://api.tensorx.ai/v1';     // direct — may have CORS issues on errors
+let API_BASE = (window.location.hostname !== 'bowdenneil.github.io')
+  ? window.location.origin + '/api'     // same-origin proxy (localhost, Hetzner, any custom domain)
+  : 'https://api.tensorx.ai/v1';        // GitHub Pages — direct (needs CORS)
 let MODEL = 'z-ai/glm-5.2';
-let SEARCH_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? window.location.origin + '/api/search'   // local proxy
+let SEARCH_BASE = (window.location.hostname !== 'bowdenneil.github.io')
+  ? window.location.origin + '/api/search'  // same-origin proxy
   : 'https://api.search.brave.com/res/v1/web/search';  // direct
 let BRAVE_KEY = '';  // only needed for non-localhost (GitHub Pages)
 
