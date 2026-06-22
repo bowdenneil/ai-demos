@@ -14,12 +14,12 @@ export default {
 
     // Only allow POST to /chat/completions and GET to /models
     const url = new URL(request.url);
-    const targetUrl = 'https://api.tensorix.ai/v1' + url.pathname;
+    const targetUrl = 'https://api.tensorx.ai/v1' + url.pathname;
 
-    // Forward the request to Tensorix
+    // Forward the request to Tensorx
     const headers = new Headers(request.headers);
     headers.delete('host');
-    headers.set('Origin', 'https://api.tensorix.ai');
+    headers.set('Origin', 'https://api.tensorx.ai');
 
     const init = {
       method: request.method,

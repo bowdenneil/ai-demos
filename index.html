@@ -525,7 +525,7 @@
 </div>
 
 <div class="footer">
-  <p>AI Solutions Demo Portal — Powered by <a href="https://tensorix.ai" target="_blank">Tensorix</a> — Built with ❤️ by <a href="https://github.com/bowdenneil" target="_blank">Pug</a></p>
+  <p>AI Solutions Demo Portal — Powered by <a href="https://tensorx.ai" target="_blank">Tensorx</a> — Built with ❤️ by <a href="https://github.com/bowdenneil" target="_blank">Pug</a></p>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -536,8 +536,8 @@ let API_KEY=*** || '';
 // Use local proxy if served from localhost, otherwise direct API
 let API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? window.location.origin + '/api'   // local proxy — no CORS issues
-  : 'https://api.tensorix.ai/v1';     // direct — may have CORS issues on errors
-let MODEL = 'z-ai/glm-5.1';
+  : 'https://api.tensorx.ai/v1';     // direct — may have CORS issues on errors
+let MODEL = 'z-ai/glm-5.2';
 
 const statusDot = document.getElementById('apiStatus');
 const keyInput = document.getElementById('apiKeyInput');
@@ -572,7 +572,7 @@ async function saveApiKey() {
     }
     await testRes.json();
   } catch (e) {
-    showToast('Cannot reach Tensorix API from this browser. Try running locally instead.', true);
+    showToast('Cannot reach Tensorx API from this browser. Try running locally instead.', true);
     return;
   }
 

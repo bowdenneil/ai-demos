@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Local AI Demos server — serves the portal and proxies API calls to Tensorix.
+Local AI Demos server — serves the portal and proxies API calls to Tensorx.
 This avoids CORS issues entirely since the browser talks to localhost.
 
 Usage: python3 server.py [--port 8888] [--api-key YOUR_KEY]
@@ -14,8 +14,8 @@ import urllib.error
 import argparse
 from pathlib import Path
 
-API_BASE = 'https://api.tensorix.ai/v1'
-API_KEY = os.environ.get('TENSORIX_API_KEY', '')
+API_BASE = 'https://api.tensorx.ai/v1'
+API_KEY = os.environ.get('TENSORX_API_KEY', '')
 
 class DemoHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -137,7 +137,7 @@ class DemoHandler(http.server.SimpleHTTPRequestHandler):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='AI Demos Server')
     parser.add_argument('--port', type=int, default=8888)
-    parser.add_argument('--api-key', type=str, default='', help='Tensorix API key (or set TENSORIX_API_KEY env var)')
+    parser.add_argument('--api-key', type=str, default='', help='Tensorx API key (or set TENSORX_API_KEY env var)')
     args = parser.parse_args()
 
     if args.api_key:
@@ -148,7 +148,7 @@ if __name__ == '__main__':
         env_path = Path.home() / '.hermes' / '.env'
         if env_path.exists():
             for line in env_path.read_text().splitlines():
-                if line.startswith('TENSORIX_API_KEY=') and '***' not in line:
+                if line.startswith('TENSORX_API_KEY=') and '***' not in line:
                     API_KEY = line.split('=', 1)[1]
                     break
 
