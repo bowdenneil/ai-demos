@@ -3761,6 +3761,12 @@ function checkAndLoadIcon(demo) {
   const overlay = document.getElementById(`card-gen-${demo}`);
   if (!img) return;
 
+  // onprem has an inline SVG icon — skip PNG generation
+  if (demo === 'onprem') {
+    if (overlay) overlay.style.display = 'none';
+    return;
+  }
+
   // Try loading the existing icon
   const testImg = new Image();
   testImg.onload = () => {
@@ -4090,6 +4096,37 @@ async function onpremAssess() {
   const dimBreakdown = ONPREM_DIMS.map(d => `- ${d.name}: ${scores[d.id]}/5 (${d.levels[scores[d.id]-1].title})`).join('\n');
   const weakDims = ONPREM_DIMS.filter(d => scores[d.id] <= 2).map(d => `${d.name} (${d.levels[scores[d.id]-1].title})`);
 
+  const spinner = document.getElementById('onprem-spinner');
+  spinner.classList.add('active');
+
+  // Default to GLM-5.2 for assessment (best for structured reports)
+  const savedModel = MODEL;
+  MODEL = 'z-ai/glm-5.2';
+
+  // Web search for company and sector context
+  let searchContext = '';
+  try {
+    const searchOrg = org !== 'Your Organisation' ? org : '';
+    const searchQueries = [
+      `${searchOrg} ${sector} AI strategy infrastructure 2025 2026`,
+      `${sector} sector EU AI Act GDPR on-premise AI deployment 2025`
+    ].filter(q => q.trim().length > 30);
+
+    const allResults = [];
+    for (const q of searchQueries) {
+      const results = await webSearch(q, 5);
+      allResults.push(...results);
+    }
+
+    if (allResults.length > 0) {
+      const unique = allResults.filter((r, i, arr) => arr.findIndex(x => x.url === r.url) === i).slice(0, 8);
+      searchContext = '\n\n**Web Research Context:**\n' + unique.map(r => `- ${r.title}: ${r.description}`).join('\n');
+    }
+  } catch (e) {
+    console.warn('Search failed for onprem assessment:', e);
+  }
+
+  // Build prompt AFTER search so searchContext is available
   const prompt = `Produce an executive-level AI readiness report for the following organisation. Write as a senior consultant briefing a C-suite audience — narrative prose, not numbered Q&A. Weave insights throughout rather than listing them in sections.
 
 **Client:** ${org}
@@ -4122,36 +4159,6 @@ ${searchContext}
 5. **Risk register** — Top 3 risks for this maturity level with mitigations. Frame as board-level concerns, not operational details.
 
 Keep the report under 800 words. Write with authority and specificity — no filler, no hedging, no "it depends." Use tables sparingly and only when they add clarity over prose.`;
-
-  const spinner = document.getElementById('onprem-spinner');
-  spinner.classList.add('active');
-
-  // Default to GLM-5.2 for assessment (best for structured reports)
-  const savedModel = MODEL;
-  MODEL = 'z-ai/glm-5.2';
-
-  // Web search for company and sector context
-  let searchContext = '';
-  try {
-    const searchOrg = org !== 'Your Organisation' ? org : '';
-    const searchQueries = [
-      `${searchOrg} ${sector} AI strategy infrastructure 2025 2026`,
-      `${sector} sector EU AI Act GDPR on-premise AI deployment 2025`
-    ].filter(q => q.trim().length > 30);
-
-    const allResults = [];
-    for (const q of searchQueries) {
-      const results = await webSearch(q, 5);
-      allResults.push(...results);
-    }
-
-    if (allResults.length > 0) {
-      const unique = allResults.filter((r, i, arr) => arr.findIndex(x => x.url === r.url) === i).slice(0, 8);
-      searchContext = '\n\n**Web Research Context:**\n' + unique.map(r => `- ${r.title}: ${r.description}`).join('\n');
-    }
-  } catch (e) {
-    console.warn('Search failed for onprem assessment:', e);
-  }
 
   try {
     const messages = [
