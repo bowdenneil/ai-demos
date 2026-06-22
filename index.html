@@ -480,11 +480,11 @@
 
     /* OUTPUT */
     .output-content {
-      white-space: pre-wrap;
       font-size: 0.9rem;
       line-height: 1.8;
       color: var(--text);
     }
+    .output-content p { margin: 0.4rem 0; }
     .output-content strong { color: var(--accent); font-weight: 700; }
     .output-content em { color: var(--accent2); }
     .output-placeholder {
@@ -691,11 +691,147 @@
       border-color: var(--danger);
       color: var(--danger);
     }
+    /* ─── MARKDOWN RENDERED STYLES ─── */
+    .md-table-wrap { overflow-x: auto; margin: 0.75rem 0; }
+    .md-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 0.85rem;
+    }
+    .md-table thead th {
+      background: rgba(83,216,251,0.08);
+      color: var(--accent);
+      font-weight: 600;
+      text-align: left;
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .md-table tbody td {
+      padding: 0.5rem 0.8rem;
+      border-bottom: 1px solid rgba(42,42,90,0.4);
+      vertical-align: top;
+    }
+    .md-table tbody tr:last-child td { border-bottom: none; }
+    .md-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+    .md-table tbody tr:hover { background: rgba(83,216,251,0.04); }
+    .md-code-block {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+    .md-code-block code {
+      background: none !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+      font-size: inherit;
+      color: #c9d1d9;
+    }
+    .md-inline-code {
+      background: rgba(83,216,251,0.1);
+      color: var(--accent);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    }
+    .md-blockquote {
+      border-left: 3px solid var(--accent2);
+      background: rgba(124,92,252,0.05);
+      padding: 0.5rem 1rem;
+      margin: 0.75rem 0;
+      border-radius: 0 8px 8px 0;
+      color: var(--text);
+    }
+    .md-h1 { font-size: 1.4rem; font-weight: 800; margin: 1.2rem 0 0.5rem; color: var(--accent); }
+    .md-h2 { font-size: 1.2rem; font-weight: 700; margin: 1rem 0 0.4rem; color: var(--accent); }
+    .md-h3 { font-size: 1.05rem; font-weight: 700; margin: 0.8rem 0 0.3rem; color: var(--accent); }
+    .md-h4 { font-size: 0.95rem; font-weight: 600; margin: 0.6rem 0 0.25rem; color: var(--accent); }
+    .md-ul { padding-left: 1.5rem; margin: 0.4rem 0; }
+    .md-ul li { margin: 0.2rem 0; list-style: disc; }
+    .md-ol { padding-left: 1.5rem; margin: 0.4rem 0; }
+    .md-ol li { margin: 0.2rem 0; }
+    .md-hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    .md-link { color: var(--accent); text-decoration: underline; }
+    .md-link:hover { color: #70e4ff; }
+
+    /* ─── SWOT GRID ─── */
+    .swot-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+    .swot-quadrant {
+      border-radius: 10px;
+      padding: 1rem;
+      border: 1px solid;
+    }
+    .swot-quadrant h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .swot-quadrant ul { padding-left: 1.2rem; margin: 0; }
+    .swot-quadrant li { font-size: 0.85rem; margin: 0.2rem 0; line-height: 1.4; }
+    .swot-strengths { background: rgba(52,211,153,0.1); border-color: #34d399; }
+    .swot-strengths h4 { color: #34d399; }
+    .swot-weaknesses { background: rgba(249,83,186,0.1); border-color: #f953ba; }
+    .swot-weaknesses h4 { color: #f953ba; }
+    .swot-opportunities { background: rgba(83,216,251,0.1); border-color: #53d8fb; }
+    .swot-opportunities h4 { color: #53d8fb; }
+    .swot-threats { background: rgba(251,191,36,0.1); border-color: #fbbf24; }
+    .swot-threats h4 { color: #fbbf24; }
+
+    /* ─── COMPARISON CARD GRID ─── */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+    .comparison-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .comparison-card h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .comparison-card .comp-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.25rem 0;
+      font-size: 0.82rem;
+      border-bottom: 1px solid rgba(42,42,90,0.3);
+    }
+    .comparison-card .comp-row:last-child { border-bottom: none; }
+    .comparison-card .comp-label { color: var(--text-dim); }
+    .comparison-card .comp-value { color: var(--text); font-weight: 600; }
+
     @media (max-width: 768px) {
       .cards { grid-template-columns: 1fr; }
       .demo-input { flex-direction: column; }
       .input-group { min-width: 100%; }
       .demo-input .presets { align-self: flex-start; }
+      .swot-grid { grid-template-columns: 1fr; }
+      .comparison-grid { grid-template-columns: 1fr; }
     }
   </style>
   <script src="chart.min.js"></script>
@@ -1408,17 +1544,327 @@ function closeDemo() {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDemo(); });
 
 function formatMarkdown(text) {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/^### (.+)$/gm, '<div style="font-size:1.1rem;font-weight:700;margin:0.75rem 0 0.25rem;color:var(--accent)">$1</div>')
-    .replace(/^## (.+)$/gm, '<div style="font-size:1.2rem;font-weight:700;margin:1rem 0 0.5rem;color:var(--accent)">$1</div>')
-    .replace(/^# (.+)$/gm, '<div style="font-size:1.4rem;font-weight:800;margin:1rem 0 0.5rem;color:var(--accent)">$1</div>')
-    .replace(/^- (.+)$/gm, '<div style="padding-left:1rem">• $1</div>')
-    .replace(/^\d+\. (.+)$/gm, (m, p1, off, str) => {
-      return `<div style="padding-left:1rem">${m}</div>`;
-    })
-    .replace(/\n/g, '<br>');
+  if (!text) return '';
+  // --- Phase 1: Extract and protect code blocks ---
+  const codeBlocks = [];
+  text = text.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    const idx = codeBlocks.length;
+    codeBlocks.push(`<div class="md-code-block"><code>${escapeHtml(code.trim())}</code></div>`);
+    return `\n%%CODEBLOCK_${idx}%%\n`;
+  });
+  const inlineCodes = [];
+  text = text.replace(/`([^`\n]+)`/g, (_, code) => {
+    const idx = inlineCodes.length;
+    inlineCodes.push(`<code class="md-inline-code">${escapeHtml(code)}</code>`);
+    return `%%INLINECODE_${idx}%%`;
+  });
+
+  // --- Phase 2: Extract and convert tables ---
+  text = convertMarkdownTables(text);
+
+  // --- Phase 3: Block-level elements (headings, blockquotes, lists, hr) ---
+  const lines = text.split('\n');
+  const result = [];
+  let inUl = false, inOl = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+
+    // Skip lines inside code block placeholders — they are self-contained
+    if (line.match(/^%%CODEBLOCK_\d+%%$/)) {
+      if (inUl) { result.push('</ul>'); inUl = false; }
+      if (inOl) { result.push('</ol>'); inOl = false; }
+      result.push(line);
+      continue;
+    }
+    // Skip lines that are already HTML from table conversion
+    if (line.match(/^<(div class="md-table|\/div|table|\/table|thead|\/thead|tbody|\/tbody|tr|\/tr|th|\/th|td|\/td)/)) {
+      if (inUl) { result.push('</ul>'); inUl = false; }
+      if (inOl) { result.push('</ol>'); inOl = false; }
+      result.push(line);
+      continue;
+    }
+
+    // Headings
+    const h4 = line.match(/^####\s+(.+)$/);
+    const h3 = line.match(/^###\s+(.+)$/);
+    const h2 = line.match(/^##\s+(.+)$/);
+    const h1 = line.match(/^#\s+(.+)$/);
+    if (h1) { if (inUl) { result.push('</ul>'); inUl = false; } if (inOl) { result.push('</ol>'); inOl = false; } result.push(`<div class="md-h1">${h1[1]}</div>`); continue; }
+    if (h2) { if (inUl) { result.push('</ul>'); inUl = false; } if (inOl) { result.push('</ol>'); inOl = false; } result.push(`<div class="md-h2">${h2[1]}</div>`); continue; }
+    if (h3) { if (inUl) { result.push('</ul>'); inUl = false; } if (inOl) { result.push('</ol>'); inOl = false; } result.push(`<div class="md-h3">${h3[1]}</div>`); continue; }
+    if (h4) { if (inUl) { result.push('</ul>'); inUl = false; } if (inOl) { result.push('</ol>'); inOl = false; } result.push(`<div class="md-h4">${h4[1]}</div>`); continue; }
+
+    // Blockquote
+    const bq = line.match(/^>\s?(.*)$/);
+    if (bq) {
+      if (inUl) { result.push('</ul>'); inUl = false; }
+      if (inOl) { result.push('</ol>'); inOl = false; }
+      result.push(`<div class="md-blockquote">${bq[1]}</div>`);
+      continue;
+    }
+
+    // Horizontal rule
+    if (line.match(/^(---+|\*\*\*+|___+)\s*$/)) {
+      if (inUl) { result.push('</ul>'); inUl = false; }
+      if (inOl) { result.push('</ol>'); inOl = false; }
+      result.push('<hr class="md-hr">');
+      continue;
+    }
+
+    // Unordered list
+    const ulMatch = line.match(/^[\s]*[-*+]\s+(.+)$/);
+    if (ulMatch) {
+      if (inOl) { result.push('</ol>'); inOl = false; }
+      if (!inUl) { result.push('<ul class="md-ul">'); inUl = true; }
+      result.push(`<li>${ulMatch[1]}</li>`);
+      continue;
+    }
+
+    // Ordered list
+    const olMatch = line.match(/^[\s]*(\d+)\.\s+(.+)$/);
+    if (olMatch) {
+      if (inUl) { result.push('</ul>'); inUl = false; }
+      if (!inOl) { result.push('<ol class="md-ol">'); inOl = true; }
+      result.push(`<li>${olMatch[2]}</li>`);
+      continue;
+    }
+
+    // Close lists if we hit a non-list line
+    if (inUl) { result.push('</ul>'); inUl = false; }
+    if (inOl) { result.push('</ol>'); inOl = false; }
+
+    // Empty line → paragraph break
+    if (line.trim() === '') {
+      result.push('');
+      continue;
+    }
+
+    // Regular text line
+    result.push(line);
+  }
+  if (inUl) result.push('</ul>');
+  if (inOl) result.push('</ol>');
+
+  text = result.join('\n');
+
+  // --- Phase 4: Inline formatting ---
+  // Bold
+  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/__(.+?)__/g, '<strong>$1</strong>');
+  // Italic
+  text = text.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+  text = text.replace(/_(.+?)_/g, '<em>$1</em>');
+  // Links
+  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="md-link">$1</a>');
+
+  // --- Phase 5: Paragraphs — wrap consecutive non-empty, non-tag lines ---
+  const finalLines = text.split('\n');
+  const out = [];
+  let paraBuf = [];
+  for (const ln of finalLines) {
+    const trimmed = ln.trim();
+    const isTag = trimmed.startsWith('<') || trimmed.startsWith('%%CODEBLOCK') || trimmed.startsWith('%%INLINECODE');
+    if (trimmed === '' || isTag) {
+      if (paraBuf.length) { out.push('<p>' + paraBuf.join(' ') + '</p>'); paraBuf = []; }
+      if (trimmed !== '') out.push(ln);
+    } else {
+      paraBuf.push(trimmed);
+    }
+  }
+  if (paraBuf.length) out.push('<p>' + paraBuf.join(' ') + '</p>');
+  text = out.join('\n');
+
+  // --- Phase 6: Restore code blocks and inline codes ---
+  codeBlocks.forEach((html, idx) => {
+    text = text.replace(`%%CODEBLOCK_${idx}%%`, html);
+  });
+  inlineCodes.forEach((html, idx) => {
+    text = text.replace(`%%INLINECODE_${idx}%%`, html);
+  });
+
+  return text;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function convertMarkdownTables(text) {
+  const lines = text.split('\n');
+  const out = [];
+  let i = 0;
+  while (i < lines.length) {
+    // Detect start of table block: line starting with |
+    if (lines[i].trim().startsWith('|')) {
+      const tableLines = [];
+      while (i < lines.length && lines[i].trim().startsWith('|')) {
+        tableLines.push(lines[i]);
+        i++;
+      }
+      // Parse the table
+      out.push(parseTableBlock(tableLines));
+    } else {
+      out.push(lines[i]);
+      i++;
+    }
+  }
+  return out.join('\n');
+}
+
+function parseTableBlock(tableLines) {
+  if (tableLines.length < 2) return tableLines.join('\n');
+
+  // Parse cells from a table row
+  function parseRow(line) {
+    return line.split('|').slice(1, -1).map(c => c.trim());
+  }
+
+  const headerCells = parseRow(tableLines[0]);
+  if (!headerCells.length) return tableLines.join('\n');
+
+  // Check if second line is a separator (|---|---|)
+  const sepMatch = tableLines[1].match(/^\|[\s\-:]+\|/);
+  const dataStart = sepMatch ? 2 : 1;
+
+  let html = '<div class="md-table-wrap"><table class="md-table"><thead><tr>';
+  headerCells.forEach(h => { html += `<th>${h}</th>`; });
+  html += '</tr></thead><tbody>';
+
+  for (let r = dataStart; r < tableLines.length; r++) {
+    const cells = parseRow(tableLines[r]);
+    html += '<tr>';
+    cells.forEach(c => { html += `<td>${c}</td>`; });
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+  return html;
+}
+
+// ─── SWOT & COMPARISON POST-PROCESSING ───
+function postProcessLLMOutput(html) {
+  html = detectAndRenderSWOT(html);
+  html = detectAndRenderComparisonGrid(html);
+  return html;
+}
+
+function detectAndRenderSWOT(html) {
+  // Check if all four SWOT terms are present
+  const hasS = /strengths/i.test(html);
+  const hasW = /weaknesses/i.test(html);
+  const hasO = /opportunities/i.test(html);
+  const hasT = /threats/i.test(html);
+  if (!(hasS && hasW && hasO && hasT)) return html;
+
+  // Try to find SWOT sections in the HTML. Look for headings containing the terms
+  // followed by list items or content until the next heading.
+  const sections = { strengths: '', weaknesses: '', opportunities: '', threats: '' };
+
+  // Pattern: find a heading (md-h1/2/3/4) containing the keyword, then capture content until next heading
+  for (const key of Object.keys(sections)) {
+    const regex = new RegExp(`<(?:div class="md-h[1-4]"|strong)>(?:.*?\\b${key}\\b.*?)<\\/(?:div|strong)>([\\s\\S]*?)(?=<(?:div class="md-h[1-4]"|strong|div class="md-blockquote"|hr class="md-hr")|$)`, 'i');
+    const m = html.match(regex);
+    if (m) {
+      let content = m[1].trim();
+      // Remove leading <p> wrapper if it's just wrapping list items
+      content = content.replace(/^<p>/, '').replace(/<\/p>$/, '');
+      sections[key] = content;
+    }
+  }
+
+  // If we extracted content for all four, build the grid
+  const allFound = Object.values(sections).every(s => s.length > 0);
+  if (!allFound) return html; // Couldn't extract, leave as-is
+
+  // Build the SWOT grid HTML
+  const gridHtml = `<div class="swot-grid">
+    <div class="swot-quadrant swot-strengths"><h4>💪 Strengths</h4><ul>${extractBullets(sections.strengths)}</ul></div>
+    <div class="swot-quadrant swot-weaknesses"><h4>⚠️ Weaknesses</h4><ul>${extractBullets(sections.weaknesses)}</ul></div>
+    <div class="swot-quadrant swot-opportunities"><h4>🚀 Opportunities</h4><ul>${extractBullets(sections.opportunities)}</ul></div>
+    <div class="swot-quadrant swot-threats"><h4>🔥 Threats</h4><ul>${extractBullets(sections.threats)}</ul></div>
+  </div>`;
+
+  // Replace the SWOT sections in the original HTML with the grid
+  // Remove each section's heading + content, insert grid once
+  let result = html;
+  let inserted = false;
+  for (const key of Object.keys(sections)) {
+    const headingRegex = new RegExp(
+      `<(?:div class="md-h[1-4]"|strong)>(?:.*?\\b${key}\\b.*?)<\\/(?:div|strong)>[\\s\\S]*?(?=<(?:div class="md-h[1-4]"|strong|div class="md-blockquote"|hr class="md-hr"|div class="swot-grid")|$)`,
+      'i'
+    );
+    result = result.replace(headingRegex, (match) => {
+      if (!inserted) { inserted = true; return gridHtml; }
+      return '';
+    });
+  }
+  return result;
+}
+
+function extractBullets(html) {
+  // Extract list items from HTML and return <li> elements
+  const lis = [];
+  // Match <li>...</li>
+  const liRegex = /<li>([\s\S]*?)<\/li>/g;
+  let m;
+  while ((m = liRegex.exec(html)) !== null) {
+    lis.push(`<li>${m[1].trim()}</li>`);
+  }
+  // If no <li> found, try splitting by <br> or <p> and treating each as a bullet
+  if (lis.length === 0) {
+    const items = html.replace(/<\/?p>/g, '').replace(/<\/?ul>|<\/?ol>/g, '').split(/<br\s*\/?>|\n/).map(s => s.trim()).filter(s => s && s !== '•' && !s.match(/^<hr/));
+    items.forEach(item => {
+      // Clean up leading bullet chars
+      const clean = item.replace(/^[•\-\*]\s*/, '');
+      if (clean) lis.push(`<li>${clean}</li>`);
+    });
+  }
+  return lis.join('');
+}
+
+function detectAndRenderComparisonGrid(html) {
+  // Look for tables with class md-table that have 3+ columns and "Comparison" or "Competitor" in a heading nearby
+  // This is a heuristic: if there's a heading containing "Comparison" or "Competitor Analysis"
+  // followed by a table with 3+ columns, convert it to comparison cards
+  const headingRegex = /<div class="md-h[1-4]">([^<]*(?:Comparison|Competitor Analysis)[^<]*)<\/div>\s*(<div class="md-table-wrap">[\s\S]*?<\/div>)/gi;
+  return html.replace(headingRegex, (match, title, tableHtml) => {
+    // Parse the table to extract column headers and rows
+    const headerMatch = tableHtml.match(/<thead>[\s\S]*?<tr>([\s\S]*?)<\/tr>/);
+    const bodyMatch = tableHtml.match(/<tbody>([\s\S]*?)<\/tbody>/);
+    if (!headerMatch || !bodyMatch) return match;
+
+    const headers = [];
+    const hReg = /<th>([\s\S]*?)<\/th>/g;
+    let hm;
+    while ((hm = hReg.exec(headerMatch[1])) !== null) headers.push(hm[1].trim());
+
+    if (headers.length < 3) return match; // Not enough columns for card grid
+
+    // Parse rows
+    const rows = [];
+    const rowReg = /<tr>([\s\S]*?)<\/tr>/g;
+    let rm;
+    while ((rm = rowReg.exec(bodyMatch[1])) !== null) {
+      const cells = [];
+      const tdReg = /<td>([\s\S]*?)<\/td>/g;
+      let tm;
+      while ((tm = tdReg.exec(rm[1])) !== null) cells.push(tm[1].trim());
+      if (cells.length) rows.push(cells);
+    }
+
+    // First column is the "dimension" label, rest are competitors/entities
+    // Build cards for each competitor (columns 1+)
+    const cardHtml = rows.length ? rows.map(row => {
+      const cardTitle = row[0] || '';
+      const cardRows = headers.slice(1).map((h, idx) => {
+        const val = row[idx + 1] || '—';
+        return `<div class="comp-row"><span class="comp-label">${h}</span><span class="comp-value">${val}</span></div>`;
+      }).join('');
+      return `<div class="comparison-card"><h4>${cardTitle}</h4>${cardRows}</div>`;
+    }).join('') : '';
+
+    return `<div class="md-h3">${title}</div><div class="comparison-grid">${cardHtml}</div>`;
+  });
 }
 
 // ─── RAG DEMO ───
@@ -1570,7 +2016,7 @@ async function ragQuery() {
     const result = await callLLM(messages, (text) => {
       output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
     });
-    output.innerHTML = formatMarkdown(result);
+    output.innerHTML = postProcessLLMOutput(formatMarkdown(result));
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
@@ -1642,16 +2088,16 @@ Be specific with numbers, market shares, growth rates, and competitive positioni
       fullText = text;
       output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
     });
-    output.innerHTML = formatMarkdown(fullText);
+    output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
   spinner.classList.remove('active');
-  renderMarketChart();
+  renderMarketChart(fullText);
 }
 
 // ─── CHART: MARKET RESEARCH ───
-function renderMarketChart() {
+function renderMarketChart(llmText) {
   if (typeof Chart === 'undefined') return;
   try {
   const canvas = document.getElementById('market-radar-chart');
@@ -1662,39 +2108,139 @@ function renderMarketChart() {
   if (window.marketRadarChart) window.marketRadarChart.destroy();
 
   const company = document.getElementById('market-company').value.trim() || 'Target Company';
-  const competitor1 = 'Competitor A';
-  const competitor2 = 'Competitor B';
 
-  window.marketRadarChart = new Chart(canvas, {
-    type: 'radar',
-    data: {
-      labels: ['Market Share', 'Innovation', 'Pricing', 'Customer Satisfaction', 'Global Reach'],
-      datasets: [
-        {
+  // --- Parse LLM output for competitor data ---
+  const defaultDimensions = ['Market Share', 'Innovation', 'Brand Strength', 'Customer Satisfaction', 'Pricing'];
+  const competitorColors = [
+    { border: '#7c5cfc', bg: 'rgba(124,92,252,0.15)', point: '#7c5cfc' },
+    { border: '#53d8fb', bg: 'rgba(83,216,251,0.1)', point: '#53d8fb' },
+    { border: '#f953ba', bg: 'rgba(249,83,186,0.1)', point: '#f953ba' },
+    { border: '#fbbf24', bg: 'rgba(251,191,36,0.1)', point: '#fbbf24' },
+    { border: '#34d399', bg: 'rgba(52,211,153,0.1)', point: '#34d399' }
+  ];
+
+  let datasets = [];
+  let labels = defaultDimensions;
+
+  if (llmText) {
+    // Try to extract a markdown table with competitor comparison data
+    const tableRows = llmText.split('\n').filter(l => l.trim().startsWith('|') && !l.match(/^\|[\s\-:]+\|/));
+    if (tableRows.length >= 2) {
+      // Parse table
+      const parseRow = (line) => line.split('|').slice(1, -1).map(c => c.trim());
+      const headers = parseRow(tableRows[0]);
+      const numericCols = []; // indices of columns with numeric data
+      const dataRows = tableRows.slice(1).map(parseRow);
+
+      // Find columns that contain numbers
+      if (headers.length > 1) {
+        for (let ci = 1; ci < headers.length; ci++) {
+          const hasNums = dataRows.some(r => r[ci] && /[\d\.]+/.test(r[ci]));
+          if (hasNums) numericCols.push(ci);
+        }
+      }
+
+      if (numericCols.length >= 3) {
+        // Use the first column as dimension labels, numeric columns as competitors
+        labels = dataRows.map(r => r[0]).filter(Boolean);
+        if (labels.length >= 3) {
+          // Each numeric column is a competitor dataset
+          numericCols.forEach((ci, idx) => {
+            const compName = headers[ci] || `Competitor ${idx + 1}`;
+            const values = dataRows.map(r => {
+              const num = parseFloat((r[ci] || '').replace(/[^0-9.\-]/g, ''));
+              return isNaN(num) ? 0 : num;
+            });
+            const color = competitorColors[idx % competitorColors.length];
+            datasets.push({
+              label: compName,
+              data: values,
+              borderColor: color.border,
+              backgroundColor: color.bg,
+              pointBackgroundColor: color.point,
+              borderWidth: 2
+            });
+          });
+        }
+      }
+    }
+
+    // Fallback: try to extract scored dimensions from text patterns
+    if (datasets.length === 0) {
+      // Look for patterns like "Market Share: 7/10" or "Innovation: 8.5"
+      const dimPatterns = {};
+      const scoreRegex = /(?:Market Share|Innovation|Brand Strength|Customer Satisfaction|Pricing|Global Reach|Product Quality|Growth)[:\s]+(\d+(?:\.\d+)?)(?:\s*\/\s*10)?/gi;
+      let m;
+      while ((m = scoreRegex.exec(llmText)) !== null) {
+        const dim = m[0].split(/[:\s]/)[0];
+        const score = parseFloat(m[1]);
+        if (dim && !isNaN(score)) {
+          if (!dimPatterns[dim]) dimPatterns[dim] = [];
+          dimPatterns[dim].push(Math.min(score, 10));
+        }
+      }
+
+      // Also try "X% market share" patterns
+      const shareRegex = /(\w[\w\s]*?)\s*[:\-]\s*(\d+(?:\.\d+)?)\s*(?:%|\/10)/gi;
+      // Don't override if we already have dimPatterns
+
+      // If we found enough dimensions, build a radar chart
+      const dims = Object.keys(dimPatterns);
+      if (dims.length >= 3) {
+        labels = dims.slice(0, 5);
+        // Use company as first dataset, aggregate others
+        const companyScores = labels.map(l => {
+          const scores = dimPatterns[l] || [];
+          return scores[0] || 3;
+        });
+        datasets.push({
           label: company,
-          data: [4, 3.5, 3, 4.2, 3.8],
+          data: companyScores,
           borderColor: '#7c5cfc',
           backgroundColor: 'rgba(124,92,252,0.15)',
           pointBackgroundColor: '#7c5cfc',
           borderWidth: 2
-        },
-        {
-          label: competitor1,
-          data: [3.5, 4, 3.5, 3.2, 4.5],
-          borderColor: '#53d8fb',
-          backgroundColor: 'rgba(83,216,251,0.1)',
-          pointBackgroundColor: '#53d8fb',
-          borderWidth: 2
-        },
-        {
-          label: competitor2,
-          data: [2.5, 3, 4.2, 3.8, 2.8],
-          borderColor: '#f953ba',
-          backgroundColor: 'rgba(249,83,186,0.1)',
-          pointBackgroundColor: '#f953ba',
-          borderWidth: 2
-        }
-      ]
+        });
+      }
+    }
+  }
+
+  // Fallback: use default placeholder data if nothing parsed
+  if (datasets.length === 0) {
+    datasets = [
+      {
+        label: company,
+        data: [4, 3.5, 3, 4.2, 3.8],
+        borderColor: '#7c5cfc',
+        backgroundColor: 'rgba(124,92,252,0.15)',
+        pointBackgroundColor: '#7c5cfc',
+        borderWidth: 2
+      },
+      {
+        label: 'Competitor A',
+        data: [3.5, 4, 3.5, 3.2, 4.5],
+        borderColor: '#53d8fb',
+        backgroundColor: 'rgba(83,216,251,0.1)',
+        pointBackgroundColor: '#53d8fb',
+        borderWidth: 2
+      },
+      {
+        label: 'Competitor B',
+        data: [2.5, 3, 4.2, 3.8, 2.8],
+        borderColor: '#f953ba',
+        backgroundColor: 'rgba(249,83,186,0.1)',
+        pointBackgroundColor: '#f953ba',
+        borderWidth: 2
+      }
+    ];
+    labels = ['Market Share', 'Innovation', 'Pricing', 'Customer Satisfaction', 'Global Reach'];
+  }
+
+  window.marketRadarChart = new Chart(canvas, {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: datasets
     },
     options: {
       responsive: true,
@@ -1702,8 +2248,8 @@ function renderMarketChart() {
       scales: {
         r: {
           beginAtZero: true,
-          max: 5,
-          ticks: { stepSize: 1, color: '#8888aa', backdropColor: 'transparent' },
+          max: 10,
+          ticks: { stepSize: 2, color: '#8888aa', backdropColor: 'transparent' },
           grid: { color: '#2a2a5a' },
           pointLabels: { color: '#e8e8f0', font: { size: 11 } },
           angleLines: { color: '#2a2a5a' }
@@ -1836,16 +2382,16 @@ Provide:
       fullText = text;
       output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
     });
-    output.innerHTML = formatMarkdown(fullText);
+    output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
   spinner.classList.remove('active');
-  renderFinCharts();
+  renderFinCharts(fullText);
 }
 
 // ─── CHART: FINANCIAL ANALYSIS ───
-function renderFinCharts() {
+function renderFinCharts(llmText) {
   if (typeof Chart === 'undefined') return;
   try {
   const canvas1 = document.getElementById('fin-revenue-chart');
@@ -1859,9 +2405,19 @@ function renderFinCharts() {
   const opex = parseFloat(document.getElementById('fin-opex').value) || 0;
   const net = parseFloat(document.getElementById('fin-net').value) || 0;
 
-  const grossMargin = revenue > 0 ? ((revenue - cogs) / revenue * 100) : 0;
-  const opMargin = revenue > 0 ? ((revenue - cogs - opex) / revenue * 100) : 0;
-  const netMargin = revenue > 0 ? (net / revenue * 100) : 0;
+  let grossMargin = revenue > 0 ? ((revenue - cogs) / revenue * 100) : 0;
+  let opMargin = revenue > 0 ? ((revenue - cogs - opex) / revenue * 100) : 0;
+  let netMargin = revenue > 0 ? (net / revenue * 100) : 0;
+
+  // --- Parse LLM output for margin data ---
+  if (llmText) {
+    const gmMatch = llmText.match(/Gross\s*Margin[:\s]+(\d+(?:\.\d+)?)\s*%/i);
+    const omMatch = llmText.match(/Operating\s*Margin[:\s]+(\d+(?:\.\d+)?)\s*%/i);
+    const nmMatch = llmText.match(/Net\s*Margin[:\s]+(\d+(?:\.\d+)?)\s*%/i);
+    if (gmMatch) grossMargin = parseFloat(gmMatch[1]);
+    if (omMatch) opMargin = parseFloat(omMatch[1]);
+    if (nmMatch) netMargin = parseFloat(nmMatch[1]);
+  }
 
   // Revenue & Profit Bar Chart
   if (window.finRevenueChart) window.finRevenueChart.destroy();
@@ -2019,7 +2575,7 @@ Provide:
       fullText = text;
       output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
     });
-    output.innerHTML = formatMarkdown(fullText);
+    output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
@@ -2090,16 +2646,16 @@ Provide:
       fullText = text;
       output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
     });
-    output.innerHTML = formatMarkdown(fullText);
+    output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
   spinner.classList.remove('active');
-  renderEarningsChart();
+  renderEarningsChart(fullText);
 }
 
 // ─── CHART: EARNINGS SENTIMENT ───
-function renderEarningsChart() {
+function renderEarningsChart(llmText) {
   if (typeof Chart === 'undefined') return;
   try {
   const canvas = document.getElementById('earn-sentiment-chart');
@@ -2109,7 +2665,57 @@ function renderEarningsChart() {
 
   if (window.earnSentimentChart) window.earnSentimentChart.destroy();
 
-  const score = 55; // Default neutral sentiment score
+  // --- Parse LLM output for sentiment ---
+  let score = 50; // Default neutral
+
+  if (llmText) {
+    const lower = llmText.toLowerCase();
+
+    // Try numeric sentiment score first: "Sentiment Score: X/100" or "score of X/100"
+    const numMatch = llmText.match(/sentiment\s*score[:\s]+(-?\d+(?:\.\d+)?)(?:\s*\/\s*100)?/i)
+                  || llmText.match(/sentiment[:\s]+(-?\d+(?:\.\d+)?)(?:\s*\/\s*100)?/i)
+                  || llmText.match(/score[:\s]+(-?\d+(?:\.\d+)?)(?:\s*\/\s*(?:10|100))?/i);
+    if (numMatch) {
+      let val = parseFloat(numMatch[1]);
+      // If score looks like -100 to +100 range, map to 0-100
+      if (val < 0) val = val + 100; // -100..+100 → 0..200, then clamp
+      if (val <= 10) val = val * 10; // Probably 1-10 scale, convert to 0-100
+      score = Math.max(0, Math.min(100, Math.round(val)));
+    } else {
+      // Map sentiment words to scores
+      const sentimentMap = {
+        'very bullish': 90, 'strongly bullish': 90,
+        'bullish': 75, 'positive': 70, 'optimistic': 70,
+        'cautiously optimistic': 65, 'cautiously positive': 65, 'mildly positive': 65,
+        'neutral': 50, 'mixed': 50, 'balanced': 50,
+        'cautious': 40, 'somewhat negative': 35,
+        'bearish': 25, 'negative': 25, 'pessimistic': 25,
+        'very bearish': 10, 'strongly bearish': 10
+      };
+
+      let bestScore = -1;
+      for (const [phrase, val] of Object.entries(sentimentMap)) {
+        if (lower.includes(phrase) && val !== 50) {
+          // Prefer more specific (longer) matches
+          if (phrase.length > 5 || bestScore === -1) {
+            bestScore = val;
+          }
+        }
+      }
+      if (bestScore !== -1) score = bestScore;
+
+      // Check for simpler word matches if no phrase matched
+      if (bestScore === -1) {
+        if (lower.includes('bullish')) score = 75;
+        else if (lower.includes('bearish')) score = 25;
+        else if (lower.includes('optimistic')) score = 65;
+        else if (lower.includes('pessimistic')) score = 25;
+        else if (lower.includes('positive')) score = 70;
+        else if (lower.includes('negative')) score = 30;
+      }
+    }
+  }
+
   const color = score < 30 ? '#f87171' : score < 50 ? '#f97316' : score < 70 ? '#fbbf24' : '#34d399';
 
   window.earnSentimentChart = new Chart(canvas, {
@@ -2237,16 +2843,16 @@ Provide:
       fullText = text;
       output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
     });
-    output.innerHTML = formatMarkdown(fullText);
+    output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
   spinner.classList.remove('active');
-  renderChurnCharts();
+  renderChurnCharts(fullText);
 }
 
 // ─── CHART: CHURN PREDICTION ───
-function renderChurnCharts() {
+function renderChurnCharts(llmText) {
   if (typeof Chart === 'undefined') return;
   try {
   const canvas1 = document.getElementById('churn-gauge-chart');
@@ -2262,17 +2868,83 @@ function renderChurnCharts() {
   const contract = document.getElementById('churn-contract').value;
   const competitor = document.getElementById('churn-competitor').value.trim();
 
-  // Calculate risk scores (0-100)
+  // Calculate risk scores from form inputs (0-100)
   const tenureRisk = Math.max(0, Math.min(100, 100 - (tenure / 60 * 100)));
   const usageRisk = Math.max(0, Math.min(100, drop * 2));
   const ticketRisk = Math.max(0, Math.min(100, tickets * 20));
   const contractRisk = contract === 'Monthly' ? 80 : contract === 'Annual' ? 45 : 15;
   const competitorRisk = competitor ? 75 : 20;
 
-  // Overall churn risk (weighted average)
-  const churnRisk = Math.round(
+  let churnRisk = Math.round(
     tenureRisk * 0.2 + usageRisk * 0.25 + ticketRisk * 0.2 + contractRisk * 0.15 + competitorRisk * 0.2
   );
+
+  // --- Parse LLM output for churn risk data ---
+  let factorLabels = ['Tenure', 'Usage Drop', 'Support Tickets', 'Contract Type', 'Competitor Pressure'];
+  let factorScores = [Math.round(tenureRisk), Math.round(usageRisk), Math.round(ticketRisk), contractRisk, competitorRisk];
+
+  if (llmText) {
+    // Parse risk level: CRITICAL/HIGH/MEDIUM/LOW
+    const riskLevelMatch = llmText.match(/\b(CRITICAL|HIGH|MEDIUM|LOW)\b/i);
+    if (riskLevelMatch) {
+      const riskLevel = riskLevelMatch[1].toUpperCase();
+      const riskMap = { CRITICAL: 90, HIGH: 70, MEDIUM: 45, LOW: 20 };
+      churnRisk = riskMap[riskLevel] || churnRisk;
+    }
+
+    // Try to find a numeric churn probability
+    const probMatch = llmText.match(/(?:churn|attrition)\s*(?:risk|probability|rate)[:\s]+(\d+(?:\.\d+)?)\s*%/i);
+    if (probMatch) {
+      churnRisk = Math.round(parseFloat(probMatch[1]));
+    }
+
+    // Parse risk factors with scores
+    const llmFactors = [];
+    // Pattern: "Factor Name: X/10" or "Factor Name - Score: X%" or "X% Factor Name"
+    const factorRegex = /[-•*]\s+([A-Za-z\s/]+?)[\s:]+(\d+(?:\.\d+)?)\s*(?:\/\s*10|%)/gi;
+    let fm;
+    while ((fm = factorRegex.exec(llmText)) !== null) {
+      let factorName = fm[1].trim();
+      let factorVal = parseFloat(fm[2]);
+      if (factorVal <= 10) factorVal = factorVal * 10; // Convert X/10 to percentage
+      if (factorName.length > 2 && factorName.length < 50) {
+        llmFactors.push({ name: factorName, score: Math.round(factorVal) });
+      }
+    }
+
+    // Also try table-based risk factors
+    const tableRows = llmText.split('\n').filter(l => l.trim().startsWith('|') && !l.match(/^\|[\s\-:]+\|/));
+    if (tableRows.length >= 2 && llmFactors.length === 0) {
+      const parseRow = (line) => line.split('|').slice(1, -1).map(c => c.trim());
+      const headers = parseRow(tableRows[0]);
+      // Find columns that look like "Factor" and "Score/Risk/Weight"
+      let factorCol = -1, scoreCol = -1;
+      headers.forEach((h, i) => {
+        const hl = h.toLowerCase();
+        if (hl.includes('factor') || hl.includes('risk') || hl.includes('driver')) factorCol = i;
+        if (hl.includes('score') || hl.includes('weight') || hl.includes('rating') || hl.includes('severity')) scoreCol = i;
+      });
+      if (factorCol >= 0 && scoreCol >= 0) {
+        for (let r = 1; r < tableRows.length && llmFactors.length < 5; r++) {
+          const cells = parseRow(tableRows[r]);
+          const fname = cells[factorCol] || '';
+          const fval = parseFloat((cells[scoreCol] || '').replace(/[^0-9.\-]/g, ''));
+          if (fname && !isNaN(fval)) {
+            let normalized = fval;
+            if (fval <= 10) normalized = fval * 10;
+            llmFactors.push({ name: fname, score: Math.round(normalized) });
+          }
+        }
+      }
+    }
+
+    if (llmFactors.length >= 2) {
+      // Use LLM-derived factors (top 5)
+      const topFactors = llmFactors.slice(0, 5);
+      factorLabels = topFactors.map(f => f.name);
+      factorScores = topFactors.map(f => Math.max(0, Math.min(100, f.score)));
+    }
+  }
 
   // Gauge color
   const gaugeColor = churnRisk <= 25 ? '#34d399' : churnRisk <= 50 ? '#fbbf24' : churnRisk <= 75 ? '#f97316' : '#f87171';
@@ -2324,30 +2996,24 @@ function renderChurnCharts() {
   window.churnFactorsChart = new Chart(canvas2, {
     type: 'bar',
     data: {
-      labels: ['Tenure', 'Usage Drop', 'Support Tickets', 'Contract Type', 'Competitor Pressure'],
+      labels: factorLabels,
       datasets: [{
         label: 'Risk Score',
-        data: [
-          Math.round(tenureRisk),
-          Math.round(usageRisk),
-          Math.round(ticketRisk),
-          contractRisk,
-          competitorRisk
-        ],
-        backgroundColor: [
-          'rgba(83,216,251,0.7)',
-          'rgba(249,83,186,0.7)',
-          'rgba(251,191,36,0.7)',
-          'rgba(124,92,252,0.7)',
-          'rgba(249,115,22,0.7)'
-        ],
-        borderColor: [
-          '#53d8fb',
-          '#f953ba',
-          '#fbbf24',
-          '#7c5cfc',
-          '#f97316'
-        ],
+        data: factorScores,
+        backgroundColor: factorScores.map((_, idx) => {
+          const colors = [
+            'rgba(83,216,251,0.7)',
+            'rgba(249,83,186,0.7)',
+            'rgba(251,191,36,0.7)',
+            'rgba(124,92,252,0.7)',
+            'rgba(249,115,22,0.7)'
+          ];
+          return colors[idx % colors.length];
+        }),
+        borderColor: factorScores.map((_, idx) => {
+          const colors = ['#53d8fb', '#f953ba', '#fbbf24', '#7c5cfc', '#f97316'];
+          return colors[idx % colors.length];
+        }),
         borderWidth: 1
       }]
     },
@@ -2468,7 +3134,7 @@ Tone: ${tone}. Be specific and reference our differentiators throughout.` }
       fullText = text;
       output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
     });
-    output.innerHTML = formatMarkdown(fullText);
+    output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
