@@ -556,34 +556,62 @@ function saveApiKey() {
 
 async function callLLM(messages, onChunk) {
   if (!API_KEY) { showToast('Enter your API key first', true); throw new Error('No API key'); }
-  const res = await fetch(`${API_BASE}/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
-    body: JSON.stringify({ model: MODEL, messages, stream: true })
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    showToast(`API error: ${res.status}`, true);
-    throw new Error(err);
-  }
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let full = '';
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    const chunk = decoder.decode(value);
-    for (const line of chunk.split('\n')) {
-      if (!line.startsWith('data: ') || line === 'data: [DONE]') continue;
-      try {
-        const j = JSON.parse(line.slice(6));
-        const t = j.choices?.[0]?.delta?.content || '';
-        full += t;
-        if (onChunk) onChunk(full);
-      } catch {}
+
+  // Try streaming first, fall back to non-streaming
+  for (const stream of [true, false]) {
+    try {
+      const res = await fetch(`${API_BASE}/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
+        body: JSON.stringify({ model: MODEL, messages, stream, max_tokens: 4096 })
+      });
+      if (!res.ok) {
+        const err = await res.text();
+        showToast(`API error: ${res.status} — check your API key`, true);
+        throw new Error(err);
+      }
+
+      if (!stream) {
+        // Non-streaming fallback
+        const data = await res.json();
+        const content = data.choices?.[0]?.message?.content || '';
+        if (onChunk) onChunk(content);
+        return content;
+      }
+
+      // Streaming response
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let full = '';
+      let buffer = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop(); // keep incomplete line in buffer
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data: ') || trimmed === 'data: [DONE]') continue;
+          try {
+            const j = JSON.parse(trimmed.slice(6));
+            const delta = j.choices?.[0]?.delta;
+            // Handle both content and reasoning_content (GLM models use reasoning_content)
+            const t = delta?.content || '';
+            if (t) {
+              full += t;
+              if (onChunk) onChunk(full);
+            }
+          } catch {}
+        }
+      }
+      return full;
+    } catch (e) {
+      if (!stream) throw e; // Non-streaming also failed — rethrow
+      // Streaming failed, try non-streaming
+      console.warn('Streaming failed, trying non-streaming:', e);
     }
   }
-  return full;
 }
 
 // ─── UI HELPERS ───
@@ -750,11 +778,10 @@ async function ragQuery() {
   ];
 
   try {
-    await callLLM(messages, (text) => {
+    const result = await callLLM(messages, (text) => {
       output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
     });
-    output.innerHTML = formatMarkdown(await callLLM(messages));
-    // Re-run without streaming for final clean output
+    output.innerHTML = formatMarkdown(result);
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
