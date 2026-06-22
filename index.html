@@ -925,7 +925,7 @@
     <input type="password" id="apiKeyInput" placeholder="Enter your API key (OpenAI-compatible endpoint)">
     <select id="modelSelect">
       <optgroup label="Tensorx GLM">
-        <option value="z-ai/glm-5.2" selected>GLM-5.2</option>
+        <option value="z-ai/glm-5.2">GLM-5.2</option>
         <option value="z-ai/glm-5.1">GLM-5.1</option>
         <option value="z-ai/glm-5-turbo">GLM-5 Turbo</option>
         <option value="z-ai/glm-5v-turbo">GLM-5V Turbo</option>
@@ -933,7 +933,7 @@
       </optgroup>
       <optgroup label="DeepSeek">
         <option value="deepseek/deepseek-v4-pro">DeepSeek V4 Pro</option>
-        <option value="deepseek/deepseek-v4-flash">DeepSeek V4 Flash</option>
+        <option value="deepseek/deepseek-v4-flash" selected>DeepSeek V4 Flash</option>
         <option value="deepseek/deepseek-r1-0528">DeepSeek R1</option>
         <option value="deepseek/deepseek-chat-v3.1">DeepSeek V3.1</option>
         <option value="deepseek/deepseek-v3.2">DeepSeek V3.2</option>
@@ -1483,7 +1483,7 @@ let API_KEY=***  // server proxy handles auth
 let API_BASE = (window.location.hostname !== 'bowdenneil.github.io')
   ? window.location.origin + '/api'     // same-origin proxy (localhost, Hetzner, any custom domain)
   : 'https://api.tensorx.ai/v1';        // GitHub Pages — direct (needs CORS)
-let MODEL = document.getElementById('modelSelect')?.value || 'z-ai/glm-5.2';
+let MODEL = document.getElementById('modelSelect')?.value || 'deepseek/deepseek-v4-flash';
 
 // Restore saved model from localStorage
 (function() {
