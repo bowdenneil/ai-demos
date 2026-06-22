@@ -892,129 +892,178 @@
     .assess-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 1rem;
-      margin: 1rem 0;
+      gap: 1.25rem;
     }
     .assess-dim {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: border-color 0.2s;
+    }
+    .assess-dim:hover { border-color: rgba(139,92,246,0.3); }
+    .assess-dim-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.2rem;
+    }
+    .assess-dim-header h4 { font-size: 0.95rem; margin: 0; font-weight: 700; color: var(--text); }
+    .assess-dim-sub { font-size: 0.78rem; color: var(--text-dim); margin: 0 0 0.75rem; line-height: 1.4; }
+    .score-badge {
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      min-width: 28px;
+      text-align: center;
+    }
+    .score-badge.l1 { background: rgba(248,113,113,0.15); color: #f87171; }
+    .score-badge.l2 { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .score-badge.l3 { background: rgba(52,211,153,0.15); color: #34d399; }
+    .score-badge.l4 { background: rgba(83,216,251,0.15); color: #53d8fb; }
+    .score-badge.l5 { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+
+    /* Level selector cards */
+    .level-selector {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding: 0.25rem 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .level-card {
+      flex: 1;
+      min-width: 135px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 0.65rem 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      background: var(--surface2);
+    }
+    .level-card:hover { border-color: rgba(139,92,246,0.4); background: rgba(139,92,246,0.04); }
+    .level-card input { display: none; }
+    .level-card.selected {
+      border-color: #8b5cf6;
+      background: rgba(139,92,246,0.08);
+      box-shadow: 0 0 0 1px #8b5cf6, 0 2px 8px rgba(139,92,246,0.15);
+    }
+    .level-num {
+      display: block;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text-dim);
+      margin-bottom: 0.1rem;
+    }
+    .level-card.selected .level-num { color: #a78bfa; }
+    .level-title {
+      display: block;
+      font-weight: 700;
+      font-size: 0.7rem;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .level-desc {
+      display: block;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      line-height: 1.35;
+    }
+
+    /* Gauge chart */
+    .gauge-wrap { text-align: center; margin: 0.5rem 0 0.25rem; }
+    .gauge-wrap svg { max-width: 220px; }
+    .gauge-value { font-size: 2rem; font-weight: 800; fill: #e8e8f0; }
+    .gauge-label { font-size: 0.8rem; fill: #8888aa; }
+    .gauge-arc-bg { fill: none; stroke: var(--border); stroke-width: 14; stroke-linecap: round; }
+    .gauge-arc-fill { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 1s ease, stroke 0.3s; }
+
+    /* Dimension scorecards */
+    .dim-scorecards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+      margin: 1rem 0;
+    }
+    .dim-card {
       background: var(--surface2);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 1rem;
-    }
-    .assess-dim-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.5rem;
-    }
-    .assess-dim-header h4 {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #8b5cf6;
-      margin: 0;
-    }
-    .assess-dim-header .score-badge {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #8b5cf6;
-      background: rgba(139,92,246,0.15);
-      padding: 0.2rem 0.6rem;
-      border-radius: 6px;
-    }
-    .assess-dim p {
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      margin: 0.25rem 0 0.5rem;
-    }
-    .assess-slider-row {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    .assess-slider-row input[type="range"] {
-      flex: 1;
-      -webkit-appearance: none;
-      appearance: none;
-      height: 6px;
-      border-radius: 3px;
-      background: var(--border);
-      outline: none;
-    }
-    .assess-slider-row input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-      cursor: pointer;
-      border: 2px solid #1a1a3a;
-    }
-    .assess-slider-row input[type="range"]::-moz-range-thumb {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-      cursor: pointer;
-      border: 2px solid #1a1a3a;
-    }
-    .assess-level-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.65rem;
-      color: var(--text-dim);
-      margin-top: 0.2rem;
-      padding: 0 2px;
-    }
-    .assess-result-card {
-      background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(59,130,246,0.1));
-      border: 1px solid rgba(139,92,246,0.3);
-      border-radius: 12px;
-      padding: 1.5rem;
+      padding: 0.75rem;
       text-align: center;
-      margin: 1rem 0;
     }
-    .assess-result-card .maturity-level {
-      font-size: 2rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .assess-result-card .maturity-name {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-top: 0.25rem;
-    }
-    .assess-result-card .maturity-score {
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      margin-top: 0.25rem;
-    }
-    .assess-radar-wrap {
-      max-width: 350px;
-      margin: 1rem auto;
-    }
-    .assess-next-steps {
-      text-align: left;
-    }
-    .assess-next-steps h4 {
-      font-size: 0.9rem;
+    .dim-card-name { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.25rem; }
+    .dim-card-score { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.3rem; }
+    .dim-card-bar-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 0.2rem; }
+    .dim-card-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+    .dim-card-bar-fill[data-level="1"] { background: #f87171; }
+    .dim-card-bar-fill[data-level="2"] { background: #fbbf24; }
+    .dim-card-bar-fill[data-level="3"] { background: #34d399; }
+    .dim-card-bar-fill[data-level="4"] { background: #53d8fb; }
+    .dim-card-bar-fill[data-level="5"] { background: #8b5cf6; }
+    .dim-card-level { font-size: 0.65rem; font-weight: 600; }
+
+    /* Priority tags */
+    .priority-tag {
+      display: inline-block;
+      font-size: 0.65rem;
       font-weight: 700;
-      color: #8b5cf6;
-      margin: 1rem 0 0.5rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-right: 0.4rem;
     }
-    .assess-next-steps ol {
-      padding-left: 1.5rem;
-      margin: 0;
+    .priority-tag.high { background: rgba(248,113,113,0.15); color: #f87171; }
+    .priority-tag.medium { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .priority-tag.low { background: rgba(52,211,153,0.15); color: #34d399; }
+
+    /* Report narrative */
+    .assess-report {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      max-width: 72ch;
     }
-    .assess-next-steps li {
-      font-size: 0.85rem;
-      margin: 0.3rem 0;
-      line-height: 1.5;
+    .assess-report h1, .assess-report h2, .assess-report h3 {
+      color: var(--text); margin-top: 1.5rem; margin-bottom: 0.5rem;
     }
+    .assess-report h2 { font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35rem; }
+    .assess-report h3 { font-size: 1rem; }
+    .assess-report ul, .assess-report ol { padding-left: 1.25rem; margin: 0.5rem 0; }
+    .assess-report li { margin: 0.3rem 0; }
+    .assess-report strong { color: #a78bfa; }
+    .assess-report table { border-collapse: collapse; width: 100%; margin: 0.75rem 0; font-size: 0.82rem; }
+    .assess-report th, .assess-report td { border: 1px solid var(--border); padding: 0.4rem 0.6rem; text-align: left; }
+    .assess-report th { background: var(--surface2); color: var(--text); font-weight: 600; }
+    .assess-report blockquote { border-left: 3px solid #8b5cf6; padding: 0.6rem 1rem; background: rgba(139,92,246,0.04); border-radius: 0 6px 6px 0; margin: 0.75rem 0; }
+    .assess-report code { background: var(--surface2); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.82rem; }
+
+    /* Guest restriction */
+    .guest-restricted {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 3rem 2rem; text-align: center; min-height: 300px;
+    }
+    .guest-restricted-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .guest-restricted h3 { color: var(--text); margin-bottom: 0.5rem; }
+    .guest-restricted p { color: var(--text-dim); max-width: 400px; font-size: 0.9rem; }
+
+    /* Result header */
+    .assess-result-header {
+      display: flex; align-items: center; gap: 1.5rem; justify-content: center;
+      background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(59,130,246,0.08));
+      border: 1px solid rgba(139,92,246,0.2);
+      border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem;
+    }
+    .assess-result-header .gauge-wrap { margin: 0; }
+    .assess-result-meta { text-align: left; }
+    .assess-result-meta .maturity-name { font-size: 1.3rem; font-weight: 700; color: var(--text); }
+    .assess-result-meta .maturity-subtitle { font-size: 0.85rem; color: var(--text-dim); margin-top: 0.15rem; }
+    .assess-radar-wrap { max-width: 380px; margin: 1rem auto; }
 
     @media (max-width: 768px) {
       .cards { grid-template-columns: 1fr; }
@@ -1023,6 +1072,7 @@
       .demo-input .presets { align-self: flex-start; }
       .swot-grid { grid-template-columns: 1fr; }
       .comparison-grid { grid-template-columns: 1fr; }
+      .dim-scorecards { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
   <script src="chart.min.js"></script>
@@ -1193,7 +1243,7 @@
   <div class="card" onclick="openDemo('onprem')">
     <div class="card-header-img onprem" id="card-header-onprem">
       <img src="/icons/onprem.png" alt="" id="card-img-onprem">
-      <div class="card-icon onprem" id="card-emoji-onprem">🏗️</div>
+      <div class="card-icon onprem" id="card-emoji-onprem"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#8b5cf6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="6" rx="1.5"/><rect x="4" y="10" width="16" height="6" rx="1.5"/><rect x="4" y="18" width="16" height="4" rx="1.5"/><circle cx="7.5" cy="5" r="1" fill="#8b5cf6" stroke="none"/><circle cx="7.5" cy="13" r="1" fill="#8b5cf6" stroke="none"/><line x1="10" y1="5" x2="17" y2="5"/><line x1="10" y1="13" x2="17" y2="13"/><circle cx="12" cy="19.8" r="0.7" fill="#8b5cf6" stroke="none"/></svg></div>
       <div class="card-gen-overlay" id="card-gen-onprem">✨ Generating...</div>
     </div>
     <div class="card-body">
@@ -1615,9 +1665,14 @@
 <div class="demo-overlay" id="demo-onprem">
   <div class="demo-panel">
     <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
-    <h2 class="demo-title">🏗️ On-Premise AI Readiness Assessment</h2>
-    <p class="demo-desc">Score your organisation on 6 dimensions. The assessment maps your maturity level, highlights regulatory obligations (GDPR, EU AI Act, NIS2), and generates AI-powered next steps.</p>
-    <div class="demo-body">
+    <h2 class="demo-title">On-Premise AI Readiness Assessment</h2>
+    <p class="demo-desc">Select the description that best matches your organisation for each dimension. The assessment maps your maturity level, highlights regulatory obligations (GDPR, EU AI Act, NIS2), and generates AI-powered next steps.</p>
+    <div id="onprem-guest-block" class="guest-restricted" style="display:none">
+      <div class="guest-restricted-icon">🔒</div>
+      <h3>Login Required</h3>
+      <p>The AI Readiness Assessment is available for authenticated users. Please sign in with your account to access this demo.</p>
+    </div>
+    <div class="demo-body" id="onprem-main-body">
       <div class="demo-input" style="flex-direction:column;align-items:stretch">
         <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
           <div class="input-group" style="flex:2;min-width:160px">
@@ -1659,61 +1714,14 @@
           </div>
         </div>
         <div class="assess-grid" id="onprem-assess-grid">
-          <div class="assess-dim">
-            <div class="assess-dim-header"><h4>D1: Strategy & Business Alignment</h4><span class="score-badge" id="badge-d1">1</span></div>
-            <p>AI strategy, executive sponsorship, use case prioritisation, value tracking</p>
-            <div class="assess-slider-row">
-              <input type="range" min="1" max="5" value="1" id="slider-d1" oninput="onpremUpdateSlider('d1')">
-            </div>
-            <div class="assess-level-labels"><span>Experimental</span><span>Emerging</span><span>Operational</span><span>Scaled</span><span>Transformative</span></div>
-          </div>
-          <div class="assess-dim">
-            <div class="assess-dim-header"><h4>D2: Data Readiness</h4><span class="score-badge" id="badge-d2">1</span></div>
-            <p>Data quality, cataloguing, pipelines, feature store, governance</p>
-            <div class="assess-slider-row">
-              <input type="range" min="1" max="5" value="1" id="slider-d2" oninput="onpremUpdateSlider('d2')">
-            </div>
-            <div class="assess-level-labels"><span>Experimental</span><span>Emerging</span><span>Operational</span><span>Scaled</span><span>Transformative</span></div>
-          </div>
-          <div class="assess-dim">
-            <div class="assess-dim-header"><h4>D3: Infrastructure & Platform</h4><span class="score-badge" id="badge-d3">1</span></div>
-            <p>GPU infrastructure, MLOps tooling, on-prem capacity, hybrid orchestration</p>
-            <div class="assess-slider-row">
-              <input type="range" min="1" max="5" value="1" id="slider-d3" oninput="onpremUpdateSlider('d3')">
-            </div>
-            <div class="assess-level-labels"><span>Experimental</span><span>Emerging</span><span>Operational</span><span>Scaled</span><span>Transformative</span></div>
-          </div>
-          <div class="assess-dim">
-            <div class="assess-dim-header"><h4>D4: Governance, Risk & Compliance</h4><span class="score-badge" id="badge-d4">1</span></div>
-            <p>AI governance, GDPR DPIAs, EU AI Act risk mapping, NIS2 compliance, model audit</p>
-            <div class="assess-slider-row">
-              <input type="range" min="1" max="5" value="1" id="slider-d4" oninput="onpremUpdateSlider('d4')">
-            </div>
-            <div class="assess-level-labels"><span>Experimental</span><span>Emerging</span><span>Operational</span><span>Scaled</span><span>Transformative</span></div>
-          </div>
-          <div class="assess-dim">
-            <div class="assess-dim-header"><h4>D5: Skills & Organisation</h4><span class="score-badge" id="badge-d5">1</span></div>
-            <p>AI team size, platform engineering, centre of excellence, training programmes</p>
-            <div class="assess-slider-row">
-              <input type="range" min="1" max="5" value="1" id="slider-d5" oninput="onpremUpdateSlider('d5')">
-            </div>
-            <div class="assess-level-labels"><span>Experimental</span><span>Emerging</span><span>Operational</span><span>Scaled</span><span>Transformative</span></div>
-          </div>
-          <div class="assess-dim">
-            <div class="assess-dim-header"><h4>D6: Operations & Lifecycle</h4><span class="score-badge" id="badge-d6">1</span></div>
-            <p>Model deployment, monitoring, drift detection, retraining, AIOps</p>
-            <div class="assess-slider-row">
-              <input type="range" min="1" max="5" value="1" id="slider-d6" oninput="onpremUpdateSlider('d6')">
-            </div>
-            <div class="assess-level-labels"><span>Experimental</span><span>Emerging</span><span>Operational</span><span>Scaled</span><span>Transformative</span></div>
-          </div>
+          <!-- Dimensions rendered by JS -->
         </div>
-        <button class="btn btn-onprem" onclick="onpremAssess()" style="align-self:center;margin-top:0.5rem">🏗️ Assess & Generate Report</button>
+        <button class="btn btn-onprem" onclick="onpremAssess()" style="align-self:center;margin-top:0.5rem">Assess & Generate Report</button>
       </div>
       <div class="demo-output">
         <h3>Assessment Results <div class="output-spinner" id="onprem-spinner"></div></h3>
         <div id="onprem-output" class="output-content">
-          <div class="output-placeholder">Adjust the sliders above and click Assess to generate your maturity report</div>
+          <div class="output-placeholder">Select the maturity level for each dimension above, then click Assess to generate your report</div>
         </div>
         <div id="onprem-radar" class="chart-container single" style="display:none;max-width:400px;margin:1rem auto">
           <div class="chart-box">
@@ -3821,12 +3829,66 @@ function showIcon(demo) {
 
 // ─── ON-PREM ASSESSMENT ───
 const ONPREM_DIMS = [
-  { id: 'd1', name: 'Strategy & Business Alignment', short: 'Strategy' },
-  { id: 'd2', name: 'Data Readiness', short: 'Data' },
-  { id: 'd3', name: 'Infrastructure & Platform', short: 'Infrastructure' },
-  { id: 'd4', name: 'Governance, Risk & Compliance', short: 'Governance' },
-  { id: 'd5', name: 'Skills & Organisation', short: 'Skills' },
-  { id: 'd6', name: 'Operations & Lifecycle', short: 'Operations' },
+  { id: 'd1', name: 'Strategy & Business Alignment', short: 'Strategy',
+    sub: 'AI strategy, executive sponsorship, use case prioritisation, value tracking',
+    levels: [
+      { title: 'Ad Hoc', desc: 'No formal AI strategy; isolated experiments by individual teams' },
+      { title: 'Exploring', desc: 'Early AI use cases identified; no central coordination or budget' },
+      { title: 'Defined', desc: 'AI roadmap with exec sponsor; prioritised use cases with ROI tracking' },
+      { title: 'Managed', desc: 'Portfolio-wide AI governance; value realised across multiple functions' },
+      { title: 'Optimised', desc: 'AI is core to business model; continuous innovation with strategic investment' },
+    ]
+  },
+  { id: 'd2', name: 'Data Readiness', short: 'Data',
+    sub: 'Data quality, cataloguing, pipelines, feature store, governance',
+    levels: [
+      { title: 'Ad Hoc', desc: 'Siloed, inconsistent data; no cataloguing or quality controls' },
+      { title: 'Exploring', desc: 'Basic data inventory started; quality issues remain widespread' },
+      { title: 'Defined', desc: 'Central data catalogue with lineage; pipelines automated; quality enforced' },
+      { title: 'Managed', desc: 'Feature store operational; real-time pipelines; self-service analytics' },
+      { title: 'Optimised', desc: 'Data mesh/marketplace; automated quality gates; AI-ready data on demand' },
+    ]
+  },
+  { id: 'd3', name: 'Infrastructure & Platform', short: 'Infrastructure',
+    sub: 'GPU infrastructure, MLOps tooling, on-prem capacity, hybrid orchestration',
+    levels: [
+      { title: 'Ad Hoc', desc: 'No on-prem GPU capacity; all workloads on cloud VMs or workstations' },
+      { title: 'Exploring', desc: 'Proof-of-concept GPU server; manual deployment; no MLOps tooling' },
+      { title: 'Defined', desc: 'Dedicated GPU cluster with CI/CD; model serving via Triton/NIM; hybrid networked' },
+      { title: 'Managed', desc: 'Scalable GPU fleet with autoscaling; full MLOps stack; cloud-burst capability' },
+      { title: 'Optimised', desc: 'AI factory with multi-GPU orchestration; inference at scale; cost-optimised hybrid' },
+    ]
+  },
+  { id: 'd4', name: 'Governance, Risk & Compliance', short: 'Governance',
+    sub: 'AI governance, GDPR DPIAs, EU AI Act risk mapping, NIS2 compliance, model audit',
+    levels: [
+      { title: 'Ad Hoc', desc: 'No AI-specific governance; GDPR compliance is reactive only' },
+      { title: 'Exploring', desc: 'Basic data processing records; AI risk register started; no formal DPIAs' },
+      { title: 'Defined', desc: 'DPIA process for AI systems; EU AI Act risk classification underway; NIS2 mapped' },
+      { title: 'Managed', desc: 'Full model audit trail; automated bias/fairness checks; regulatory reporting automated' },
+      { title: 'Optimised', desc: 'Continuous compliance monitoring; AI ethics board; regulatory changes auto-assessed' },
+    ]
+  },
+  { id: 'd5', name: 'Skills & Organisation', short: 'Skills',
+    sub: 'AI team size, platform engineering, centre of excellence, training programmes',
+    levels: [
+      { title: 'Ad Hoc', desc: 'No dedicated AI team; skills distributed without coordination' },
+      { title: 'Exploring', desc: 'Small AI team formed; external consultants for key projects' },
+      { title: 'Defined', desc: 'ML engineering team; internal training programme; centre of excellence launched' },
+      { title: 'Managed', desc: 'Platform engineering team; AI talent pipeline; cross-functional squads' },
+      { title: 'Optimised', desc: 'AI-native culture; talent attracts top-tier; internal AI academy with certifications' },
+    ]
+  },
+  { id: 'd6', name: 'Operations & Lifecycle', short: 'Operations',
+    sub: 'Model deployment, monitoring, drift detection, retraining, AIOps',
+    levels: [
+      { title: 'Ad Hoc', desc: 'Manual deployments; no monitoring; models decay untracked' },
+      { title: 'Exploring', desc: 'Basic CI/CD for models; ad-hoc monitoring alerts; manual retraining' },
+      { title: 'Defined', desc: 'Automated deployment pipeline; drift detection; scheduled retraining cycles' },
+      { title: 'Managed', desc: 'AIOps platform with auto-retraining; canary deployments; SLO-driven' },
+      { title: 'Optimised', desc: 'Self-healing ML systems; continuous evaluation; zero-downtime model swaps' },
+    ]
+  },
 ];
 
 const ONPREM_LEVELS = [
@@ -3839,14 +3901,51 @@ const ONPREM_LEVELS = [
 
 let onpremRadarChart = null;
 
-function onpremUpdateSlider(dim) {
-  const val = document.getElementById(`slider-${dim}`).value;
-  document.getElementById(`badge-${dim}`).textContent = val;
+// Render the dimension cards with descriptive level selectors
+function onpremRenderGrid() {
+  const grid = document.getElementById('onprem-assess-grid');
+  if (!grid) return;
+  grid.innerHTML = ONPREM_DIMS.map(dim => {
+    const levelCards = dim.levels.map((lvl, i) => {
+      const val = i + 1;
+      return `<label class="level-card" id="lc-${dim.id}-${val}" onclick="onpremSelectLevel('${dim.id}',${val})">
+        <input type="radio" name="level-${dim.id}" value="${val}">
+        <span class="level-num">${val}</span>
+        <span class="level-title">${lvl.title}</span>
+        <span class="level-desc">${lvl.desc}</span>
+      </label>`;
+    }).join('');
+    return `<div class="assess-dim">
+      <div class="assess-dim-header"><h4>${dim.name}</h4><span class="score-badge" id="badge-${dim.id}">—</span></div>
+      <div class="assess-dim-sub">${dim.sub}</div>
+      <div class="level-selector">${levelCards}</div>
+    </div>`;
+  }).join('');
+}
+
+function onpremSelectLevel(dimId, val) {
+  // Check the radio input
+  const radio = document.querySelector(`input[name="level-${dimId}"][value="${val}"]`);
+  if (radio) radio.checked = true;
+  // Update visual state
+  for (let i = 1; i <= 5; i++) {
+    const card = document.getElementById(`lc-${dimId}-${i}`);
+    if (card) card.classList.toggle('selected', i === val);
+  }
+  // Update badge
+  const badge = document.getElementById(`badge-${dimId}`);
+  if (badge) {
+    badge.textContent = val;
+    badge.className = `score-badge l${val}`;
+  }
 }
 
 function onpremGetScores() {
   const scores = {};
-  ONPREM_DIMS.forEach(d => { scores[d.id] = parseInt(document.getElementById(`slider-${d.id}`).value); });
+  ONPREM_DIMS.forEach(d => {
+    const checked = document.querySelector(`input[name="level-${d.id}"]:checked`);
+    scores[d.id] = checked ? parseInt(checked.value) : 1;
+  });
   return scores;
 }
 
@@ -3855,6 +3954,48 @@ function onpremGetLevel(total) {
     if (total >= lvl.range[0] && total <= lvl.range[1]) return lvl;
   }
   return ONPREM_LEVELS[0];
+}
+
+function onpremGetLevelNumber(total) {
+  if (total <= 10) return 1;
+  if (total <= 15) return 2;
+  if (total <= 20) return 3;
+  if (total <= 25) return 4;
+  return 5;
+}
+
+function onpremDrawGauge(total) {
+  const maxScore = 30;
+  const pct = total / maxScore;
+  const lvlNum = onpremGetLevelNumber(total);
+  const colors = ['#f87171','#fbbf24','#34d399','#53d8fb','#8b5cf6'];
+  const color = colors[lvlNum - 1];
+  // SVG semicircular gauge — arc length = pi * 80 ≈ 251.3
+  const arcLen = 251.3;
+  const offset = arcLen * (1 - pct);
+  return `<div class="gauge-wrap">
+    <svg viewBox="0 0 200 120">
+      <path d="M 20 100 A 80 80 0 0 1 180 100" class="gauge-arc-bg"/>
+      <path d="M 20 100 A 80 80 0 0 1 180 100" class="gauge-arc-fill"
+            stroke="${color}" stroke-dasharray="${arcLen}" stroke-dashoffset="${offset}"/>
+      <text x="100" y="82" text-anchor="middle" class="gauge-value">${total}</text>
+      <text x="100" y="100" text-anchor="middle" class="gauge-label">out of ${maxScore}</text>
+    </svg>
+  </div>`;
+}
+
+function onpremDrawDimScorecards(scores) {
+  const levelNames = ['Ad Hoc','Exploring','Defined','Managed','Optimised'];
+  return `<div class="dim-scorecards">${ONPREM_DIMS.map(d => {
+    const v = scores[d.id];
+    const pct = (v / 5 * 100);
+    return `<div class="dim-card">
+      <div class="dim-card-name">${d.short}</div>
+      <div class="dim-card-score">${v}/5</div>
+      <div class="dim-card-bar-track"><div class="dim-card-bar-fill" data-level="${v}" style="width:${pct}%"></div></div>
+      <div class="dim-card-level">${levelNames[v-1]}</div>
+    </div>`;
+  }).join('')}</div>`;
 }
 
 function onpremDrawRadar(scores) {
@@ -3896,10 +4037,33 @@ function onpremDrawRadar(scores) {
   });
 }
 
+// Guest restriction for onprem demo
+function onpremCheckGuest() {
+  const email = localStorage.getItem('ai_demo_email');
+  const guestBlock = document.getElementById('onprem-guest-block');
+  const mainBody = document.getElementById('onprem-main-body');
+  if (!guestBlock || !mainBody) return;
+  if (email === 'guest@aidemos.com') {
+    guestBlock.style.display = 'flex';
+    mainBody.style.display = 'none';
+  } else {
+    guestBlock.style.display = 'none';
+    mainBody.style.display = '';
+  }
+}
+
+// Override openDemo to check guest for onprem
+const _origOpenDemo = openDemo;
+openDemo = function(name) {
+  _origOpenDemo(name);
+  if (name === 'onprem') onpremCheckGuest();
+};
+
 async function onpremAssess() {
   const scores = onpremGetScores();
   const total = Object.values(scores).reduce((a, b) => a + b, 0);
   const level = onpremGetLevel(total);
+  const lvlNum = onpremGetLevelNumber(total);
   const org = document.getElementById('onprem-org').value.trim() || 'Your Organisation';
   const sector = document.getElementById('onprem-sector').selectedOptions[0].text;
   const size = document.getElementById('onprem-size').selectedOptions[0].text;
@@ -3908,20 +4072,23 @@ async function onpremAssess() {
   // Draw radar immediately
   onpremDrawRadar(scores);
 
-  // Show immediate result card
+  // Show result header with gauge + scorecards
   const output = document.getElementById('onprem-output');
   output.innerHTML = `
-    <div class="assess-result-card">
-      <div class="maturity-level">Level ${level.range[0] <= 10 ? 1 : level.range[0] <= 15 ? 2 : level.range[0] <= 20 ? 3 : level.range[0] <= 25 ? 4 : 5}</div>
-      <div class="maturity-name">${level.name}</div>
-      <div class="maturity-score">${total} / 30</div>
+    <div class="assess-result-header">
+      ${onpremDrawGauge(total)}
+      <div class="assess-result-meta">
+        <div class="maturity-name">Level ${lvlNum}: ${level.name}</div>
+        <div class="maturity-subtitle">${org} — ${sector}</div>
+      </div>
     </div>
-    <div style="text-align:center;color:var(--text-dim);font-size:0.85rem">Generating AI-powered recommendations...</div>
+    ${onpremDrawDimScorecards(scores)}
+    <div style="text-align:center;color:var(--text-dim);font-size:0.85rem;margin-top:0.75rem">Generating AI-powered recommendations...</div>
   `;
 
   // Build prompt for LLM
-  const dimBreakdown = ONPREM_DIMS.map(d => `- ${d.name}: ${scores[d.id]}/5`).join('\n');
-  const weakDims = ONPREM_DIMS.filter(d => scores[d.id] <= 2).map(d => d.name);
+  const dimBreakdown = ONPREM_DIMS.map(d => `- ${d.name}: ${scores[d.id]}/5 (${d.levels[scores[d.id]-1].title})`).join('\n');
+  const weakDims = ONPREM_DIMS.filter(d => scores[d.id] <= 2).map(d => `${d.name} (${d.levels[scores[d.id]-1].title})`);
 
   const prompt = `You are an expert AI infrastructure consultant specialising in European on-premise AI deployments. Based on the following maturity assessment, provide a detailed, actionable report.
 
@@ -3930,7 +4097,7 @@ async function onpremAssess() {
 **Size:** ${size} employees
 **Annual AI Spend:** ${spend}
 **Total Maturity Score:** ${total}/30
-**Maturity Level:** ${level.name}
+**Maturity Level:** Level ${lvlNum} — ${level.name}
 
 **Dimension Scores:**
 ${dimBreakdown}
@@ -3965,6 +4132,10 @@ Format the response with clear headers and use tables where appropriate. Be spec
   const spinner = document.getElementById('onprem-spinner');
   spinner.classList.add('active');
 
+  // Default to GLM-5.2 for assessment (best for structured reports)
+  const savedModel = MODEL;
+  MODEL = 'z-ai/glm-5.2';
+
   try {
     const messages = [
       { role: 'system', content: 'You are an expert AI infrastructure consultant specialising in European on-premise AI deployment. You combine deep knowledge of Dell AI infrastructure, NVIDIA AI Enterprise, EU regulations (GDPR, EU AI Act, NIS2), and industry best practices from Gartner, Forrester, IDC, and McKinsey. Be specific, practical, and European-focused. Use EUR for all costs.' },
@@ -3975,20 +4146,27 @@ Format the response with clear headers and use tables where appropriate. Be spec
     await callLLM(messages, (chunk) => {
       fullText += chunk;
       output.innerHTML = `
-        <div class="assess-result-card">
-          <div class="maturity-level">Level ${level.range[0] <= 10 ? 1 : level.range[0] <= 15 ? 2 : level.range[0] <= 20 ? 3 : level.range[0] <= 25 ? 4 : 5}</div>
-          <div class="maturity-name">${level.name}</div>
-          <div class="maturity-score">${total} / 30</div>
+        <div class="assess-result-header">
+          ${onpremDrawGauge(total)}
+          <div class="assess-result-meta">
+            <div class="maturity-name">Level ${lvlNum}: ${level.name}</div>
+            <div class="maturity-subtitle">${org} — ${sector}</div>
+          </div>
         </div>
-        <div class="assess-next-steps">${formatMarkdown(fullText)}</div>
+        ${onpremDrawDimScorecards(scores)}
+        <div class="assess-report" style="margin-top:1rem">${formatMarkdown(fullText)}</div>
       `;
     });
   } catch (e) {
     output.innerHTML += `<p style="color:var(--danger);margin-top:1rem">Error: ${e.message}</p>`;
   } finally {
+    MODEL = savedModel;
     spinner.classList.remove('active');
   }
 }
+
+// Render dimension grid on page load
+onpremRenderGrid();
 
 // Check auth on page load
 checkAuth();
