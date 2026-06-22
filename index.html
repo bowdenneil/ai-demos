@@ -562,7 +562,7 @@ async function saveApiKey() {
     const testRes = await fetch(`${API_BASE}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${val}` },
-      body: JSON.stringify({ model: MODEL, messages: [{ role: 'user', content: 'test' }], max_tokens: 5, stream: false })
+      body: JSON.stringify({ model: MODEL, messages: [{ role: 'user', content: 'Hi' }], max_tokens: 50, stream: false })
     });
     if (!testRes.ok) {
       let errMsg = `Key rejected (${testRes.status})`;
@@ -572,8 +572,8 @@ async function saveApiKey() {
     }
     await testRes.json();
   } catch (e) {
-    showToast('Cannot reach Tensorx API from this browser. Try running locally instead.', true);
-    return;
+    // CORS or network error — key might still be valid, save it anyway
+    console.warn('API test failed (likely CORS), saving key anyway:', e.message);
   }
 
   API_KEY=***  localStorage.setItem('ai_demo_api_key', val);
