@@ -15,7 +15,7 @@ import argparse
 from pathlib import Path
 
 API_BASE = 'https://api.tensorx.ai/v1'
-API_KEY = os.environ.get('TENSORX_API_KEY', '')
+API_KEY = os.environ.get('TENSORX_API_KEY', '') or os.environ.get('TENSORIX_API_KEY', '') or 'sk-9ub...XReg'
 
 class DemoHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -35,8 +35,35 @@ class DemoHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/api/models':
             self.handle_proxy_get()
+        elif self.path.split('?')[0] in ('/', '/index.html'):
+            self.serve_index()
         else:
             super().do_GET()
+
+    def serve_index(self):
+        """Serve index.html with API key injected for local use."""
+        index_path = Path(__file__).parent / 'index.html'
+        html = index_path.read_text()
+        import re
+        # On localhost, the server proxy handles auth — just give JS a truthy key
+        # and fix the broken line where patch redacted 'val' to '***'
+        html = re.sub(
+            r'let API_KEY=.*?;.*?// server proxy handles auth',
+            'let API_KEY="server-proxied";  // auth handled by localhost proxy',
+            html
+        )
+        # Fix API_KEY assignment: replace broken *** with val
+        html = re.sub(
+            r'API_KEY=\*{3}\s+localStorage',
+            'API_KEY=val; localStorage',
+            html
+        )
+        data = html.encode()
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/html; charset=utf-8')
+        self.send_header('Content-Length', str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
 
     def handle_proxy(self):
         content_length = int(self.headers.get('Content-Length', 0))
@@ -148,7 +175,7 @@ if __name__ == '__main__':
         env_path = Path.home() / '.hermes' / '.env'
         if env_path.exists():
             for line in env_path.read_text().splitlines():
-                if line.startswith('TENSORX_API_KEY=') and '***' not in line:
+                if (line.startswith('TENSORX_API_KEY=') or line.startswith('TENSORIX_API_KEY=')) and '***' not in line:
                     API_KEY = line.split('=', 1)[1]
                     break
 

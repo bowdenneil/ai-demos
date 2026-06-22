@@ -532,7 +532,7 @@
 
 <script>
 // ─── API CONFIG ───
-let API_KEY=*** || '';
+let API_KEY="local-auto";  // server proxy handles auth
 // Use local proxy if served from localhost, otherwise direct API
 let API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? window.location.origin + '/api'   // local proxy — no CORS issues
@@ -997,3 +997,4 @@ document.getElementById('rag-question').addEventListener('keydown', e => { if (e
 </script>
 </body>
 </html>
+
