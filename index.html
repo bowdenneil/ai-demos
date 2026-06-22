@@ -13,6 +13,10 @@
       --accent: #53d8fb;
       --accent2: #7c5cfc;
       --accent3: #f953ba;
+      --accent4: #34d399;
+      --accent5: #fbbf24;
+      --accent6: #f97316;
+      --accent7: #06b6d4;
       --success: #34d399;
       --warning: #fbbf24;
       --danger: #f87171;
@@ -131,6 +135,10 @@
     .card-icon.rag { background: rgba(83,216,251,0.15); }
     .card-icon.market { background: rgba(124,92,252,0.15); }
     .card-icon.finance { background: rgba(249,83,186,0.15); }
+    .card-icon.regulatory { background: rgba(52,211,153,0.15); }
+    .card-icon.earnings { background: rgba(251,191,36,0.15); }
+    .card-icon.churn { background: rgba(249,115,22,0.15); }
+    .card-icon.rfp { background: rgba(6,182,212,0.15); }
     .card h2 { font-size: 1.3rem; margin-bottom: 0.5rem; }
     .card p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; }
     .card .tag {
@@ -144,6 +152,10 @@
     .tag.rag { background: rgba(83,216,251,0.15); color: var(--accent); }
     .tag.market { background: rgba(124,92,252,0.15); color: var(--accent2); }
     .tag.finance { background: rgba(249,83,186,0.15); color: var(--accent3); }
+    .tag.regulatory { background: rgba(52,211,153,0.15); color: var(--accent4); }
+    .tag.earnings { background: rgba(251,191,36,0.15); color: var(--accent5); }
+    .tag.churn { background: rgba(249,115,22,0.15); color: var(--accent6); }
+    .tag.rfp { background: rgba(6,182,212,0.15); color: var(--accent7); }
     /* DEMO PANEL */
     .demo-overlay {
       display: none;
@@ -258,6 +270,14 @@
     .btn-market:hover:not(:disabled) { background: #9678ff; }
     .btn-finance { background: var(--accent3); color: #fff; }
     .btn-finance:hover:not(:disabled) { background: #fb73c8; }
+    .btn-regulatory { background: var(--accent4); color: #000; }
+    .btn-regulatory:hover:not(:disabled) { background: #5be8b0; }
+    .btn-earnings { background: var(--accent5); color: #000; }
+    .btn-earnings:hover:not(:disabled) { background: #fcd34d; }
+    .btn-churn { background: var(--accent6); color: #fff; }
+    .btn-churn:hover:not(:disabled) { background: #fb923c; }
+    .btn-rfp { background: var(--accent7); color: #fff; }
+    .btn-rfp:hover:not(:disabled) { background: #22d3ee; }
     .btn-secondary {
       background: var(--surface2);
       color: var(--text-dim);
@@ -374,7 +394,7 @@
 
 <div class="header">
   <h1>⚡ AI Solutions Demo</h1>
-  <p>Interactive demos powered by LLM — RAG, Market Research & Financial Analysis</p>
+  <p>Interactive demos powered by LLM — RAG, Market Research, Financial Analysis & more</p>
   <div class="api-bar">
     <div class="api-status" id="apiStatus"></div>
     <input type="password" id="apiKeyInput" placeholder="Enter your API key (OpenAI-compatible endpoint)">
@@ -400,6 +420,30 @@
     <h2>Financial Analysis</h2>
     <p>Process financial data, fetch live market context, and generate investment insights. AI-powered analysis of revenue, margins, and valuation.</p>
     <span class="tag finance">Investment Intel</span>
+  </div>
+  <div class="card" onclick="openDemo('regulatory')">
+    <div class="card-icon regulatory">⚖️</div>
+    <h2>Regulatory Impact Analyser</h2>
+    <p>Paste a regulation name or text — the system searches the web for latest guidance, then AI maps affected policies, identifies compliance gaps, and suggests remediation.</p>
+    <span class="tag regulatory">Compliance</span>
+  </div>
+  <div class="card" onclick="openDemo('earnings')">
+    <div class="card-icon earnings">📈</div>
+    <h2>Earnings Call Analyser</h2>
+    <p>Enter a company name to search for recent earnings call data. AI extracts key themes, quantifies sentiment, flags risk language, and generates an investor brief.</p>
+    <span class="tag earnings">Investor Intel</span>
+  </div>
+  <div class="card" onclick="openDemo('churn')">
+    <div class="card-icon churn">🔄</div>
+    <h2>Churn Prediction</h2>
+    <p>Enter customer data and the system searches for competitor offers and churn benchmarks. AI identifies at-risk customers, explains why, and recommends retention actions.</p>
+    <span class="tag churn">Customer Retention</span>
+  </div>
+  <div class="card" onclick="openDemo('rfp')">
+    <div class="card-icon rfp">📝</div>
+    <h2>RFP Drafter</h2>
+    <p>Paste RFP text or describe requirements — the system searches for relevant capabilities and case studies, then AI drafts section-by-section responses.</p>
+    <span class="tag rfp">Bid &amp; Proposals</span>
   </div>
 </div>
 
@@ -524,6 +568,175 @@
         <div id="fin-metrics" class="metric-grid" style="display:none"></div>
         <div id="fin-output" class="output-content" style="margin-top:1rem">
           <div class="output-placeholder">Enter financial data and click Analyse</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REGULATORY IMPACT ANALYSER DEMO -->
+<div class="demo-overlay" id="demo-regulatory">
+  <div class="demo-panel">
+    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
+    <h2 class="demo-title">⚖️ Regulatory Impact Analyser</h2>
+    <p class="demo-desc">Paste a regulation name or text — the system searches the web for latest guidance, maps affected policies, identifies compliance gaps, and suggests remediation.</p>
+    <div class="demo-layout">
+      <div class="demo-input">
+        <h3>Regulation Details</h3>
+        <label>Regulation Name</label>
+        <input type="text" id="reg-name" placeholder="e.g. EU DORA, Basel IV, MiCA">
+        <label>Regulation Text (optional)</label>
+        <textarea id="reg-text" rows="4" placeholder="Paste regulation text or summary..."></textarea>
+        <label>Industry</label>
+        <select id="reg-industry">
+          <option value="Banking">Banking</option>
+          <option value="Insurance">Insurance</option>
+          <option value="Telecom">Telecom</option>
+          <option value="Technology">Technology</option>
+          <option value="Healthcare">Healthcare</option>
+        </select>
+        <label>Additional Context (optional)</label>
+        <textarea id="reg-context" rows="3" placeholder="Specific areas of concern, existing policies, deadlines..."></textarea>
+        <div class="presets">
+          <button class="preset-btn" onclick="regPreset('dora')">🏛️ EU DORA</button>
+          <button class="preset-btn" onclick="regPreset('basel')">🏦 Basel IV</button>
+          <button class="preset-btn" onclick="regPreset('mica')">💶 MiCA</button>
+        </div>
+        <button class="btn btn-regulatory" onclick="regQuery()">⚖️ Analyse Impact</button>
+      </div>
+      <div class="demo-output">
+        <h3>Impact Assessment <div class="output-spinner" id="reg-spinner"></div></h3>
+        <div id="reg-sources"></div>
+        <div id="reg-output" class="output-content">
+          <div class="output-placeholder">Enter a regulation and click Analyse Impact to see the compliance assessment</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EARNINGS CALL ANALYSER DEMO -->
+<div class="demo-overlay" id="demo-earnings">
+  <div class="demo-panel">
+    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
+    <h2 class="demo-title">📈 Earnings Call Analyser</h2>
+    <p class="demo-desc">Enter a company name to search for recent earnings call data. AI extracts key themes, quantifies sentiment, flags risk language, and generates an investor brief.</p>
+    <div class="demo-layout">
+      <div class="demo-input">
+        <h3>Earnings Call Parameters</h3>
+        <label>Company Name</label>
+        <input type="text" id="earn-company" placeholder="e.g. Microsoft, NVIDIA, Salesforce">
+        <label>Quarter</label>
+        <select id="earn-quarter">
+          <option value="Q1">Q1</option>
+          <option value="Q2">Q2</option>
+          <option value="Q3">Q3</option>
+          <option value="Q4">Q4</option>
+        </select>
+        <label>Year</label>
+        <input type="text" id="earn-year" placeholder="e.g. 2026">
+        <label>Focus Area (optional)</label>
+        <input type="text" id="earn-focus" placeholder="e.g. AI growth, cloud revenue, margins">
+        <div class="presets">
+          <button class="preset-btn" onclick="earnPreset('msft')">🪟 Microsoft Q2 2026</button>
+          <button class="preset-btn" onclick="earnPreset('crm')">☁️ Salesforce Q1 2026</button>
+          <button class="preset-btn" onclick="earnPreset('nvda')">🟢 NVIDIA Q4 2025</button>
+        </div>
+        <button class="btn btn-earnings" onclick="earnQuery()">📈 Analyse Earnings</button>
+      </div>
+      <div class="demo-output">
+        <h3>Investor Brief <div class="output-spinner" id="earn-spinner"></div></h3>
+        <div id="earn-sources"></div>
+        <div id="earn-output" class="output-content">
+          <div class="output-placeholder">Enter company details and click Analyse Earnings to see the investor brief</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHURN PREDICTION DEMO -->
+<div class="demo-overlay" id="demo-churn">
+  <div class="demo-panel">
+    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
+    <h2 class="demo-title">🔄 Churn Prediction</h2>
+    <p class="demo-desc">Enter customer data and the system searches for competitor offers and churn benchmarks. AI identifies at-risk customers, explains why, and recommends retention actions.</p>
+    <div class="demo-layout">
+      <div class="demo-input">
+        <h3>Customer Data</h3>
+        <label>Customer Name</label>
+        <input type="text" id="churn-name" placeholder="e.g. Acme Corp or Customer #12345">
+        <label>Tenure (months)</label>
+        <input type="number" id="churn-tenure" placeholder="e.g. 24">
+        <label>Monthly Spend (EUR)</label>
+        <input type="number" id="churn-spend" placeholder="e.g. 450">
+        <label>Support Tickets (last 6 months)</label>
+        <input type="number" id="churn-tickets" placeholder="e.g. 3">
+        <label>Usage Drop (%)</label>
+        <input type="number" id="churn-drop" placeholder="e.g. 20">
+        <label>Contract Type</label>
+        <select id="churn-contract">
+          <option value="Monthly">Monthly</option>
+          <option value="Annual">Annual</option>
+          <option value="Multi-year">Multi-year</option>
+        </select>
+        <label>Competitor Mentioned (optional)</label>
+        <input type="text" id="churn-competitor" placeholder="e.g. Vodafone, Deutsche Telekom">
+        <div class="presets">
+          <button class="preset-btn" onclick="churnPreset('sme')">🏢 High-risk SME</button>
+          <button class="preset-btn" onclick="churnPreset('enterprise')">🏛️ At-risk Enterprise</button>
+          <button class="preset-btn" onclick="churnPreset('stable')">✅ Stable Customer</button>
+        </div>
+        <button class="btn btn-churn" onclick="churnQuery()">🔄 Predict Churn</button>
+      </div>
+      <div class="demo-output">
+        <h3>Churn Risk Assessment <div class="output-spinner" id="churn-spinner"></div></h3>
+        <div id="churn-sources"></div>
+        <div id="churn-output" class="output-content">
+          <div class="output-placeholder">Enter customer data and click Predict Churn to see the risk assessment</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RFP DRAFTER DEMO -->
+<div class="demo-overlay" id="demo-rfp">
+  <div class="demo-panel">
+    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
+    <h2 class="demo-title">📝 RFP Drafter</h2>
+    <p class="demo-desc">Paste RFP text or describe requirements — the system searches for relevant capabilities and case studies, then AI drafts section-by-section responses.</p>
+    <div class="demo-layout">
+      <div class="demo-input">
+        <h3>RFP Details</h3>
+        <label>RFP Title</label>
+        <input type="text" id="rfp-title" placeholder="e.g. Cloud Migration RFP 2026">
+        <label>RFP Requirements</label>
+        <textarea id="rfp-requirements" rows="5" placeholder="Paste the RFP text or describe the requirements..."></textarea>
+        <label>Industry</label>
+        <input type="text" id="rfp-industry" placeholder="e.g. Financial Services, Telecom, Healthcare">
+        <label>Our Company</label>
+        <input type="text" id="rfp-company" placeholder="e.g. TechNova Solutions">
+        <label>Key Differentiators</label>
+        <textarea id="rfp-diff" rows="3" placeholder="What sets us apart? Certifications, case studies, unique capabilities..."></textarea>
+        <label>Tone</label>
+        <select id="rfp-tone">
+          <option value="Professional">Professional</option>
+          <option value="Technical">Technical</option>
+          <option value="Persuasive">Persuasive</option>
+        </select>
+        <div class="presets">
+          <button class="preset-btn" onclick="rfpPreset('cloud')">☁️ Cloud Migration</button>
+          <button class="preset-btn" onclick="rfpPreset('network')">🌐 Network Infrastructure</button>
+          <button class="preset-btn" onclick="rfpPreset('data')">📊 Data Platform</button>
+        </div>
+        <button class="btn btn-rfp" onclick="rfpQuery()">📝 Draft Response</button>
+      </div>
+      <div class="demo-output">
+        <h3>Drafted Response <div class="output-spinner" id="rfp-spinner"></div></h3>
+        <div id="rfp-sources"></div>
+        <div id="rfp-output" class="output-content">
+          <div class="output-placeholder">Enter RFP details and click Draft Response to generate the proposal</div>
         </div>
       </div>
     </div>
@@ -1076,6 +1289,343 @@ Provide:
 4. Comparison to industry benchmarks
 5. Strategic recommendations
 6. Risk factors${webSection}` }
+  ];
+
+  try {
+    let fullText = '';
+    await callLLM(messages, (text) => {
+      fullText = text;
+      output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
+    });
+    output.innerHTML = formatMarkdown(fullText);
+  } catch (e) {
+    output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
+  }
+  spinner.classList.remove('active');
+}
+
+// ─── REGULATORY IMPACT ANALYSER DEMO ───
+const REG_PRESETS = {
+  dora: { name: 'EU DORA (Digital Operational Resilience Act)', text: 'The Digital Operational Resilience Act (DORA) establishes a comprehensive framework for ICT risk management, incident reporting, digital operational resilience testing, and third-party risk management for financial entities in the EU.', industry: 'Banking', context: 'We are a mid-size EU bank with legacy ICT infrastructure. Concerned about third-party provider oversight and incident reporting timelines.' },
+  basel: { name: 'Basel IV (Basel III Final Reforms)', text: 'Basel IV introduces revised standardised approaches for credit risk, market risk (FRTB), and operational risk. Includes output floor limiting benefits of internal models to 72.5% of standardised approach.', industry: 'Banking', context: 'Our bank uses internal models for credit risk. Need to understand impact on RWA and capital requirements.' },
+  mica: { name: 'MiCA (Markets in Crypto-Assets Regulation)', text: 'MiCA establishes a comprehensive regulatory framework for crypto-asset issuers and service providers in the EU, covering stablecoins, utility tokens, and crypto-asset services.', industry: 'Technology', context: 'We offer crypto custody and trading services to EU clients. Need to understand licensing and whitepaper requirements.' }
+};
+
+function regPreset(name) {
+  const p = REG_PRESETS[name];
+  document.getElementById('reg-name').value = p.name;
+  document.getElementById('reg-text').value = p.text;
+  document.getElementById('reg-industry').value = p.industry;
+  document.getElementById('reg-context').value = p.context;
+}
+
+async function regQuery() {
+  const regName = document.getElementById('reg-name').value.trim();
+  const regText = document.getElementById('reg-text').value.trim();
+  const industry = document.getElementById('reg-industry').value;
+  const context = document.getElementById('reg-context').value.trim();
+
+  if (!regName) { showToast('Enter a regulation name', true); return; }
+
+  const spinner = document.getElementById('reg-spinner');
+  const output = document.getElementById('reg-output');
+  const sourcesEl = document.getElementById('reg-sources');
+  spinner.classList.add('active');
+  output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching web for latest guidance...</span>';
+
+  const searchQ = `${regName} ${industry} compliance requirements 2025 2026`;
+  const webResults = await webSearch(searchQ);
+  const webCtx = searchContext(webResults);
+  renderSearchResults(webResults, 'reg-sources');
+  output.innerHTML = '<span class="typing-cursor"></span>';
+
+  const webSection = webResults.length
+    ? `\n\nWeb Search Results (use these for current guidance and cite as [web N]):\n${webCtx}`
+    : '';
+
+  const regTextSection = regText
+    ? `\n\nRegulation Text Provided:\n${regText}`
+    : '';
+
+  const contextSection = context
+    ? `\n\nAdditional Context:\n${context}`
+    : '';
+
+  const messages = [
+    { role: 'system', content: `You are an expert compliance analyst specialising in financial regulation. Map all affected policies and processes, identify compliance gaps with severity ratings (Critical/High/Medium/Low), and suggest a remediation timeline with priorities. Use EUR for any financial figures. When web search results are provided, use them for current guidance and cite sources as [web N]. Format with markdown headers, bullets, and bold highlights. Include a severity-rated gap analysis table.` },
+    { role: 'user', content: `Analyse the regulatory impact of: ${regName}
+Industry: ${industry}${regTextSection}${contextSection}${webSection}
+
+Provide:
+1. Executive Summary
+2. Regulation Overview
+3. Affected Policies & Processes
+4. Compliance Gap Analysis (with severity ratings: Critical/High/Medium/Low)
+5. Remediation Recommendations & Timeline
+6. Quick Wins vs Long-term Actions
+7. Key Risks if Non-compliant` }
+  ];
+
+  try {
+    let fullText = '';
+    await callLLM(messages, (text) => {
+      fullText = text;
+      output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
+    });
+    output.innerHTML = formatMarkdown(fullText);
+  } catch (e) {
+    output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
+  }
+  spinner.classList.remove('active');
+}
+
+// ─── EARNINGS CALL ANALYSER DEMO ───
+const EARN_PRESETS = {
+  msft: { company: 'Microsoft', quarter: 'Q2', year: '2026', focus: 'AI and cloud growth, Azure momentum, Copilot adoption' },
+  crm: { company: 'Salesforce', quarter: 'Q1', year: '2026', focus: 'AI agent revenue, Data Cloud traction, margin expansion' },
+  nvda: { company: 'NVIDIA', quarter: 'Q4', year: '2025', focus: 'Data centre revenue, Blackwell demand, China restrictions impact' }
+};
+
+function earnPreset(name) {
+  const p = EARN_PRESETS[name];
+  document.getElementById('earn-company').value = p.company;
+  document.getElementById('earn-quarter').value = p.quarter;
+  document.getElementById('earn-year').value = p.year;
+  document.getElementById('earn-focus').value = p.focus;
+}
+
+async function earnQuery() {
+  const company = document.getElementById('earn-company').value.trim();
+  const quarter = document.getElementById('earn-quarter').value;
+  const year = document.getElementById('earn-year').value.trim();
+  const focus = document.getElementById('earn-focus').value.trim();
+
+  if (!company || !year) { showToast('Fill in company name and year', true); return; }
+
+  const spinner = document.getElementById('earn-spinner');
+  const output = document.getElementById('earn-output');
+  const sourcesEl = document.getElementById('earn-sources');
+  spinner.classList.add('active');
+  output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching web for earnings data...</span>';
+
+  const searchQ = `${company} ${quarter} ${year} earnings call transcript results highlights`;
+  const webResults = await webSearch(searchQ);
+  const webCtx = searchContext(webResults);
+  renderSearchResults(webResults, 'earn-sources');
+  output.innerHTML = '<span class="typing-cursor"></span>';
+
+  const webSection = webResults.length
+    ? `\n\nWeb Search Results (use these for current earnings data and cite as [web N]):\n${webCtx}`
+    : '';
+
+  const focusSection = focus
+    ? `\n\nSpecific Focus Area: ${focus}`
+    : '';
+
+  const messages = [
+    { role: 'system', content: `You are a senior equity analyst at a top investment bank. Extract key themes from the earnings call, quantify sentiment shift (bullish/bearish signals), flag risk language and cautious phrasing, compare to previous quarter if possible. Provide a sentiment score from -100 (very bearish) to +100 (very bullish). When web search results are provided, use them for current data and cite sources as [web N]. Format with markdown headers, bullets, and bold highlights. Use USD for US companies and EUR for European companies.` },
+    { role: 'user', content: `Analyse the ${quarter} ${year} earnings call for ${company}.${focusSection}${webSection}
+
+Provide:
+1. Executive Summary
+2. Key Themes & Takeaways
+3. Financial Highlights (revenue, EPS, guidance)
+4. Sentiment Analysis (with score from -100 to +100)
+5. Risk Language & Caution Flags
+6. Management Tone Assessment
+7. Forward-Looking Signals
+8. Investor Brief: Buy/Hold/Sell Considerations` }
+  ];
+
+  try {
+    let fullText = '';
+    await callLLM(messages, (text) => {
+      fullText = text;
+      output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
+    });
+    output.innerHTML = formatMarkdown(fullText);
+  } catch (e) {
+    output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
+  }
+  spinner.classList.remove('active');
+}
+
+// ─── CHURN PREDICTION DEMO ───
+const CHURN_PRESETS = {
+  sme: { name: 'Acme Solutions GmbH', tenure: 8, spend: 120, tickets: 4, drop: 35, contract: 'Monthly', competitor: 'Vodafone Business' },
+  enterprise: { name: 'Deutsche Industriebank AG', tenure: 24, spend: 4500, tickets: 2, drop: 15, contract: 'Annual', competitor: '' },
+  stable: { name: 'Müller Logistics SE', tenure: 36, spend: 800, tickets: 0, drop: 2, contract: 'Multi-year', competitor: '' }
+};
+
+function churnPreset(name) {
+  const p = CHURN_PRESETS[name];
+  document.getElementById('churn-name').value = p.name;
+  document.getElementById('churn-tenure').value = p.tenure;
+  document.getElementById('churn-spend').value = p.spend;
+  document.getElementById('churn-tickets').value = p.tickets;
+  document.getElementById('churn-drop').value = p.drop;
+  document.getElementById('churn-contract').value = p.contract;
+  document.getElementById('churn-competitor').value = p.competitor;
+}
+
+async function churnQuery() {
+  const name = document.getElementById('churn-name').value.trim();
+  const tenure = parseInt(document.getElementById('churn-tenure').value);
+  const spend = parseFloat(document.getElementById('churn-spend').value);
+  const tickets = parseInt(document.getElementById('churn-tickets').value);
+  const drop = parseFloat(document.getElementById('churn-drop').value);
+  const contract = document.getElementById('churn-contract').value;
+  const competitor = document.getElementById('churn-competitor').value.trim();
+
+  if (!name || isNaN(tenure) || isNaN(spend)) { showToast('Fill in customer name, tenure, and monthly spend', true); return; }
+
+  const spinner = document.getElementById('churn-spinner');
+  const output = document.getElementById('churn-output');
+  const sourcesEl = document.getElementById('churn-sources');
+  spinner.classList.add('active');
+  output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching web for churn benchmarks and retention strategies...</span>';
+
+  let searchQ = `telecom churn ${contract.toLowerCase()} customer retention strategies 2025 2026`;
+  let webResults = await webSearch(searchQ);
+
+  if (competitor) {
+    const compResults = await webSearch(`${competitor} telecom offers`);
+    webResults = webResults.concat(compResults);
+  }
+
+  const webCtx = searchContext(webResults);
+  renderSearchResults(webResults, 'churn-sources');
+  output.innerHTML = '<span class="typing-cursor"></span>';
+
+  const webSection = webResults.length
+    ? `\n\nWeb Search Results (use these for industry benchmarks and competitor intel, cite as [web N]):\n${webCtx}`
+    : '';
+
+  const competitorSection = competitor
+    ? `\n\nCompetitor Mentioned by Customer: ${competitor}`
+    : '';
+
+  const messages = [
+    { role: 'system', content: `You are a telecom customer success expert. Assess churn risk as Low/Medium/High/Critical, explain contributing factors, compare to industry benchmarks, and recommend specific retention actions with expected impact. Use EUR for all financial figures. When web search results are provided, use them for industry benchmarks, competitor offers, and retention best practices. Cite sources as [web N]. Format with markdown headers, bullets, and bold highlights.` },
+    { role: 'user', content: `Assess churn risk for the following telecom customer:
+
+- Customer: ${name}
+- Tenure: ${tenure} months
+- Monthly Spend: €${spend}
+- Support Tickets (last 6m): ${tickets || 0}
+- Usage Drop: ${drop}%
+- Contract Type: ${contract}${competitorSection}${webSection}
+
+Provide:
+1. Churn Risk Assessment (Low/Medium/High/Critical with confidence score)
+2. Risk Factor Analysis (weight each factor)
+3. Industry Benchmark Comparison
+4. Predicted Churn Probability (%)
+5. Revenue at Risk (annual)
+6. Recommended Retention Actions (prioritised)
+7. Suggested Offer/Intervention
+8. Escalation Recommendation` }
+  ];
+
+  try {
+    let fullText = '';
+    await callLLM(messages, (text) => {
+      fullText = text;
+      output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
+    });
+    output.innerHTML = formatMarkdown(fullText);
+  } catch (e) {
+    output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
+  }
+  spinner.classList.remove('active');
+}
+
+// ─── RFP DRAFTER DEMO ───
+const RFP_PRESETS = {
+  cloud: {
+    title: 'Cloud Migration RFP 2026',
+    requirements: `The organisation seeks a qualified partner to migrate our on-premise infrastructure to a cloud-native architecture.\n\nRequirements:\n1. Assessment of current infrastructure (120 servers, 15 applications)\n2. Migration strategy with minimal downtime (<4 hours per application)\n3. Target architecture: AWS/Azure multi-cloud with Kubernetes orchestration\n4. Data migration with zero data loss guarantee\n5. Security compliance: ISO 27001, SOC 2 Type II\n6. Training for 40 internal engineers\n7. Post-migration support for 12 months\n8. Budget: €1.2M - €1.8M\n9. Timeline: 6 months from contract signing`,
+    industry: 'Financial Services',
+    company: 'TechNova Solutions',
+    diff: 'AWS Advanced Consulting Partner, Azure Expert MSP, 50+ successful cloud migrations in finance, ISO 27001 certified, proprietary CloudPath migration methodology, 24/7 NOC with 99.99% SLA track record',
+    tone: 'Professional'
+  },
+  network: {
+    title: 'Network Infrastructure Modernisation RFP',
+    requirements: `We require a partner to design and implement a next-generation network infrastructure across 12 European offices.\n\nRequirements:\n1. SD-WAN implementation replacing legacy MPLS\n2. SASE architecture with zero-trust networking\n3. 10Gbps backbone capacity with 99.99% uptime SLA\n4. Network segmentation for PCI-DSS compliance\n5. Centralised management and monitoring platform\n6. Integration with existing Fortinet security stack\n7. Phased rollout: 3 offices per quarter\n8. Training for 15 network engineers\n9. Budget: €800K - €1.2M`,
+    industry: 'Telecom',
+    company: 'NetForge GmbH',
+    diff: 'Certified Cisco Gold Partner, Fortinet Platinum Partner, SD-WAN deployment for 200+ sites, proprietary NetHealth monitoring platform, European team of 30+ CCIE engineers, 15-year track record in telecom networking',
+    tone: 'Technical'
+  },
+  data: {
+    title: 'Enterprise Data Platform RFP',
+    requirements: `We seek a partner to build a modern data platform enabling advanced analytics and AI/ML capabilities.\n\nRequirements:\n1. Data lake architecture on cloud (Azure/GCP)\n2. Real-time streaming ingestion (10K events/sec)\n3. Data governance framework with lineage tracking\n4. Self-service analytics layer for 500+ business users\n5. ML/AI model deployment infrastructure (MLOps)\n6. GDPR-compliant data handling with encryption at rest and in transit\n7. Migration of 5TB existing data warehouse\n8. Integration with SAP S/4HANA and Salesforce\n9. Budget: €600K - €900K`,
+    industry: 'Healthcare',
+    company: 'DataBridge Analytics',
+    diff: 'Azure Data Platform partner, GCP Specialisation in ML, HIPAA-compliant deployments, 20+ healthcare data platforms delivered, proprietary DataOps methodology, published case studies with 3 Fortune 500 pharma companies',
+    tone: 'Persuasive'
+  }
+};
+
+function rfpPreset(name) {
+  const p = RFP_PRESETS[name];
+  document.getElementById('rfp-title').value = p.title;
+  document.getElementById('rfp-requirements').value = p.requirements;
+  document.getElementById('rfp-industry').value = p.industry;
+  document.getElementById('rfp-company').value = p.company;
+  document.getElementById('rfp-diff').value = p.diff;
+  document.getElementById('rfp-tone').value = p.tone;
+}
+
+async function rfpQuery() {
+  const title = document.getElementById('rfp-title').value.trim();
+  const requirements = document.getElementById('rfp-requirements').value.trim();
+  const industry = document.getElementById('rfp-industry').value.trim();
+  const company = document.getElementById('rfp-company').value.trim();
+  const diff = document.getElementById('rfp-diff').value.trim();
+  const tone = document.getElementById('rfp-tone').value;
+
+  if (!title || !requirements) { showToast('Fill in RFP title and requirements', true); return; }
+
+  const spinner = document.getElementById('rfp-spinner');
+  const output = document.getElementById('rfp-output');
+  const sourcesEl = document.getElementById('rfp-sources');
+  spinner.classList.add('active');
+  output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching web for industry best practices...</span>';
+
+  const searchQ = `${industry} ${title} requirements best practices 2025 2026`;
+  const webResults = await webSearch(searchQ);
+  const webCtx = searchContext(webResults);
+  renderSearchResults(webResults, 'rfp-sources');
+  output.innerHTML = '<span class="typing-cursor"></span>';
+
+  const webSection = webResults.length
+    ? `\n\nWeb Search Results (use these for industry best practices and cite as [web N]):\n${webCtx}`
+    : '';
+
+  const industrySection = industry ? `\n\nIndustry: ${industry}` : '';
+  const companySection = company ? `\n\nOur Company: ${company}` : '';
+  const diffSection = diff ? `\n\nKey Differentiators: ${diff}` : '';
+
+  const messages = [
+    { role: 'system', content: `You are an expert proposal writer with deep experience winning RFPs. Draft section-by-section RFP responses that address each requirement specifically. Highlight differentiators naturally within the response. Use a ${tone.toLowerCase()} tone. When web search results are provided, use them for industry best practices and cite as [web N]. Format with markdown headers, bullets, and bold highlights. Make responses specific and actionable, not generic.` },
+    { role: 'user', content: `Draft an RFP response for: ${title}
+
+RFP Requirements:
+${requirements}${industrySection}${companySection}${diffSection}${webSection}
+
+Draft the response with:
+1. Executive Summary
+2. Understanding of Requirements
+3. Proposed Solution (section-by-section for each requirement)
+4. Differentiators & Value-Add
+5. Implementation Approach & Timeline
+6. Team & Qualifications
+7. Risk Mitigation
+8. Why Choose Us (closing section)
+
+Tone: ${tone}. Be specific and reference our differentiators throughout.` }
   ];
 
   try {
