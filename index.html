@@ -1232,7 +1232,7 @@
   <div class="card" onclick="openDemo('image')">
     <div class="card-header-img image" id="card-header-image">
       <img src="/icons/image.png" alt="" id="card-img-image">
-      <div class="card-icon image" id="card-emoji-image">🎨</div>
+      <div class="card-icon image" id="card-emoji-image"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#7c5cf6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5" fill="#53d8fb" stroke="none"/><path d="M21 15l-5-5L5 21"/></svg></div>
       <div class="card-gen-overlay" id="card-gen-image">✨ Generating...</div>
     </div>
     <div class="card-body">
@@ -3762,8 +3762,8 @@ function checkAndLoadIcon(demo) {
   const overlay = document.getElementById(`card-gen-${demo}`);
   if (!img) return;
 
-  // onprem has an inline SVG icon — skip PNG generation
-  if (demo === 'onprem') {
+  // onprem and image have inline SVG icons — skip PNG generation
+  if (demo === 'onprem' || demo === 'image') {
     if (overlay) overlay.style.display = 'none';
     return;
   }
