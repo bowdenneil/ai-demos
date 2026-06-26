@@ -3,786 +3,455 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Readiness Assessment — Executive Diagnostic</title>
+<title>AI Readiness Assessment</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 :root {
-  --bg: #0a0a1a;
-  --surface: #12122a;
-  --surface2: #1a1a3a;
-  --border: #2a2a5a;
-  --accent: #53d8fb;
-  --accent2: #7c5cfc;
-  --accent3: #f953ba;
-  --accent4: #34d399;
-  --accent5: #fbbf24;
-  --accent6: #f97316;
-  --accent7: #06b6d4;
-  --success: #34d399;
-  --warning: #fbbf24;
-  --danger: #f87171;
-  --text: #e8e8f0;
-  --text-dim: #8888aa;
-  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface2: #334155;
+  --border: #475569;
+  --accent: #38bdf8;
+  --accent2: #818cf8;
+  --green: #34d399;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --text: #f1f5f9;
+  --text-dim: #94a3b8;
+  --font: -apple-system, 'Segoe UI', system-ui, sans-serif;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; }
 
 /* ─── HEADER ─── */
-.header {
-  background: linear-gradient(135deg, #0a0a2a 0%, #1a0a3a 50%, #0a1a2a 100%);
-  border-bottom: 1px solid var(--border);
-  padding: 1.2rem 2rem;
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 1rem;
-}
-.header h1 {
-  font-size: 1.4rem; font-weight: 800;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
-.header p { color: var(--text-dim); font-size: 0.82rem; margin-top: 0.15rem; }
+.header { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border); }
+.header h1 { font-size: 1.3rem; font-weight: 700; }
+.header p { font-size: 0.85rem; color: var(--text-dim); margin-top: 0.2rem; }
 
-/* ─── PROGRESS BAR ─── */
-.progress-wrap { padding: 0 2rem; margin-top: 1rem; }
-.progress-bar { display: flex; justify-content: space-between; position: relative; }
-.progress-bar::before {
-  content: ''; position: absolute; top: 14px; left: 0; right: 0;
-  height: 2px; background: var(--border); z-index: 0;
-}
-.progress-fill {
-  position: absolute; top: 14px; left: 0; height: 2px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  z-index: 1; transition: width 0.4s ease;
-}
-.progress-step {
-  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
-  z-index: 2; cursor: pointer; position: relative;
-}
-.progress-dot {
-  width: 30px; height: 30px; border-radius: 50%;
-  background: var(--surface); border: 2px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.75rem; font-weight: 700; color: var(--text-dim);
-  transition: all 0.3s;
-}
-.progress-step.active .progress-dot {
-  background: var(--accent); border-color: var(--accent); color: #000;
-}
-.progress-step.done .progress-dot {
-  background: var(--success); border-color: var(--success); color: #000;
-}
-.progress-step.active .progress-label,
-.progress-step.done .progress-label { color: var(--text); }
-.progress-label { font-size: 0.7rem; color: var(--text-dim); font-weight: 500; }
+/* ─── PROGRESS ─── */
+.progress-wrap { padding: 1rem 2rem; display: flex; gap: 0.5rem; }
+.progress-step { flex: 1; text-align: center; font-size: 0.78rem; color: var(--text-dim); cursor: default; }
+.progress-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border); margin: 0 auto 0.3rem; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; }
+.progress-step.done .progress-dot { background: var(--green); border-color: var(--green); color: var(--bg); }
+.progress-step.active .progress-dot { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.progress-step.active { color: var(--text); }
 
 /* ─── MAIN ─── */
-.main { max-width: 900px; margin: 0 auto; padding: 1.5rem 2rem 5rem; }
+.main { max-width: 760px; margin: 0 auto; padding: 1.5rem 2rem 4rem; }
 
-/* ─── STEP ─── */
-.step { display: none; animation: fadeIn 0.3s ease; }
-.step.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-.step h2 { font-size: 1.3rem; margin-bottom: 0.3rem; }
-.step .step-sub { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 1.5rem; }
+/* ─── STEPS ─── */
+.step { display: none; }
+.step.active { display: block; animation: fadeIn 0.3s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.step h2 { font-size: 1.25rem; margin-bottom: 0.2rem; }
+.step .step-sub { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.5rem; }
 
 /* ─── QUESTION CARDS ─── */
-.q-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem;
-}
-.q-card .q-label {
-  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;
-  color: var(--accent); font-weight: 700; margin-bottom: 0.4rem;
-}
-.q-card .q-text { font-size: 0.95rem; margin-bottom: 0.9rem; font-weight: 500; }
+.q-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem; margin-bottom: 0.8rem; }
+.q-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); font-weight: 700; margin-bottom: 0.3rem; }
+.q-text { font-size: 0.92rem; margin-bottom: 0.8rem; font-weight: 500; }
 
-/* ─── OPTION BUTTONS ─── */
-.opt-grid { display: grid; gap: 0.5rem; }
+/* ─── OPTIONS ─── */
+.opt-grid { display: grid; gap: 0.4rem; }
 .opt-grid.cols-2 { grid-template-columns: 1fr 1fr; }
 .opt-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
 @media (max-width: 600px) { .opt-grid.cols-2, .opt-grid.cols-3 { grid-template-columns: 1fr; } }
-.opt-btn {
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 8px; padding: 0.7rem 0.9rem; cursor: pointer;
-  transition: all 0.2s; text-align: left; display: flex; gap: 0.6rem;
-  align-items: flex-start; color: var(--text); font-family: var(--font);
-  font-size: 0.85rem;
-}
+.opt-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.8rem; cursor: pointer; transition: all 0.15s; text-align: left; display: flex; gap: 0.5rem; align-items: flex-start; color: var(--text); font-family: var(--font); font-size: 0.83rem; }
 .opt-btn:hover { border-color: var(--accent); }
-.opt-btn.selected {
-  border-color: var(--accent); background: rgba(83,216,251,0.08);
-  box-shadow: 0 0 0 1px var(--accent);
-}
-.opt-btn .opt-icon { font-size: 1.1rem; flex-shrink: 0; line-height: 1.4; }
-.opt-btn .opt-body { flex: 1; }
-.opt-btn .opt-title { font-weight: 600; margin-bottom: 0.1rem; }
-.opt-btn .opt-desc { font-size: 0.75rem; color: var(--text-dim); }
+.opt-btn.selected { border-color: var(--accent); background: rgba(56,189,248,0.1); box-shadow: 0 0 0 1px var(--accent); }
+.opt-icon { font-size: 1rem; flex-shrink: 0; }
+.opt-title { font-weight: 600; }
+.opt-desc { font-size: 0.74rem; color: var(--text-dim); margin-top: 0.1rem; }
 
-/* ─── SELECT / INPUT ─── */
-.q-select, .q-input {
-  width: 100%; padding: 0.5rem 0.7rem; background: var(--surface2);
-  border: 1px solid var(--border); color: var(--text); border-radius: 8px;
-  font-size: 0.85rem; font-family: var(--font);
-}
-.q-select:focus, .q-input:focus { outline: none; border-color: var(--accent); }
+/* ─── INPUTS ─── */
+.q-input, .q-select { width: 100%; padding: 0.5rem 0.7rem; background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; font-size: 0.85rem; font-family: var(--font); }
+.q-input:focus, .q-select:focus { outline: none; border-color: var(--accent); }
 .q-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
 @media (max-width: 600px) { .q-row { grid-template-columns: 1fr; } }
 
-/* ─── NAV BUTTONS ─── */
-.nav-row { display: flex; justify-content: space-between; margin-top: 1.5rem; }
-.btn {
-  padding: 0.6rem 1.4rem; border-radius: 8px; border: none;
-  font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
-  font-family: var(--font);
-}
-.btn-primary { background: var(--accent); color: #000; }
-.btn-primary:hover { background: #70e4ff; }
+/* ─── NAV ─── */
+.nav-row { display: flex; justify-content: space-between; margin-top: 1.2rem; }
+.btn { padding: 0.55rem 1.3rem; border-radius: 8px; border: none; font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: var(--font); }
+.btn-primary { background: var(--accent); color: var(--bg); }
+.btn-primary:hover { background: #7dd3fc; }
 .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
 .btn-secondary { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
-.btn-secondary:hover { color: var(--text); border-color: var(--text-dim); }
+.btn-secondary:hover { color: var(--text); }
 
-/* ─── RESULTS DASHBOARD ─── */
+/* ─── LOADING ─── */
+.loading-screen { text-align: center; padding: 3rem 1rem; }
+.loading-screen .spinner { width: 40px; height: 40px; border: 3px solid var(--surface2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-screen p { color: var(--text-dim); font-size: 0.9rem; }
+
+/* ─── RESULTS ─── */
 .results { display: none; }
-.results.active { display: block; animation: fadeIn 0.4s ease; }
+.results.active { display: block; animation: fadeIn 0.4s; }
+.results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+.results-header h2 { font-size: 1.3rem; }
 
-/* KPI ROW */
-.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.2rem; }
-.kpi-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 1rem 1.2rem; position: relative; overflow: hidden;
-}
-.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent); }
-.kpi-card.green::before { background: var(--success); }
-.kpi-card.orange::before { background: var(--accent6); }
-.kpi-card.purple::before { background: var(--accent2); }
-.kpi-card.red::before { background: var(--danger); }
-.kpi-card .kpi-label { font-size: 0.68rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; }
-.kpi-card .kpi-value { font-size: 1.4rem; font-weight: 800; margin-top: 0.2rem; }
-.kpi-card .kpi-sub { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.1rem; }
+/* ─── SCORE GAUGE ─── */
+.score-section { display: grid; grid-template-columns: auto 1fr; gap: 2rem; align-items: center; margin-bottom: 1.5rem; }
+@media (max-width: 600px) { .score-section { grid-template-columns: 1fr; text-align: center; } }
+.gauge-wrap { width: 160px; height: 160px; position: relative; }
+.gauge-svg { transform: rotate(-90deg); }
+.gauge-bg { fill: none; stroke: var(--surface2); stroke-width: 10; }
+.gauge-fill { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+.gauge-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+.gauge-score { font-size: 2rem; font-weight: 800; }
+.gauge-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+.score-info h3 { font-size: 1.1rem; margin-bottom: 0.3rem; }
+.score-info .maturity-level { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.78rem; font-weight: 600; margin-bottom: 0.5rem; }
+.score-info p { font-size: 0.85rem; color: var(--text-dim); }
 
-/* CHART CARD */
+/* ─── RECOMMENDATION ─── */
+.rec-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.3rem; margin-bottom: 1rem; border-left: 4px solid var(--accent); }
+.rec-card .rec-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); font-weight: 600; margin-bottom: 0.4rem; }
+.rec-card .rec-path { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; }
+.rec-card .rec-signal { display: flex; gap: 1rem; margin-top: 0.8rem; font-size: 0.78rem; }
+.rec-signal span { display: flex; align-items: center; gap: 0.3rem; }
+.signal-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* ─── EXECUTIVE NARRATIVE ─── */
+.narrative-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+.narrative-card h3 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); margin-bottom: 0.8rem; }
+.narrative-card .narrative-content { font-size: 0.88rem; line-height: 1.7; color: var(--text); }
+.narrative-card .narrative-content p { margin-bottom: 0.6rem; }
+.narrative-card .narrative-content p:last-child { margin-bottom: 0; }
+.narrative-card .narrative-content strong { color: var(--accent); }
+.narrative-card .narrature-error { color: var(--text-dim); font-style: italic; font-size: 0.82rem; }
+
+/* ─── CHARTS ─── */
 .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; }
-.chart-card h3 { font-size: 0.82rem; color: var(--text-dim); margin-bottom: 0.7rem; font-weight: 600; }
-.chart-wrap { position: relative; height: 300px; }
+.chart-card h3 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); margin-bottom: 0.7rem; }
+.chart-wrap { position: relative; height: 280px; }
 .chart-wrap.short { height: 220px; }
 .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 @media (max-width: 700px) { .chart-row { grid-template-columns: 1fr; } }
 
-/* RECOMMENDATION BANNER */
-.rec-banner {
-  background: linear-gradient(135deg, var(--surface), var(--surface2));
-  border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem;
-}
-.rec-banner h3 { font-size: 0.82rem; color: var(--text-dim); margin-bottom: 0.5rem; }
-.rec-path { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem; }
-.rec-rationale { font-size: 0.85rem; color: var(--text); line-height: 1.6; }
-.rec-confidence { margin-top: 0.6rem; display: flex; align-items: center; gap: 0.5rem; }
-.conf-bar { width: 120px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-.conf-fill { height: 100%; background: var(--success); border-radius: 3px; }
-.conf-label { font-size: 0.75rem; color: var(--text-dim); }
+/* ─── DIMENSION SCORES ─── */
+.dim-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+@media (max-width: 600px) { .dim-grid { grid-template-columns: repeat(2, 1fr); } }
+.dim-card { background: var(--surface2); border-radius: 8px; padding: 0.7rem; text-align: center; }
+.dim-name { font-size: 0.7rem; color: var(--text-dim); margin-bottom: 0.2rem; }
+.dim-score { font-size: 1.1rem; font-weight: 800; }
+.dim-bar { height: 3px; background: var(--border); border-radius: 2px; margin: 0.3rem 0 0.15rem; overflow: hidden; }
+.dim-bar-fill { height: 100%; border-radius: 2px; }
+.dim-level { font-size: 0.65rem; color: var(--text-dim); }
 
-/* DIMENSION SCORECARDS */
-.dim-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.7rem; }
-.dim-card {
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 10px; padding: 0.8rem; text-align: center;
-}
-.dim-card .dim-name { font-size: 0.72rem; color: var(--text-dim); margin-bottom: 0.3rem; }
-.dim-card .dim-score { font-size: 1.2rem; font-weight: 800; }
-.dim-card .dim-bar { height: 4px; background: var(--border); border-radius: 2px; margin: 0.4rem 0 0.2rem; overflow: hidden; }
-.dim-card .dim-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s; }
-.dim-card .dim-level { font-size: 0.68rem; color: var(--text-dim); }
+/* ─── TABLES ─── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 0.5rem; }
+.data-table th { text-align: left; color: var(--text-dim); font-size: 0.7rem; text-transform: uppercase; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border); font-weight: 600; }
+.data-table td { padding: 0.45rem 0.6rem; border-bottom: 1px solid rgba(71,85,105,0.4); }
+.data-table td:last-child { text-align: right; }
+.data-table .highlight { color: var(--green); font-weight: 700; }
+.badge { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 4px; font-size: 0.68rem; font-weight: 700; }
+.badge.high { background: rgba(248,113,113,0.15); color: var(--red); }
+.badge.medium { background: rgba(251,191,36,0.15); color: var(--amber); }
+.badge.low { background: rgba(52,211,153,0.15); color: var(--green); }
 
-/* ROADMAP */
-.roadmap-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem;
-}
-.roadmap-card h3 { font-size: 0.82rem; color: var(--text-dim); margin-bottom: 0.7rem; font-weight: 600; }
-.roadmap-item {
-  display: flex; gap: 0.8rem; padding: 0.7rem 0;
-  border-bottom: 1px solid rgba(42,42,90,0.4);
-}
+/* ─── ROADMAP ─── */
+.roadmap-list { counter-reset: step; }
+.roadmap-item { display: flex; gap: 0.7rem; padding: 0.6rem 0; border-bottom: 1px solid rgba(71,85,105,0.3); }
 .roadmap-item:last-child { border-bottom: none; }
-.roadmap-num {
-  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.75rem; font-weight: 700;
-}
-.roadmap-num.urgent { background: rgba(248,113,113,0.15); color: var(--danger); }
-.roadmap-num.high { background: rgba(251,191,36,0.15); color: var(--warning); }
-.roadmap-num.medium { background: rgba(83,216,251,0.15); color: var(--accent); }
-.roadmap-num.low { background: rgba(52,211,153,0.15); color: var(--success); }
-.roadmap-body { flex: 1; }
-.roadmap-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.1rem; }
-.roadmap-desc { font-size: 0.78rem; color: var(--text-dim); }
+.roadmap-num { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; }
+.roadmap-num.urgent { background: rgba(248,113,113,0.15); color: var(--red); }
+.roadmap-num.high { background: rgba(251,191,36,0.15); color: var(--amber); }
+.roadmap-num.medium { background: rgba(56,189,248,0.15); color: var(--accent); }
+.roadmap-num.low { background: rgba(52,211,153,0.15); color: var(--green); }
+.roadmap-title { font-size: 0.84rem; font-weight: 600; }
+.roadmap-desc { font-size: 0.77rem; color: var(--text-dim); margin-top: 0.1rem; }
 .roadmap-meta { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.2rem; }
 
-/* RISK TABLE */
-.risk-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-.risk-table th, .risk-table td { padding: 0.5rem 0.7rem; text-align: left; border-bottom: 1px solid rgba(42,42,90,0.4); }
-.risk-table th { color: var(--text-dim); font-size: 0.72rem; text-transform: uppercase; font-weight: 600; }
-.risk-badge { padding: 0.1rem 0.5rem; border-radius: 4px; font-size: 0.68rem; font-weight: 700; display: inline-block; }
-.risk-badge.high { background: rgba(248,113,113,0.15); color: var(--danger); }
-.risk-badge.medium { background: rgba(251,191,36,0.15); color: var(--warning); }
-.risk-badge.low { background: rgba(52,211,153,0.15); color: var(--success); }
+/* ─── REG CARDS ─── */
+.reg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.6rem; }
+.reg-card { background: var(--surface2); border-radius: 8px; padding: 0.7rem; }
+.reg-name { font-size: 0.8rem; font-weight: 700; margin-bottom: 0.2rem; }
+.reg-note { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.3rem; }
 
-/* COST PROJECTION TABLE */
-.cost-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 0.5rem; }
-.cost-table th, .cost-table td { padding: 0.5rem 0.7rem; text-align: right; border-bottom: 1px solid rgba(42,42,90,0.4); }
-.cost-table th:first-child, .cost-table td:first-child { text-align: left; }
-.cost-table th { color: var(--text-dim); font-size: 0.72rem; text-transform: uppercase; font-weight: 600; }
-.cost-table .highlight { color: var(--success); font-weight: 700; }
-
-/* REGULATORY CARDS */
-.reg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.7rem; margin-top: 0.7rem; }
-.reg-card {
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 10px; padding: 0.8rem;
-}
-.reg-card .reg-name { font-size: 0.82rem; font-weight: 700; margin-bottom: 0.2rem; }
-.reg-card .reg-status { font-size: 0.72rem; }
-.reg-card .reg-note { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.3rem; }
-
-/* TCO LINK */
-.tco-link {
-  display: flex; align-items: center; gap: 0.6rem; padding: 0.8rem 1rem;
-  background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3);
-  border-radius: 10px; margin-bottom: 1rem; cursor: pointer; transition: all 0.2s;
-}
-.tco-link:hover { background: rgba(16,185,129,0.15); }
-.tco-link .tco-icon { font-size: 1.3rem; }
+/* ─── TCO LINK ─── */
+.tco-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.8rem 1rem; background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.3); border-radius: 10px; margin-bottom: 1rem; cursor: pointer; transition: all 0.2s; }
+.tco-link:hover { background: rgba(52,211,153,0.15); }
 .tco-link .tco-text { flex: 1; }
-.tco-link .tco-title { font-size: 0.85rem; font-weight: 600; color: var(--success); }
-.tco-link .tco-desc { font-size: 0.75rem; color: var(--text-dim); }
-.tco-link .tco-arrow { color: var(--success); font-size: 1.2rem; }
+.tco-link .tco-title { font-size: 0.84rem; font-weight: 600; color: var(--green); }
+.tco-link .tco-desc { font-size: 0.74rem; color: var(--text-dim); }
 
-/* RESPONSIVE */
+/* ─── REG GRID ─── */
+.cost-table th:nth-child(2), .cost-table th:nth-child(3), .cost-table th:nth-child(4) { text-align: right; }
+
 @media (max-width: 600px) {
   .header { padding: 1rem; }
   .main { padding: 1rem; }
-  .progress-label { display: none; }
+  .progress-wrap { padding: 0.5rem 1rem; }
 }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div>
-    <h1>AI Readiness Assessment</h1>
-    <p>Executive Diagnostic — Cloud, Hybrid, or On-Premise AI Strategy</p>
-  </div>
-  <div id="header-right"></div>
+  <h1>AI Readiness Assessment</h1>
+  <p>Executive diagnostic — Cloud, Hybrid, or On-Premise AI strategy</p>
 </div>
 
-<div class="progress-wrap" id="progressWrap" style="display:none">
-  <div class="progress-bar" id="progressBar">
-    <div class="progress-fill" id="progressFill"></div>
-  </div>
-</div>
+<div class="progress-wrap" id="progressWrap" style="display:none"></div>
 
 <div class="main">
-  <!-- STEP 0: WELCOME -->
-  <div class="step active" id="step-0">
-    <h2>AI Readiness Diagnostic</h2>
-    <p class="step-sub">A 5-minute strategic assessment for C-level executives. Answer a few questions about your organisation and receive a deployment recommendation, cost projection, risk register, and priority roadmap.</p>
-    
+
+<!-- STEP 0: PROFILE -->
+<div class="step active" id="step-0">
+  <h2>Organisation Profile</h2>
+  <p class="step-sub">Tell us about your organisation to contextualise the assessment.</p>
+  <div class="q-card">
+    <div class="q-label">Organisation</div>
+    <div class="q-text">Organisation name</div>
+    <input type="text" class="q-input" id="org-name" placeholder="e.g. Acme Financial Services">
+  </div>
+  <div class="q-row">
     <div class="q-card">
-      <div class="q-label">Organisation</div>
-      <div class="q-text">What is your organisation name?</div>
-      <input type="text" class="q-input" id="org-name" placeholder="e.g. Acme Financial Services">
+      <div class="q-label">Sector</div>
+      <div class="q-text">Industry</div>
+      <select class="q-select" id="org-sector">
+        <option value="financial">Financial Services</option>
+        <option value="healthcare">Healthcare & Life Sciences</option>
+        <option value="public">Public Sector</option>
+        <option value="manufacturing">Manufacturing</option>
+        <option value="technology">Technology</option>
+        <option value="energy">Energy & Utilities</option>
+        <option value="retail">Retail & E-commerce</option>
+        <option value="telecom">Telecommunications</option>
+        <option value="other">Other</option>
+      </select>
     </div>
-
-    <div class="q-row">
-      <div class="q-card">
-        <div class="q-label">Sector</div>
-        <div class="q-text">Which best describes your industry?</div>
-        <select class="q-select" id="org-sector">
-          <option value="financial">Financial Services</option>
-          <option value="healthcare">Healthcare & Life Sciences</option>
-          <option value="public">Public Sector</option>
-          <option value="manufacturing">Manufacturing</option>
-          <option value="technology">Technology</option>
-          <option value="energy">Energy & Utilities</option>
-          <option value="retail">Retail & E-commerce</option>
-          <option value="telecom">Telecommunications</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div class="q-card">
-        <div class="q-label">Size</div>
-        <div class="q-text">How many employees?</div>
-        <select class="q-select" id="org-size">
-          <option value="250">Under 250</option>
-          <option value="1000">250 — 1,000</option>
-          <option value="5000">1,000 — 5,000</option>
-          <option value="20000">5,000 — 20,000</option>
-          <option value="50000">20,000+</option>
-        </select>
-      </div>
-    </div>
-
     <div class="q-card">
-      <div class="q-label">Region</div>
-      <div class="q-text">Where are your primary operations?</div>
-      <div class="opt-grid cols-3">
-        <button class="opt-btn" data-q="region" data-v="eu" onclick="selectOpt(this)">
-          <span class="opt-icon">🇪🇺</span>
-          <div class="opt-body"><div class="opt-title">EU / EEA</div><div class="opt-desc">GDPR, EU AI Act, NIS2</div></div>
-        </button>
-        <button class="opt-btn" data-q="region" data-v="uk" onclick="selectOpt(this)">
-          <span class="opt-icon">🇬🇧</span>
-          <div class="opt-body"><div class="opt-title">UK</div><div class="opt-desc">UK GDPR, Data Protection Act</div></div>
-        </button>
-        <button class="opt-btn" data-q="region" data-v="global" onclick="selectOpt(this)">
-          <span class="opt-icon">🌍</span>
-          <div class="opt-body"><div class="opt-title">Global / Other</div><div class="opt-desc">Mixed regulatory landscape</div></div>
-        </button>
-      </div>
-    </div>
-
-    <div class="nav-row">
-      <div></div>
-      <button class="btn btn-primary" onclick="nextStep()">Begin Assessment →</button>
+      <div class="q-label">Size</div>
+      <div class="q-text">Number of employees</div>
+      <select class="q-select" id="org-size">
+        <option value="250">Under 250</option>
+        <option value="1000">250 — 1,000</option>
+        <option value="5000">1,000 — 5,000</option>
+        <option value="20000">5,000 — 20,000</option>
+        <option value="50000">20,000+</option>
+      </select>
     </div>
   </div>
-
-  <!-- STEP 1: AI STRATEGY -->
-  <div class="step" id="step-1">
-    <h2>AI Strategy & Vision</h2>
-    <p class="step-sub">Where is your organisation on its AI journey?</p>
-
-    <div class="q-card">
-      <div class="q-label">Strategic Maturity</div>
-      <div class="q-text">Which best describes your organisation's approach to AI today?</div>
-      <div class="opt-grid">
-        <button class="opt-btn" data-q="strategy" data-v="1" onclick="selectOpt(this)">
-          <span class="opt-icon">🌱</span>
-          <div class="opt-body"><div class="opt-title">Exploring</div><div class="opt-desc">No formal strategy; isolated experiments by individual teams. No executive sponsorship or dedicated budget.</div></div>
-        </button>
-        <button class="opt-btn" data-q="strategy" data-v="2" onclick="selectOpt(this)">
-          <span class="opt-icon">📋</span>
-          <div class="opt-body"><div class="opt-title">Tactical</div><div class="opt-desc">Some AI use cases identified; pilot projects underway. Budget allocated but ad hoc. No central coordination.</div></div>
-        </button>
-        <button class="opt-btn" data-q="strategy" data-v="3" onclick="selectOpt(this)">
-          <span class="opt-icon">🎯</span>
-          <div class="opt-body"><div class="opt-title">Defined</div><div class="opt-desc">AI roadmap with executive sponsor. Prioritised use cases with ROI tracking. Dedicated AI team formed.</div></div>
-        </button>
-        <button class="opt-btn" data-q="strategy" data-v="4" onclick="selectOpt(this)">
-          <span class="opt-icon">🚀</span>
-          <div class="opt-body"><div class="opt-title">Operational</div><div class="opt-desc">Multiple AI systems in production. Governance structures in place. AI delivering measurable business value across functions.</div></div>
-        </button>
-        <button class="opt-btn" data-q="strategy" data-v="5" onclick="selectOpt(this)">
-          <span class="opt-icon">⚡</span>
-          <div class="opt-body"><div class="opt-title">Transformative</div><div class="opt-desc">AI is core to business model. Continuous innovation pipeline. AI factory operating at scale with automated MLOps.</div></div>
-        </button>
-      </div>
-    </div>
-
-    <div class="q-card">
-      <div class="q-label">Primary Objective</div>
-      <div class="q-text">What is the primary driver for investing in AI infrastructure?</div>
-      <div class="opt-grid cols-2">
-        <button class="opt-btn" data-q="objective" data-v="efficiency" onclick="selectOpt(this)">
-          <span class="opt-icon">⚙️</span>
-          <div class="opt-body"><div class="opt-title">Operational Efficiency</div><div class="opt-desc">Automate processes, reduce costs, improve productivity</div></div>
-        </button>
-        <button class="opt-btn" data-q="objective" data-v="experience" onclick="selectOpt(this)">
-          <span class="opt-icon">😊</span>
-          <div class="opt-body"><div class="opt-title">Customer Experience</div><div class="opt-desc">Personalisation, chatbots, recommendation engines</div></div>
-        </button>
-        <button class="opt-btn" data-q="objective" data-v="product" onclick="selectOpt(this)">
-          <span class="opt-icon">🧠</span>
-          <div class="opt-body"><div class="opt-title">AI-Native Products</div><div class="opt-desc">Build AI features into products, new revenue streams</div></div>
-        </button>
-        <button class="opt-btn" data-q="objective" data-v="compliance" onclick="selectOpt(this)">
-          <span class="opt-icon">🛡️</span>
-          <div class="opt-body"><div class="opt-title">Risk & Compliance</div><div class="opt-desc">Regulatory requirements, fraud detection, audit automation</div></div>
-        </button>
-      </div>
-    </div>
-
-    <div class="q-card">
-      <div class="q-label">Timeline</div>
-      <div class="q-text">What is your target timeline for having AI infrastructure operational?</div>
-      <div class="opt-grid cols-3">
-        <button class="opt-btn" data-q="timeline" data-v="3" onclick="selectOpt(this)">
-          <span class="opt-icon">🔥</span>
-          <div class="opt-body"><div class="opt-title">3 months</div><div class="opt-desc">Immediate — urgent competitive or regulatory pressure</div></div>
-        </button>
-        <button class="opt-btn" data-q="timeline" data-v="6" onclick="selectOpt(this)">
-          <span class="opt-icon">📅</span>
-          <div class="opt-body"><div class="opt-title">6 months</div><div class="opt-desc">This fiscal year — planned initiative with budget approved</div></div>
-        </button>
-        <button class="opt-btn" data-q="timeline" data-v="12" onclick="selectOpt(this)">
-          <span class="opt-icon">🗓️</span>
-          <div class="opt-body"><div class="opt-title">12 months</div><div class="opt-desc">Next fiscal year — strategic planning phase</div></div>
-        </button>
-      </div>
-    </div>
-
-    <div class="nav-row">
-      <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
-      <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+  <div class="q-card">
+    <div class="q-label">Region</div>
+    <div class="q-text">Primary operational region</div>
+    <div class="opt-grid cols-3">
+      <button class="opt-btn" data-q="region" data-v="eu" onclick="selectOpt(this)"><span class="opt-icon">🇪🇺</span><div><div class="opt-title">EU / EEA</div><div class="opt-desc">GDPR, EU AI Act, NIS2</div></div></button>
+      <button class="opt-btn" data-q="region" data-v="uk" onclick="selectOpt(this)"><span class="opt-icon">🇬🇧</span><div><div class="opt-title">UK</div><div class="opt-desc">UK GDPR, DPA</div></div></button>
+      <button class="opt-btn" data-q="region" data-v="global" onclick="selectOpt(this)"><span class="opt-icon">🌍</span><div><div class="opt-title">Global / Other</div><div class="opt-desc">Mixed regulatory</div></div></button>
     </div>
   </div>
-
-  <!-- STEP 2: DATA & INFRASTRUCTURE -->
-  <div class="step" id="step-2">
-    <h2>Data & Infrastructure</h2>
-    <p class="step-sub">Your data foundation and current technical capability.</p>
-
-    <div class="q-card">
-      <div class="q-label">Data Quality</div>
-      <div class="q-text">How would you rate the quality and accessibility of your data for AI?</div>
-      <div class="opt-grid">
-        <button class="opt-btn" data-q="data" data-v="1" onclick="selectOpt(this)">
-          <span class="opt-icon">🗂️</span>
-          <div class="opt-body"><div class="opt-title">Siloed & Inconsistent</div><div class="opt-desc">Data scattered across systems, no catalogue, quality issues widespread</div></div>
-        </button>
-        <button class="opt-btn" data-q="data" data-v="2" onclick="selectOpt(this)">
-          <span class="opt-icon">📊</span>
-          <div class="opt-body"><div class="opt-title">Basic Inventory</div><div class="opt-desc">Data sources mapped but not integrated; manual pipelines</div></div>
-        </button>
-        <button class="opt-btn" data-q="data" data-v="3" onclick="selectOpt(this)">
-          <span class="opt-icon">🔗</span>
-          <div class="opt-body"><div class="opt-title">Catalogued & Pipelined</div><div class="opt-desc">Central data catalogue, automated ETL, quality controls enforced</div></div>
-        </button>
-        <button class="opt-btn" data-q="data" data-v="4" onclick="selectOpt(this)">
-          <span class="opt-icon">⚡</span>
-          <div class="opt-body"><div class="opt-title">Real-Time & Self-Service</div><div class="opt-desc">Streaming pipelines, feature store, self-service analytics platform</div></div>
-        </button>
-        <button class="opt-btn" data-q="data" data-v="5" onclick="selectOpt(this)">
-          <span class="opt-icon">🌐</span>
-          <div class="opt-body"><div class="opt-title">Data Mesh</div><div class="opt-desc">Domain-owned data products, automated quality gates, AI-ready on demand</div></div>
-        </button>
-      </div>
-    </div>
-
-    <div class="q-card">
-      <div class="q-label">Data Sensitivity</div>
-      <div class="q-text">How sensitive is the data your AI initiatives will process?</div>
-      <div class="opt-grid cols-2">
-        <button class="opt-btn" data-q="sensitivity" data-v="public" onclick="selectOpt(this)">
-          <span class="opt-icon">🌐</span>
-          <div class="opt-body"><div class="opt-title">Public / Low</div><div class="opt-desc">Publicly available data, no personal data, minimal regulatory exposure</div></div>
-        </button>
-        <button class="opt-btn" data-q="sensitivity" data-v="internal" onclick="selectOpt(this)">
-          <span class="opt-icon">🔒</span>
-          <div class="opt-body"><div class="opt-title">Internal / Moderate</div><div class="opt-desc">Proprietary business data, some personal data, standard GDPR compliance</div></div>
-        </button>
-        <button class="opt-btn" data-q="sensitivity" data-v="sensitive" onclick="selectOpt(this)">
-          <span class="opt-icon">🔐</span>
-          <div class="opt-body"><div class="opt-title">Sensitive / High</div><div class="opt-desc">Financial records, health data, or large-scale personal data requiring strict controls</div></div>
-        </button>
-        <button class="opt-btn" data-q="sensitivity" data-v="restricted" onclick="selectOpt(this)">
-          <span class="opt-icon">🛡️</span>
-          <div class="opt-body"><div class="opt-title">Restricted / Critical</div><div class="opt-desc">National security, classified, or data that cannot leave your premises under any circumstances</div></div>
-        </button>
-      </div>
-    </div>
-
-    <div class="q-card">
-      <div class="q-label">Current Infrastructure</div>
-      <div class="q-text">What is your current GPU / AI compute situation?</div>
-      <div class="opt-grid">
-        <button class="opt-btn" data-q="infra" data-v="1" onclick="selectOpt(this)">
-          <span class="opt-icon">❌</span>
-          <div class="opt-body"><div class="opt-title">None</div><div class="opt-desc">No GPU capacity. All workloads on cloud VMs or developer workstations.</div></div>
-        </button>
-        <button class="opt-btn" data-q="infra" data-v="2" onclick="selectOpt(this)">
-          <span class="opt-icon">🖥️</span>
-          <div class="opt-body"><div class="opt-title">Workstation</div><div class="opt-desc">Individual GPU workstations for experimentation. No shared infrastructure.</div></div>
-        </button>
-        <button class="opt-btn" data-q="infra" data-v="3" onclick="selectOpt(this)">
-          <span class="opt-icon">🖥️🖥️</span>
-          <div class="opt-body"><div class="opt-title">GPU Server</div><div class="opt-desc">One or more GPU servers (A100/H100). Manual deployment, limited MLOps tooling.</div></div>
-        </button>
-        <button class="opt-btn" data-q="infra" data-v="4" onclick="selectOpt(this)">
-          <span class="opt-icon">🏭</span>
-          <div class="opt-body"><div class="opt-title">GPU Cluster</div><div class="opt-desc">Dedicated GPU cluster with CI/CD, model serving (Triton/NIM), hybrid networking.</div></div>
-        </button>
-        <button class="opt-btn" data-q="infra" data-v="5" onclick="selectOpt(this)">
-          <span class="opt-icon">⚡</span>
-          <div class="opt-body"><div class="opt-title">AI Factory</div><div class="opt-desc">Multi-GPU orchestration at scale, autoscaling, cloud-burst, cost-optimised hybrid.</div></div>
-        </button>
-      </div>
-    </div>
-
-    <div class="nav-row">
-      <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
-      <button class="btn btn-primary" onclick="nextStep()">Next →</button>
-    </div>
-  </div>
-
-  <!-- STEP 3: GOVERNANCE & RISK -->
-  <div class="step" id="step-3">
-    <h2>Governance & Risk</h2>
-    <p class="step-sub">Compliance posture and organisational readiness.</p>
-
-    <div class="q-card">
-      <div class="q-label">AI Governance</div>
-      <div class="q-text">What is your current state of AI governance?</div>
-      <div class="opt-grid">
-        <button class="opt-btn" data-q="governance" data-v="1" onclick="selectOpt(this)">
-          <span class="opt-icon">⚪</span>
-          <div class="opt-body"><div class="opt-title">None</div><div class="opt-desc">No AI-specific governance. GDPR compliance is reactive. No AI risk register.</div></div>
-        </button>
-        <button class="opt-btn" data-q="governance" data-v="2" onclick="selectOpt(this)">
-          <span class="opt-icon">📝</span>
-          <div class="opt-body"><div class="opt-title">Basic</div><div class="opt-desc">Data processing records maintained. AI risk register started. No formal DPIAs for AI.</div></div>
-        </button>
-        <button class="opt-btn" data-q="governance" data-v="3" onclick="selectOpt(this)">
-          <span class="opt-icon">✅</span>
-          <div class="opt-body"><div class="opt-title">Defined</div><div class="opt-desc">DPIA process for AI systems. EU AI Act risk classification underway. Model documentation policy.</div></div>
-        </button>
-        <button class="opt-btn" data-q="governance" data-v="4" onclick="selectOpt(this)">
-          <span class="opt-icon">📊</span>
-          <div class="opt-body"><div class="opt-title">Managed</div><div class="opt-desc">Full model audit trail. Automated bias/fairness checks. Regulatory reporting semi-automated.</div></div>
-        </button>
-        <button class="opt-btn" data-q="governance" data-v="5" onclick="selectOpt(this)">
-          <span class="opt-icon">🏗️</span>
-          <div class="opt-body"><div class="opt-title">Embedded</div><div class="opt-desc">Continuous compliance monitoring. AI ethics board. Regulatory changes auto-assessed and deployed.</div></div>
-        </button>
-      </div>
-    </div>
-
-    <div class="q-card">
-      <div class="q-label">Skills & Team</div>
-      <div class="q-text">What is your AI talent situation?</div>
-      <div class="opt-grid">
-        <button class="opt-btn" data-q="skills" data-v="1" onclick="selectOpt(this)">
-          <span class="opt-icon">👤</span>
-          <div class="opt-body"><div class="opt-title">No Dedicated Team</div><div class="opt-desc">No AI specialists. Rely entirely on external consultants or vendor managed services.</div></div>
-        </button>
-        <button class="opt-btn" data-q="skills" data-v="2" onclick="selectOpt(this)">
-          <span class="opt-icon">👥</span>
-          <div class="opt-body"><div class="opt-title">Small Team</div><div class="opt-desc">1-3 data scientists/engineers. External consultants for infrastructure. No platform engineering.</div></div>
-        </button>
-        <button class="opt-btn" data-q="skills" data-v="3" onclick="selectOpt(this)">
-          <span class="opt-icon">🧑‍💻</span>
-          <div class="opt-body"><div class="opt-title">ML Engineering Team</div><div class="opt-desc">5-15 ML engineers. Internal training programme. Centre of excellence launched.</div></div>
-        </button>
-        <button class="opt-btn" data-q="skills" data-v="4" onclick="selectOpt(this)">
-          <span class="opt-icon">🏢</span>
-          <div class="opt-body"><div class="opt-title">Platform Team</div><div class="opt-desc">Dedicated platform engineering. AI talent pipeline. Cross-functional squads with DevOps and MLOps.</div></div>
-        </button>
-        <button class="opt-btn" data-q="skills" data-v="5" onclick="selectOpt(this)">
-          <span class="opt-icon">🎓</span>
-          <div class="opt-body"><div class="opt-title">AI-Native Culture</div><div class="opt-desc">Deep talent pool. Internal AI academy with certifications. Attracts top-tier engineers.</div></div>
-        </button>
-      </div>
-    </div>
-
-    <div class="q-card">
-      <div class="q-label">Risk Tolerance</div>
-      <div class="q-text">How would you describe your organisation's risk tolerance for AI deployment?</div>
-      <div class="opt-grid cols-3">
-        <button class="opt-btn" data-q="risk" data-v="low" onclick="selectOpt(this)">
-          <span class="opt-icon">🛡️</span>
-          <div class="opt-body"><div class="opt-title">Conservative</div><div class="opt-desc">Full control required. Data sovereignty non-negotiable. Prefer proven on-prem solutions.</div></div>
-        </button>
-        <button class="opt-btn" data-q="risk" data-v="medium" onclick="selectOpt(this)">
-          <span class="opt-icon">⚖️</span>
-          <div class="opt-body"><div class="opt-title">Balanced</div><div class="opt-desc">Open to cloud for non-sensitive workloads. On-prem for sensitive data. Hybrid approach preferred.</div></div>
-        </button>
-        <button class="opt-btn" data-q="risk" data-v="high" onclick="selectOpt(this)">
-          <span class="opt-icon">🚀</span>
-          <div class="opt-body"><div class="opt-title">Aggressive</div><div class="opt-desc">Speed over control. Cloud-native first. Willing to move fast and optimise later.</div></div>
-        </button>
-      </div>
-    </div>
-
-    <div class="nav-row">
-      <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
-      <button class="btn btn-primary" onclick="nextStep()">Next →</button>
-    </div>
-  </div>
-
-  <!-- STEP 4: INVESTMENT -->
-  <div class="step" id="step-4">
-    <h2>Investment & Scale</h2>
-    <p class="step-sub">Budget parameters and expected AI workload.</p>
-
-    <div class="q-card">
-      <div class="q-label">Annual AI Budget</div>
-      <div class="q-text">What is your annual AI infrastructure budget (including talent, compute, and tooling)?</div>
-      <div class="opt-grid cols-2">
-        <button class="opt-btn" data-q="budget" data-v="under250" onclick="selectOpt(this)">
-          <span class="opt-icon">€</span>
-          <div class="opt-body"><div class="opt-title">Under €250K</div><div class="opt-desc">Small budget, need to prove ROI before scaling</div></div>
-        </button>
-        <button class="opt-btn" data-q="budget" data-v="250to1m" onclick="selectOpt(this)">
-          <span class="opt-icon">€€</span>
-          <div class="opt-body"><div class="opt-title">€250K — €1M</div><div class="opt-desc">Moderate budget, can fund a dedicated team and pilot infrastructure</div></div>
-        </button>
-        <button class="opt-btn" data-q="budget" data-v="1to5m" onclick="selectOpt(this)">
-          <span class="opt-icon">€€€</span>
-          <div class="opt-body"><div class="opt-title">€1M — €5M</div><div class="opt-desc">Significant investment, can fund GPU servers and MLOps platform</div></div>
-        </button>
-        <button class="opt-btn" data-q="budget" data-v="5mplus" onclick="selectOpt(this)">
-          <span class="opt-icon">€€€€</span>
-          <div class="opt-body"><div class="opt-title">€5M+</div><div class="opt-desc">Enterprise-scale budget, can build AI factory with multiple GPU clusters</div></div>
-        </button>
-      </div>
-    </div>
-
-    <div class="q-card">
-      <div class="q-label">Expected Scale</div>
-      <div class="q-text">What is your expected AI inference volume in 12 months?</div>
-      <div class="opt-grid cols-2">
-        <button class="opt-btn" data-q="scale" data-v="low" onclick="selectOpt(this)">
-          <span class="opt-icon">📊</span>
-          <div class="opt-body"><div class="opt-title">Low Volume</div><div class="opt-desc">Under 1M requests/month — internal tools, pilot projects</div></div>
-        </button>
-        <button class="opt-btn" data-q="scale" data-v="medium" onclick="selectOpt(this)">
-          <span class="opt-icon">📈</span>
-          <div class="opt-body"><div class="opt-title">Medium Volume</div><div class="opt-desc">1M — 100M requests/month — departmental AI, customer-facing features</div></div>
-        </button>
-        <button class="opt-btn" data-q="scale" data-v="high" onclick="selectOpt(this)">
-          <span class="opt-icon">🚀</span>
-          <div class="opt-body"><div class="opt-title">High Volume</div><div class="opt-desc">100M — 1B requests/month — enterprise platform, SaaS-scale AI</div></div>
-        </button>
-        <button class="opt-btn" data-q="scale" data-v="veryhigh" onclick="selectOpt(this)">
-          <span class="opt-icon">🌌</span>
-          <div class="opt-body"><div class="opt-title">Very High Volume</div><div class="opt-desc">1B+ requests/month — hyperscale AI inference</div></div>
-        </button>
-      </div>
-    </div>
-
-    <div class="q-card">
-      <div class="q-label">Model Strategy</div>
-      <div class="q-text">What type of AI models will you primarily use?</div>
-      <div class="opt-grid cols-2">
-        <button class="opt-btn" data-q="modeltype" data-v="api" onclick="selectOpt(this)">
-          <span class="opt-icon">☁️</span>
-          <div class="opt-body"><div class="opt-title">Managed APIs</div><div class="opt-desc">Use GPT-4, Claude, Gemini, or similar via API. No model hosting needed.</div></div>
-        </button>
-        <button class="opt-btn" data-q="modeltype" data-v="opensource" onclick="selectOpt(this)">
-          <span class="opt-icon">📖</span>
-          <div class="opt-body"><div class="opt-title">Open Source Models</div><div class="opt-desc">Llama, DeepSeek, GLM, Mistral. Self-hosted or via managed inference providers.</div></div>
-        </button>
-        <button class="opt-btn" data-q="modeltype" data-v="finetuned" onclick="selectOpt(this)">
-          <span class="opt-icon">🔧</span>
-          <div class="opt-body"><div class="opt-title">Fine-Tuned Models</div><div class="opt-desc">Custom fine-tuned models on proprietary data. Requires GPU infrastructure for training and serving.</div></div>
-        </button>
-        <button class="opt-btn" data-q="modeltype" data-v="custom" onclick="selectOpt(this)">
-          <span class="opt-icon">🧬</span>
-          <div class="opt-body"><div class="opt-title">Custom Models</div><div class="opt-desc">Training models from scratch. Requires significant GPU cluster for training pipeline.</div></div>
-        </button>
-      </div>
-    </div>
-
-    <div class="nav-row">
-      <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
-      <button class="btn btn-primary" onclick="generateResults()">Generate Assessment →</button>
-    </div>
-  </div>
-
-  <!-- RESULTS DASHBOARD -->
-  <div class="results" id="results">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-      <h2 style="font-size:1.3rem">Assessment Results</h2>
-      <button class="btn btn-secondary" onclick="resetAssessment()" style="font-size:0.8rem">↻ Restart</button>
-    </div>
-
-    <!-- KPI ROW -->
-    <div class="kpi-row" id="kpiRow"></div>
-
-    <!-- RECOMMENDATION -->
-    <div class="rec-banner" id="recBanner"></div>
-
-    <!-- TCO LINK -->
-    <div class="tco-link" onclick="window.parent.postMessage({action:'openTCO'},'*')">
-      <div class="tco-icon">💰</div>
-      <div class="tco-text">
-        <div class="tco-title">Open Inference TCO Calculator</div>
-        <div class="tco-desc">Adjust workload, model, and hardware to build a detailed 3-year cost comparison</div>
-      </div>
-      <div class="tco-arrow">→</div>
-    </div>
-
-    <!-- RADAR + DIMENSION SCORECARDS -->
-    <div class="chart-row">
-      <div class="chart-card">
-        <h3>Maturity Radar</h3>
-        <div class="chart-wrap short"><canvas id="radarChart"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <h3>Dimension Scores</h3>
-        <div class="dim-grid" id="dimGrid"></div>
-      </div>
-    </div>
-
-    <!-- COST PROJECTION -->
-    <div class="chart-card">
-      <h3>3-Year Cost Projection by Deployment Model (EUR)</h3>
-      <div class="chart-wrap"><canvas id="costChart"></canvas></div>
-      <table class="cost-table" id="costTable"></table>
-    </div>
-
-    <!-- RISK REGISTER -->
-    <div class="chart-card">
-      <h3>Top Risks & Mitigations</h3>
-      <table class="risk-table" id="riskTable"></table>
-    </div>
-
-    <!-- REGULATORY STATUS -->
-    <div class="chart-card" id="regCard">
-      <h3>Regulatory Landscape</h3>
-      <div class="reg-grid" id="regGrid"></div>
-    </div>
-
-    <!-- ROADMAP -->
-    <div class="roadmap-card">
-      <h3>Priority Roadmap — Next 12 Months</h3>
-      <div id="roadmapList"></div>
-    </div>
-  </div>
+  <div class="nav-row"><div></div><button class="btn btn-primary" onclick="nextStep()">Begin →</button></div>
 </div>
 
+<!-- STEP 1: STRATEGY -->
+<div class="step" id="step-1">
+  <h2>Strategy & Vision</h2>
+  <p class="step-sub">Where is your organisation on its AI journey?</p>
+  <div class="q-card">
+    <div class="q-label">Maturity</div>
+    <div class="q-text">Current AI strategy maturity</div>
+    <div class="opt-grid">
+      <button class="opt-btn" data-q="strategy" data-v="1" onclick="selectOpt(this)"><span class="opt-icon">🌱</span><div><div class="opt-title">Exploring</div><div class="opt-desc">No formal strategy; isolated experiments</div></div></button>
+      <button class="opt-btn" data-q="strategy" data-v="2" onclick="selectOpt(this)"><span class="opt-icon">📋</span><div><div class="opt-title">Tactical</div><div class="opt-desc">Pilot projects; ad hoc budget</div></div></button>
+      <button class="opt-btn" data-q="strategy" data-v="3" onclick="selectOpt(this)"><span class="opt-icon">🎯</span><div><div class="opt-title">Defined</div><div class="opt-desc">AI roadmap, executive sponsor, dedicated team</div></div></button>
+      <button class="opt-btn" data-q="strategy" data-v="4" onclick="selectOpt(this)"><span class="opt-icon">🚀</span><div><div class="opt-title">Operational</div><div class="opt-desc">Multiple AI systems in production</div></div></button>
+      <button class="opt-btn" data-q="strategy" data-v="5" onclick="selectOpt(this)"><span class="opt-icon">⚡</span><div><div class="opt-title">Transformative</div><div class="opt-desc">AI is core to business model</div></div></button>
+    </div>
+  </div>
+  <div class="q-card">
+    <div class="q-label">Objective</div>
+    <div class="q-text">Primary driver for AI investment</div>
+    <div class="opt-grid cols-2">
+      <button class="opt-btn" data-q="objective" data-v="efficiency" onclick="selectOpt(this)"><span class="opt-icon">⚙️</span><div><div class="opt-title">Operational Efficiency</div><div class="opt-desc">Automate processes, reduce costs</div></div></button>
+      <button class="opt-btn" data-q="objective" data-v="experience" onclick="selectOpt(this)"><span class="opt-icon">😊</span><div><div class="opt-title">Customer Experience</div><div class="opt-desc">Personalisation, chatbots</div></div></button>
+      <button class="opt-btn" data-q="objective" data-v="product" onclick="selectOpt(this)"><span class="opt-icon">🧠</span><div><div class="opt-title">AI-Native Products</div><div class="opt-desc">New revenue streams</div></div></button>
+      <button class="opt-btn" data-q="objective" data-v="compliance" onclick="selectOpt(this)"><span class="opt-icon">🛡️</span><div><div class="opt-title">Risk & Compliance</div><div class="opt-desc">Regulatory, fraud detection</div></div></button>
+    </div>
+  </div>
+  <div class="q-card">
+    <div class="q-label">Timeline</div>
+    <div class="q-text">Target for operational AI infrastructure</div>
+    <div class="opt-grid cols-3">
+      <button class="opt-btn" data-q="timeline" data-v="3" onclick="selectOpt(this)"><span class="opt-icon">🔥</span><div><div class="opt-title">3 months</div><div class="opt-desc">Urgent pressure</div></div></button>
+      <button class="opt-btn" data-q="timeline" data-v="6" onclick="selectOpt(this)"><span class="opt-icon">📅</span><div><div class="opt-title">6 months</div><div class="opt-desc">This fiscal year</div></div></button>
+      <button class="opt-btn" data-q="timeline" data-v="12" onclick="selectOpt(this)"><span class="opt-icon">🗓️</span><div><div class="opt-title">12 months</div><div class="opt-desc">Next fiscal year</div></div></button>
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn btn-secondary" onclick="prevStep()">← Back</button><button class="btn btn-primary" onclick="nextStep()">Next →</button></div>
+</div>
+
+<!-- STEP 2: DATA & INFRA -->
+<div class="step" id="step-2">
+  <h2>Data & Infrastructure</h2>
+  <p class="step-sub">Your data foundation and current technical capability.</p>
+  <div class="q-card">
+    <div class="q-label">Data Quality</div>
+    <div class="q-text">Quality and accessibility of data for AI</div>
+    <div class="opt-grid">
+      <button class="opt-btn" data-q="data" data-v="1" onclick="selectOpt(this)"><span class="opt-icon">🗂️</span><div><div class="opt-title">Siloed & Inconsistent</div><div class="opt-desc">Scattered across systems, no catalogue</div></div></button>
+      <button class="opt-btn" data-q="data" data-v="2" onclick="selectOpt(this)"><span class="opt-icon">📊</span><div><div class="opt-title">Basic Inventory</div><div class="opt-desc">Sources mapped, manual pipelines</div></div></button>
+      <button class="opt-btn" data-q="data" data-v="3" onclick="selectOpt(this)"><span class="opt-icon">🔗</span><div><div class="opt-title">Catalogued & Pipelined</div><div class="opt-desc">Automated ETL, quality controls</div></div></button>
+      <button class="opt-btn" data-q="data" data-v="4" onclick="selectOpt(this)"><span class="opt-icon">⚡</span><div><div class="opt-title">Real-Time & Self-Service</div><div class="opt-desc">Streaming, feature store, self-service</div></div></button>
+      <button class="opt-btn" data-q="data" data-v="5" onclick="selectOpt(this)"><span class="opt-icon">🌐</span><div><div class="opt-title">Data Mesh</div><div class="opt-desc">Domain-owned data products, AI-ready</div></div></button>
+    </div>
+  </div>
+  <div class="q-card">
+    <div class="q-label">Data Sensitivity</div>
+    <div class="q-text">Sensitivity of data your AI will process</div>
+    <div class="opt-grid cols-2">
+      <button class="opt-btn" data-q="sensitivity" data-v="public" onclick="selectOpt(this)"><span class="opt-icon">🌐</span><div><div class="opt-title">Public / Low</div><div class="opt-desc">No personal data, minimal exposure</div></div></button>
+      <button class="opt-btn" data-q="sensitivity" data-v="internal" onclick="selectOpt(this)"><span class="opt-icon">🔒</span><div><div class="opt-title">Internal / Moderate</div><div class="opt-desc">Proprietary data, standard GDPR</div></div></button>
+      <button class="opt-btn" data-q="sensitivity" data-v="sensitive" onclick="selectOpt(this)"><span class="opt-icon">🔐</span><div><div class="opt-title">Sensitive / High</div><div class="opt-desc">Financial, health, large-scale personal</div></div></button>
+      <button class="opt-btn" data-q="sensitivity" data-v="restricted" onclick="selectOpt(this)"><span class="opt-icon">🛡️</span><div><div class="opt-title">Restricted / Critical</div><div class="opt-desc">Cannot leave premises</div></div></button>
+    </div>
+  </div>
+  <div class="q-card">
+    <div class="q-label">Infrastructure</div>
+    <div class="q-text">Current GPU / AI compute situation</div>
+    <div class="opt-grid">
+      <button class="opt-btn" data-q="infra" data-v="1" onclick="selectOpt(this)"><span class="opt-icon">❌</span><div><div class="opt-title">None</div><div class="opt-desc">No GPU capacity</div></div></button>
+      <button class="opt-btn" data-q="infra" data-v="2" onclick="selectOpt(this)"><span class="opt-icon">🖥️</span><div><div class="opt-title">Workstation</div><div class="opt-desc">Individual GPU workstations</div></div></button>
+      <button class="opt-btn" data-q="infra" data-v="3" onclick="selectOpt(this)"><span class="opt-icon">🖥️🖥️</span><div><div class="opt-title">GPU Server</div><div class="opt-desc">A100/H100, manual deployment</div></div></button>
+      <button class="opt-btn" data-q="infra" data-v="4" onclick="selectOpt(this)"><span class="opt-icon">🏭</span><div><div class="opt-title">GPU Cluster</div><div class="opt-desc">CI/CD, model serving, hybrid</div></div></button>
+      <button class="opt-btn" data-q="infra" data-v="5" onclick="selectOpt(this)"><span class="opt-icon">⚡</span><div><div class="opt-title">AI Factory</div><div class="opt-desc">Autoscaling, cloud-burst, optimised</div></div></button>
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn btn-secondary" onclick="prevStep()">← Back</button><button class="btn btn-primary" onclick="nextStep()">Next →</button></div>
+</div>
+
+<!-- STEP 3: GOVERNANCE & RISK -->
+<div class="step" id="step-3">
+  <h2>Governance & Risk</h2>
+  <p class="step-sub">Compliance posture and organisational readiness.</p>
+  <div class="q-card">
+    <div class="q-label">Governance</div>
+    <div class="q-text">Current state of AI governance</div>
+    <div class="opt-grid">
+      <button class="opt-btn" data-q="governance" data-v="1" onclick="selectOpt(this)"><span class="opt-icon">⚪</span><div><div class="opt-title">None</div><div class="opt-desc">No AI governance, reactive GDPR</div></div></button>
+      <button class="opt-btn" data-q="governance" data-v="2" onclick="selectOpt(this)"><span class="opt-icon">📝</span><div><div class="opt-title">Basic</div><div class="opt-desc">Processing records, risk register started</div></div></button>
+      <button class="opt-btn" data-q="governance" data-v="3" onclick="selectOpt(this)"><span class="opt-icon">✅</span><div><div class="opt-title">Defined</div><div class="opt-desc">DPIAs, AI Act risk classification</div></div></button>
+      <button class="opt-btn" data-q="governance" data-v="4" onclick="selectOpt(this)"><span class="opt-icon">📊</span><div><div class="opt-title">Managed</div><div class="opt-desc">Full audit trail, bias checks</div></div></button>
+      <button class="opt-btn" data-q="governance" data-v="5" onclick="selectOpt(this)"><span class="opt-icon">🏗️</span><div><div class="opt-title">Embedded</div><div class="opt-desc">Continuous compliance, ethics board</div></div></button>
+    </div>
+  </div>
+  <div class="q-card">
+    <div class="q-label">Skills</div>
+    <div class="q-text">AI talent situation</div>
+    <div class="opt-grid">
+      <button class="opt-btn" data-q="skills" data-v="1" onclick="selectOpt(this)"><span class="opt-icon">👤</span><div><div class="opt-title">No Dedicated Team</div><div class="opt-desc">External consultants only</div></div></button>
+      <button class="opt-btn" data-q="skills" data-v="2" onclick="selectOpt(this)"><span class="opt-icon">👥</span><div><div class="opt-title">Small Team</div><div class="opt-desc">1-3 data scientists</div></div></button>
+      <button class="opt-btn" data-q="skills" data-v="3" onclick="selectOpt(this)"><span class="opt-icon">🧑‍💻</span><div><div class="opt-title">ML Engineering Team</div><div class="opt-desc">5-15 engineers, CoE launched</div></div></button>
+      <button class="opt-btn" data-q="skills" data-v="4" onclick="selectOpt(this)"><span class="opt-icon">🏢</span><div><div class="opt-title">Platform Team</div><div class="opt-desc">Dedicated platform engineering, MLOps</div></div></button>
+      <button class="opt-btn" data-q="skills" data-v="5" onclick="selectOpt(this)"><span class="opt-icon">🎓</span><div><div class="opt-title">AI-Native Culture</div><div class="opt-desc">Deep talent pool, AI academy</div></div></button>
+    </div>
+  </div>
+  <div class="q-card">
+    <div class="q-label">Risk Tolerance</div>
+    <div class="q-text">Organisation's risk appetite for AI</div>
+    <div class="opt-grid cols-3">
+      <button class="opt-btn" data-q="risk" data-v="low" onclick="selectOpt(this)"><span class="opt-icon">🛡️</span><div><div class="opt-title">Conservative</div><div class="opt-desc">Full control, data sovereignty</div></div></button>
+      <button class="opt-btn" data-q="risk" data-v="medium" onclick="selectOpt(this)"><span class="opt-icon">⚖️</span><div><div class="opt-title">Balanced</div><div class="opt-desc">Hybrid, cloud for non-sensitive</div></div></button>
+      <button class="opt-btn" data-q="risk" data-v="high" onclick="selectOpt(this)"><span class="opt-icon">🚀</span><div><div class="opt-title">Aggressive</div><div class="opt-desc">Speed over control, cloud-first</div></div></button>
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn btn-secondary" onclick="prevStep()">← Back</button><button class="btn btn-primary" onclick="nextStep()">Next →</button></div>
+</div>
+
+<!-- STEP 4: INVESTMENT -->
+<div class="step" id="step-4">
+  <h2>Investment & Scale</h2>
+  <p class="step-sub">Budget parameters and expected AI workload.</p>
+  <div class="q-card">
+    <div class="q-label">Budget</div>
+    <div class="q-text">Annual AI infrastructure budget (incl. talent, compute, tooling)</div>
+    <div class="opt-grid cols-2">
+      <button class="opt-btn" data-q="budget" data-v="under250" onclick="selectOpt(this)"><span class="opt-icon">€</span><div><div class="opt-title">Under €250K</div><div class="opt-desc">Prove ROI before scaling</div></div></button>
+      <button class="opt-btn" data-q="budget" data-v="250to1m" onclick="selectOpt(this)"><span class="opt-icon">€€</span><div><div class="opt-title">€250K — €1M</div><div class="opt-desc">Team + pilot infrastructure</div></div></button>
+      <button class="opt-btn" data-q="budget" data-v="1to5m" onclick="selectOpt(this)"><span class="opt-icon">€€€</span><div><div class="opt-title">€1M — €5M</div><div class="opt-desc">GPU servers + MLOps platform</div></div></button>
+      <button class="opt-btn" data-q="budget" data-v="5mplus" onclick="selectOpt(this)"><span class="opt-icon">€€€€</span><div><div class="opt-title">€5M+</div><div class="opt-desc">Enterprise AI factory</div></div></button>
+    </div>
+  </div>
+  <div class="q-card">
+    <div class="q-label">Scale</div>
+    <div class="q-text">Expected AI inference volume in 12 months</div>
+    <div class="opt-grid cols-2">
+      <button class="opt-btn" data-q="scale" data-v="low" onclick="selectOpt(this)"><span class="opt-icon">📊</span><div><div class="opt-title">Low</div><div class="opt-desc">Under 1M req/mo — internal tools</div></div></button>
+      <button class="opt-btn" data-q="scale" data-v="medium" onclick="selectOpt(this)"><span class="opt-icon">📈</span><div><div class="opt-title">Medium</div><div class="opt-desc">1M-100M req/mo — departmental</div></div></button>
+      <button class="opt-btn" data-q="scale" data-v="high" onclick="selectOpt(this)"><span class="opt-icon">🚀</span><div><div class="opt-title">High</div><div class="opt-desc">100M-1B req/mo — enterprise</div></div></button>
+      <button class="opt-btn" data-q="scale" data-v="veryhigh" onclick="selectOpt(this)"><span class="opt-icon">🌌</span><div><div class="opt-title">Very High</div><div class="opt-desc">1B+ req/mo — hyperscale</div></div></button>
+    </div>
+  </div>
+  <div class="q-card">
+    <div class="q-label">Model Strategy</div>
+    <div class="q-text">Type of AI models you'll primarily use</div>
+    <div class="opt-grid cols-2">
+      <button class="opt-btn" data-q="modeltype" data-v="api" onclick="selectOpt(this)"><span class="opt-icon">☁️</span><div><div class="opt-title">Managed APIs</div><div class="opt-desc">GPT-4, Claude, Gemini via API</div></div></button>
+      <button class="opt-btn" data-q="modeltype" data-v="opensource" onclick="selectOpt(this)"><span class="opt-icon">📖</span><div><div class="opt-title">Open Source</div><div class="opt-desc">Llama, DeepSeek, GLM, Mistral</div></div></button>
+      <button class="opt-btn" data-q="modeltype" data-v="finetuned" onclick="selectOpt(this)"><span class="opt-icon">🔧</span><div><div class="opt-title">Fine-Tuned</div><div class="opt-desc">Custom fine-tuned on proprietary data</div></div></button>
+      <button class="opt-btn" data-q="modeltype" data-v="custom" onclick="selectOpt(this)"><span class="opt-icon">🧬</span><div><div class="opt-title">Custom Models</div><div class="opt-desc">Training from scratch</div></div></button>
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn btn-secondary" onclick="prevStep()">← Back</button><button class="btn btn-primary" onclick="generateResults()">Generate Assessment →</button></div>
+</div>
+
+<!-- LOADING -->
+<div class="loading-screen" id="loadingScreen" style="display:none">
+  <div class="spinner"></div>
+  <p>Generating your executive assessment...</p>
+</div>
+
+<!-- RESULTS -->
+<div class="results" id="results">
+  <div class="results-header">
+    <h2>Assessment Results</h2>
+    <button class="btn btn-secondary" onclick="resetAssessment()" style="font-size:0.8rem">↻ Restart</button>
+  </div>
+  <div id="resultsContent"></div>
+</div>
+
+</div><!-- /main -->
+
 <script>
-// ─── STATE ───
+// ═══ STATE ═══
 var answers = {};
 var currentStep = 0;
 var radarChart = null, costChart = null;
 
-// ─── DIMENSIONS ───
+// ═══ DIMENSIONS ═══
 var DIMENSIONS = [
-  { id: 'strategy', name: 'Strategy & Vision', short: 'Strategy', weight: 1.2 },
-  { id: 'data', name: 'Data Foundation', short: 'Data', weight: 1.0 },
-  { id: 'infra', name: 'Infrastructure', short: 'Infra', weight: 1.0 },
-  { id: 'governance', name: 'Governance & Compliance', short: 'Governance', weight: 1.2 },
-  { id: 'skills', name: 'Skills & Talent', short: 'Skills', weight: 0.8 },
-  { id: 'budget', name: 'Investment Readiness', short: 'Budget', weight: 0.8 },
+  { id: 'strategy', name: 'Strategy', weight: 1.2 },
+  { id: 'data', name: 'Data', weight: 1.0 },
+  { id: 'infra', name: 'Infrastructure', weight: 1.0 },
+  { id: 'governance', name: 'Governance', weight: 1.2 },
+  { id: 'skills', name: 'Skills', weight: 0.8 },
+  { id: 'budget', name: 'Budget', weight: 0.8 },
 ];
 
-var MATURITY_LEVELS = [
-  { name: 'Nascent', color: '#f87171', range: [0, 14] },
-  { name: 'Emerging', color: '#fbbf24', range: [15, 20] },
-  { name: 'Operational', color: '#34d399', range: [21, 26] },
-  { name: 'Advanced', color: '#53d8fb', range: [27, 32] },
-  { name: 'Transformative', color: '#8b5cf6', range: [33, 40] },
+var LEVELS = [
+  { name: 'Nascent', color: '#f87171' },
+  { name: 'Emerging', color: '#fbbf24' },
+  { name: 'Operational', color: '#34d399' },
+  { name: 'Advanced', color: '#38bdf8' },
+  { name: 'Transformative', color: '#818cf8' },
 ];
 
-// ─── OPTION SELECTION ───
+var STEP_LABELS = ['Profile', 'Strategy', 'Data', 'Governance', 'Investment'];
+
+// ═══ SELECTION ═══
 function selectOpt(btn) {
-  var q = btn.dataset.q;
-  var v = btn.dataset.v;
+  var q = btn.dataset.q, v = btn.dataset.v;
   answers[q] = v;
-  // Update visual state
   document.querySelectorAll('.opt-btn[data-q="'+q+'"]').forEach(function(b) { b.classList.remove('selected'); });
   btn.classList.add('selected');
-  // Enable next button if exists
   var nextBtn = btn.closest('.step').querySelector('.btn-primary');
   if (nextBtn) nextBtn.disabled = false;
 }
 
-// ─── NAVIGATION ───
+// ═══ NAV ═══
 function nextStep() {
-  // Validate current step
   if (!validateStep(currentStep)) return;
   document.getElementById('step-' + currentStep).classList.remove('active');
   currentStep++;
@@ -790,7 +459,6 @@ function nextStep() {
   updateProgress();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
 function prevStep() {
   document.getElementById('step-' + currentStep).classList.remove('active');
   currentStep--;
@@ -798,21 +466,15 @@ function prevStep() {
   updateProgress();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
 function validateStep(step) {
-  if (step === 0) {
-    return document.getElementById('org-name').value.trim() !== '' && answers.region;
-  }
-  // Check all questions in this step have answers
+  if (step === 0) return document.getElementById('org-name').value.trim() !== '' && answers.region;
   var stepEl = document.getElementById('step-' + step);
-  var questions = stepEl.querySelectorAll('.opt-btn[data-q]');
   var qs = [];
-  questions.forEach(function(b) { if (qs.indexOf(b.dataset.q) === -1) qs.push(b.dataset.q); });
+  stepEl.querySelectorAll('.opt-btn[data-q]').forEach(function(b) { if (qs.indexOf(b.dataset.q) === -1) qs.push(b.dataset.q); });
   for (var i = 0; i < qs.length; i++) {
     if (!answers[qs[i]]) {
-      // Flash the question card
       var card = stepEl.querySelector('.opt-btn[data-q="'+qs[i]+'"]').closest('.q-card');
-      card.style.borderColor = 'var(--danger)';
+      card.style.borderColor = 'var(--red)';
       setTimeout(function() { card.style.borderColor = ''; }, 1500);
       return false;
     }
@@ -820,539 +482,455 @@ function validateStep(step) {
   return true;
 }
 
-// ─── PROGRESS BAR ───
-var STEP_LABELS = ['Profile', 'Strategy', 'Data', 'Governance', 'Investment'];
-
+// ═══ PROGRESS ═══
 function updateProgress() {
   var wrap = document.getElementById('progressWrap');
   if (currentStep === 0) { wrap.style.display = 'none'; return; }
-  wrap.style.display = 'block';
-  
-  var bar = document.getElementById('progressBar');
-  var fill = document.getElementById('progressFill');
-  
-  // Rebuild steps
-  var existing = bar.querySelectorAll('.progress-step');
-  existing.forEach(function(e) { e.remove(); });
-  
+  wrap.style.display = 'flex';
+  var html = '';
   for (var i = 0; i < STEP_LABELS.length; i++) {
-    var step = document.createElement('div');
-    step.className = 'progress-step';
-    if (i < currentStep) step.classList.add('done');
-    if (i === currentStep) step.classList.add('active');
-    step.innerHTML = '<div class="progress-dot">' + (i < currentStep ? '✓' : (i+1)) + '</div><div class="progress-label">' + STEP_LABELS[i] + '</div>';
-    bar.appendChild(step);
+    var cls = '';
+    if (i < currentStep) cls = 'done';
+    if (i === currentStep) cls = 'active';
+    var num = i < currentStep ? '✓' : (i+1);
+    html += '<div class="progress-step ' + cls + '"><div class="progress-dot">' + num + '</div>' + STEP_LABELS[i] + '</div>';
   }
-  
-  fill.style.width = (currentStep / (STEP_LABELS.length - 1) * 100) + '%';
+  wrap.innerHTML = html;
 }
 
-// ─── SCORING ───
-function getNumericScore(key) {
+// ═══ SCORING ═══
+function getScore(key) {
   var v = answers[key];
   if (!v) return 1;
   var n = parseInt(v);
-  return isNaN(n) ? 3 : n; // non-numeric answers default to mid
+  return isNaN(n) ? 3 : n;
 }
-
-function getScoreMap() {
-  // Map budget and scale to numeric scores
-  var budgetScores = { under250: 1, '250to1m': 2, '1to5m': 4, '5mplus': 5 };
-  var scaleScores = { low: 2, medium: 3, high: 4, veryhigh: 5 };
-  
+function getScores() {
+  var budgetMap = { under250: 1, '250to1m': 2, '1to5m': 4, '5mplus': 5 };
   return {
-    strategy: getNumericScore('strategy'),
-    data: getNumericScore('data'),
-    infra: getNumericScore('infra'),
-    governance: getNumericScore('governance'),
-    skills: getNumericScore('skills'),
-    budget: answers.budget ? budgetScores[answers.budget] : 1,
+    strategy: getScore('strategy'),
+    data: getScore('data'),
+    infra: getScore('infra'),
+    governance: getScore('governance'),
+    skills: getScore('skills'),
+    budget: answers.budget ? budgetMap[answers.budget] : 1,
   };
 }
-
-function getTotalScore(scores) {
-  var total = 0;
-  DIMENSIONS.forEach(function(d) {
-    total += (scores[d.id] || 1) * d.weight;
-  });
-  return Math.round(total);
+function getTotal(scores) {
+  var t = 0;
+  DIMENSIONS.forEach(function(d) { t += (scores[d.id] || 1) * d.weight; });
+  return Math.round(t);
+}
+function getLevel(total) {
+  if (total <= 14) return { ...LEVELS[0], num: 1 };
+  if (total <= 20) return { ...LEVELS[1], num: 2 };
+  if (total <= 26) return { ...LEVELS[2], num: 3 };
+  if (total <= 32) return { ...LEVELS[3], num: 4 };
+  return { ...LEVELS[4], num: 5 };
 }
 
-function getMaturityLevel(total) {
-  for (var i = 0; i < MATURITY_LEVELS.length; i++) {
-    if (total >= MATURITY_LEVELS[i].range[0] && total <= MATURITY_LEVELS[i].range[1]) return MATURITY_LEVELS[i];
-  }
-  return MATURITY_LEVELS[0];
-}
-
-function getLevelNumber(total) {
-  if (total <= 14) return 1;
-  if (total <= 20) return 2;
-  if (total <= 26) return 3;
-  if (total <= 32) return 4;
-  return 5;
-}
-
-// ─── RECOMMENDATION ENGINE ───
-function getRecommendation(scores, answers) {
-  var total = getTotalScore(scores);
-  var lvl = getMaturityLevel(total);
-  var lvlNum = getLevelNumber(total);
-  
-  // Decision factors
-  var dataSensitivity = answers.sensitivity || 'internal';
-  var riskTolerance = answers.risk || 'medium';
-  var modelType = answers.modeltype || 'api';
-  var scale = answers.scale || 'medium';
-  var budget = answers.budget || 'under250';
-  var infra = scores.infra;
-  var skills = scores.skills;
-  var timeline = parseInt(answers.timeline) || 6;
-  
-  // Scoring matrix for deployment path
-  var cloudScore = 0, hybridScore = 0, onpremScore = 0;
-  
+// ═══ RECOMMENDATION ENGINE ═══
+function getRecommendation(scores, ans) {
+  var cloud = 0, hybrid = 0, onprem = 0;
   // Data sensitivity
-  if (dataSensitivity === 'restricted') { onpremScore += 4; hybridScore += 2; }
-  else if (dataSensitivity === 'sensitive') { onpremScore += 2; hybridScore += 3; cloudScore += 1; }
-  else if (dataSensitivity === 'internal') { hybridScore += 2; cloudScore += 2; }
-  else { cloudScore += 4; hybridScore += 1; }
-  
+  if (ans.sensitivity === 'restricted') { onprem += 4; hybrid += 2; }
+  else if (ans.sensitivity === 'sensitive') { onprem += 2; hybrid += 3; cloud += 1; }
+  else if (ans.sensitivity === 'internal') { hybrid += 2; cloud += 2; }
+  else { cloud += 4; hybrid += 1; }
   // Risk tolerance
-  if (riskTolerance === 'low') { onpremScore += 3; hybridScore += 2; }
-  else if (riskTolerance === 'medium') { hybridScore += 3; cloudScore += 1; onpremScore += 1; }
-  else { cloudScore += 3; hybridScore += 2; }
-  
+  if (ans.risk === 'low') { onprem += 3; hybrid += 2; }
+  else if (ans.risk === 'medium') { hybrid += 3; cloud += 1; onprem += 1; }
+  else { cloud += 3; hybrid += 2; }
   // Model type
-  if (modelType === 'custom') { onpremScore += 4; hybridScore += 1; }
-  else if (modelType === 'finetuned') { onpremScore += 2; hybridScore += 3; }
-  else if (modelType === 'opensource') { hybridScore += 2; onpremScore += 1; cloudScore += 1; }
-  else { cloudScore += 3; hybridScore += 1; }
-  
+  if (ans.modeltype === 'custom') { onprem += 4; hybrid += 1; }
+  else if (ans.modeltype === 'finetuned') { onprem += 2; hybrid += 3; }
+  else if (ans.modeltype === 'opensource') { hybrid += 2; onprem += 1; cloud += 1; }
+  else { cloud += 3; hybrid += 1; }
   // Scale
-  if (scale === 'veryhigh') { onpremScore += 3; hybridScore += 2; }
-  else if (scale === 'high') { onpremScore += 2; hybridScore += 3; }
-  else if (scale === 'medium') { hybridScore += 2; cloudScore += 2; }
-  else { cloudScore += 3; hybridScore += 1; }
-  
+  if (ans.scale === 'veryhigh') { onprem += 3; hybrid += 2; }
+  else if (ans.scale === 'high') { onprem += 2; hybrid += 3; }
+  else if (ans.scale === 'medium') { hybrid += 2; cloud += 2; }
+  else { cloud += 3; hybrid += 1; }
   // Budget
-  if (budget === '5mplus') { onpremScore += 3; hybridScore += 2; }
-  else if (budget === '1to5m') { onpremScore += 1; hybridScore += 3; cloudScore += 1; }
-  else if (budget === '250to1m') { hybridScore += 2; cloudScore += 2; }
-  else { cloudScore += 3; hybridScore += 1; }
-  
-  // Timeline — short timeline favours cloud
-  if (timeline <= 3) { cloudScore += 3; hybridScore += 1; }
-  else if (timeline <= 6) { cloudScore += 1; hybridScore += 2; onpremScore += 1; }
-  else { onpremScore += 2; hybridScore += 1; }
-  
-  // Infrastructure maturity
-  if (infra >= 4) { onpremScore += 2; hybridScore += 2; }
-  else if (infra >= 3) { hybridScore += 2; onpremScore += 1; }
-  else { cloudScore += 2; }
-  
+  if (ans.budget === '5mplus') { onprem += 3; hybrid += 2; }
+  else if (ans.budget === '1to5m') { onprem += 1; hybrid += 3; cloud += 1; }
+  else if (ans.budget === '250to1m') { hybrid += 2; cloud += 2; }
+  else { cloud += 3; hybrid += 1; }
+  // Timeline
+  var tl = parseInt(ans.timeline) || 6;
+  if (tl <= 3) { cloud += 3; hybrid += 1; }
+  else if (tl <= 6) { cloud += 1; hybrid += 2; onprem += 1; }
+  else { onprem += 2; hybrid += 1; }
+  // Infra maturity
+  if (scores.infra >= 4) { onprem += 2; hybrid += 2; }
+  else if (scores.infra >= 3) { hybrid += 2; onprem += 1; }
+  else { cloud += 2; }
   // Skills
-  if (skills >= 4) { onpremScore += 2; hybridScore += 1; }
-  else if (skills <= 2) { cloudScore += 2; hybridScore += 1; }
-  
-  // Determine winner
-  var maxScore = Math.max(cloudScore, hybridScore, onpremScore);
-  var path, rationale, confidence;
-  
-  if (onpremScore === maxScore) {
-    path = 'On-Premise First';
-    confidence = Math.round((onpremScore / (cloudScore + hybridScore + onpremScore)) * 100);
-    rationale = 'Your data sensitivity, regulatory requirements, or scale make on-premise AI infrastructure the strategic choice. Invest in Dell PowerEdge with NVIDIA GPUs (XE9680 with 8x H100 or R760xa with 4x A100), NVIDIA AI Enterprise (NIM, Triton, NeMo), and Dell PowerScale storage. Build a hybrid cloud-burst capability for peak loads. This gives you data sovereignty, predictable costs at scale, and the ability to fine-tune models on proprietary data without external exposure.';
-  } else if (hybridScore === maxScore) {
-    path = 'Hybrid Cloud';
-    confidence = Math.round((hybridScore / (cloudScore + hybridScore + onpremScore)) * 100);
-    rationale = 'A hybrid approach balances your need for data control with the flexibility of cloud. Start with managed API providers (DeepInfra, Together AI) for low-volume workloads and rapid prototyping. Deploy on-premise GPU infrastructure (Dell PowerEdge R760xa or XE8640) for sensitive workloads, fine-tuned models, and production inference at scale. Use cloud GPU instances for burst capacity and training spikes. This path de-risks your investment while building toward on-prem capability.';
-  } else {
-    path = 'Cloud-First';
-    confidence = Math.round((cloudScore / (cloudScore + hybridScore + onpremScore)) * 100);
-    rationale = 'Start with managed AI APIs (DeepInfra, AWS Bedrock, Together AI) for immediate results with minimal infrastructure investment. This is the fastest path to value with zero capex. As your AI initiatives scale and you hit cost break-even (typically 100M+ requests/month), evaluate on-premise GPU infrastructure. Monitor per-token costs monthly — when cloud API costs exceed the TCO of a Dell GPU server, transition to hybrid. Keep sensitive data on-prem from day one using a data classification policy.';
-  }
-  
-  return { path: path, rationale: rationale, confidence: confidence, level: lvl, levelNum: lvlNum, total: total, cloudScore: cloudScore, hybridScore: hybridScore, onpremScore: onpremScore };
+  if (scores.skills >= 4) { onprem += 2; hybrid += 1; }
+  else if (scores.skills <= 2) { cloud += 2; hybrid += 1; }
+
+  var max = Math.max(cloud, hybrid, onprem);
+  var total = cloud + hybrid + onprem;
+  var path, confidence;
+  if (onprem === max) { path = 'On-Premise First'; confidence = Math.round(onprem / total * 100); }
+  else if (hybrid === max) { path = 'Hybrid Cloud'; confidence = Math.round(hybrid / total * 100); }
+  else { path = 'Cloud-First'; confidence = Math.round(cloud / total * 100); }
+  return { path: path, confidence: confidence, cloud: cloud, hybrid: hybrid, onprem: onprem };
 }
 
-// ─── COST PROJECTION ───
-function getCostProjection(answers, rec) {
-  var scale = answers.scale || 'medium';
-  var budget = answers.budget || 'under250';
-  var modelType = answers.modeltype || 'api';
-  
-  // Estimated monthly requests
-  var monthlyReqs = { low: 500000, medium: 10000000, high: 100000000, veryhigh: 500000000 };
-  var reqs = monthlyReqs[scale] || 10000000;
-  var avgTokensPerReq = 700; // input + output
-  var annualTokens = reqs * avgTokensPerReq * 12;
-  
-  // Cloud API cost (DeepInfra at €0.15/1M tokens blended)
-  var cloudApiAnnual = (annualTokens / 1e6) * 0.15;
-  var cloudApi3yr = cloudApiAnnual * 3;
-  
-  // On-prem cost (Dell XE9680 8xH100 at €320K)
-  var hwCost = 320000;
-  var onpremOpexAnnual = 90000; // power, colo, MLOps 0.5 FTE, maintenance
-  var onprem3yr = hwCost + onpremOpexAnnual * 3;
-  
-  // Cloud GPU (AWS p5.48xlarge at €90/hr on-demand)
-  var cloudGpuAnnual = 90.46 * 8760;
-  var cloudGpu3yr = cloudGpuAnnual * 3;
-  
-  // Scale hardware to workload
-  var serversNeeded = 1;
-  if (scale === 'high') serversNeeded = 2;
-  if (scale === 'veryhigh') serversNeeded = 15;
-  var onpremScaled = (hwCost * serversNeeded) + (onpremOpexAnnual * serversNeeded * 3);
-  
-  return {
-    cloudApi: cloudApi3yr,
-    onprem: onpremScaled,
-    cloudGpu: cloudGpu3yr * serversNeeded,
-    serversNeeded: serversNeeded,
-    annualTokens: annualTokens,
-  };
+// ═══ COST PROJECTION ═══
+function getCosts(ans) {
+  var reqMap = { low: 500000, medium: 10000000, high: 100000000, veryhigh: 500000000 };
+  var reqs = reqMap[ans.scale] || 10000000;
+  var annualTokens = reqs * 700 * 12;
+  var cloudApi3yr = (annualTokens / 1e6) * 0.15 * 3;
+  var servers = 1;
+  if (ans.scale === 'high') servers = 2;
+  if (ans.scale === 'veryhigh') servers = 15;
+  var onprem3yr = (320000 * servers) + (90000 * servers * 3);
+  var cloudGpu3yr = 90.46 * 8760 * 3 * servers;
+  return { cloudApi: cloudApi3yr, onprem: onprem3yr, cloudGpu: cloudGpu3yr, servers: servers, annualTokens: annualTokens };
 }
 
-// ─── RISK ASSESSMENT ───
-function getRisks(scores, answers, rec) {
+// ═══ RISKS ═══
+function getRisks(scores, ans, rec) {
   var risks = [];
-  var sector = answers.region || 'eu';
-  
-  if (scores.governance <= 2) {
-    risks.push({
-      risk: 'Regulatory Non-Compliance',
-      severity: 'high',
-      mitigation: 'Establish AI governance committee. Conduct DPIAs for all AI systems. Map use cases against EU AI Act risk categories. Deadline: August 2026 for high-risk systems.',
-    });
-  }
-  
-  if (scores.data <= 2) {
-    risks.push({
-      risk: 'Poor Data Quality Undermining AI',
-      severity: 'high',
-      mitigation: 'Invest in data cataloguing and pipeline automation. Assign data stewards. Implement automated quality gates before model training. Budget 3-6 months for data remediation.',
-    });
-  }
-  
-  if (scores.skills <= 2 && rec.path !== 'Cloud-First') {
-    risks.push({
-      risk: 'Talent Gap for Infrastructure',
-      severity: 'medium',
-      mitigation: 'Hire 2-3 ML platform engineers or engage Dell Professional Services for initial setup. Budget for Dell AI Factory deployment workshop and NVIDIA training certifications.',
-    });
-  }
-  
-  if (answers.sensitivity === 'restricted' || answers.sensitivity === 'sensitive') {
-    risks.push({
-      risk: 'Data Sovereignty Breach',
-      severity: answers.sensitivity === 'restricted' ? 'high' : 'medium',
-      mitigation: 'Ensure all sensitive data processing occurs on-premise or in EU-sovereign cloud. Verify vendor data residency agreements. Implement data classification and DLP policies.',
-    });
-  }
-  
-  if (scores.budget <= 2 && rec.path !== 'Cloud-First') {
-    risks.push({
-      risk: 'Budget Insufficient for On-Prem',
-      severity: 'medium',
-      mitigation: 'Start with cloud APIs to demonstrate ROI, then build business case for on-prem capex using the TCO calculator. Consider Dell APEX as-a-service financing (opex model).',
-    });
-  }
-  
-  if (scores.infra <= 2 && rec.path === 'On-Premise First') {
-    risks.push({
-      risk: 'Infrastructure Not Ready',
-      severity: 'medium',
-      mitigation: 'Engage Dell for site assessment (power, cooling, network). Plan for 3-month deployment cycle. Consider Dell APEX Data Center Managed Service for faster time-to-value.',
-    });
-  }
-  
-  if (risks.length < 3) {
-    risks.push({
-      risk: 'Model Drift & Performance Degradation',
-      severity: 'low',
-      mitigation: 'Implement monitoring pipeline with drift detection. Schedule quarterly model re-evaluation. Maintain model registry with version control.',
-    });
-  }
-  
+  if (scores.governance <= 2) risks.push({ risk: 'Regulatory Non-Compliance', severity: 'high', mitigation: 'Establish AI governance committee. Conduct DPIAs. Map use cases against EU AI Act risk categories.' });
+  if (scores.data <= 2) risks.push({ risk: 'Poor Data Quality', severity: 'high', mitigation: 'Invest in data cataloguing and pipeline automation. Assign data stewards. Implement quality gates.' });
+  if (scores.skills <= 2 && rec.path !== 'Cloud-First') risks.push({ risk: 'Talent Gap', severity: 'medium', mitigation: 'Hire 2-3 ML platform engineers or engage Dell Professional Services for initial setup.' });
+  if (ans.sensitivity === 'restricted' || ans.sensitivity === 'sensitive') risks.push({ risk: 'Data Sovereignty Breach', severity: ans.sensitivity === 'restricted' ? 'high' : 'medium', mitigation: 'Ensure sensitive data stays on-prem or in EU-sovereign cloud. Verify vendor data residency agreements.' });
+  if (scores.budget <= 2 && rec.path !== 'Cloud-First') risks.push({ risk: 'Budget Insufficient', severity: 'medium', mitigation: 'Start with cloud APIs to prove ROI, then build business case for on-prem capex.' });
+  if (risks.length < 3) risks.push({ risk: 'Model Drift', severity: 'low', mitigation: 'Implement monitoring with drift detection. Schedule quarterly model re-evaluation.' });
   return risks.slice(0, 5);
 }
 
-// ─── ROADMAP ───
-function getRoadmap(scores, answers, rec) {
+// ═══ ROADMAP ═══
+function getRoadmap(scores, ans, rec) {
   var items = [];
-  var timeline = parseInt(answers.timeline) || 6;
-  
-  // Critical: governance
-  if (scores.governance <= 3) {
-    items.push({ priority: 'urgent', title: 'Establish AI Governance Framework', desc: 'Form AI governance committee, define model risk classification, begin DPIA process', owner: 'Chief Risk Officer / DPO', timeframe: 'Weeks 1-4' });
-  }
-  
-  // Critical: data
-  if (scores.data <= 3) {
-    items.push({ priority: 'urgent', title: 'Audit & Remediate Data Assets', desc: 'Catalogue all data sources, assess quality, define data pipelines for AI workloads', owner: 'Chief Data Officer', timeframe: 'Weeks 2-8' });
-  }
-  
-  // Deployment path
+  if (scores.governance <= 3) items.push({ priority: 'urgent', title: 'Establish AI Governance Framework', desc: 'Form governance committee, define model risk classification, begin DPIA process', owner: 'CRO / DPO', timeframe: 'Weeks 1-4' });
+  if (scores.data <= 3) items.push({ priority: 'urgent', title: 'Audit & Remediate Data Assets', desc: 'Catalogue data sources, assess quality, define AI data pipelines', owner: 'Chief Data Officer', timeframe: 'Weeks 2-8' });
   if (rec.path === 'Cloud-First') {
-    items.push({ priority: 'high', title: 'Deploy Managed AI API Layer', desc: 'Set up DeepInfra/AWS Bedrock accounts, implement API gateway with rate limiting and cost controls', owner: 'Head of Engineering', timeframe: 'Weeks 3-6' });
-    items.push({ priority: 'medium', title: 'Implement Cost Monitoring', desc: 'Track per-token costs, set budget alerts, identify break-even point for on-prem transition', owner: 'FinOps Lead', timeframe: 'Weeks 6-10' });
+    items.push({ priority: 'high', title: 'Deploy Managed AI API Layer', desc: 'Set up DeepInfra/Bedrock accounts, API gateway with rate limiting and cost controls', owner: 'Head of Engineering', timeframe: 'Weeks 3-6' });
+    items.push({ priority: 'medium', title: 'Implement Cost Monitoring', desc: 'Track per-token costs, set budget alerts, identify on-prem break-even point', owner: 'FinOps Lead', timeframe: 'Weeks 6-10' });
   } else if (rec.path === 'Hybrid Cloud') {
-    items.push({ priority: 'high', title: 'Deploy Pilot GPU Infrastructure', desc: 'Procure Dell PowerEdge R760xa (4x A100) or XE8640 (4x H100), install NVIDIA AI Enterprise stack', owner: 'Head of Infrastructure', timeframe: 'Weeks 4-12' });
-    items.push({ priority: 'high', title: 'Set Up Hybrid Orchestration', desc: 'Implement workload routing: sensitive data on-prem, burst to cloud, unified monitoring', owner: 'Platform Engineering', timeframe: 'Weeks 8-14' });
-    items.push({ priority: 'medium', title: 'Migrate Sensitive Workloads On-Prem', desc: 'Move production inference for sensitive data to on-prem GPU servers, keep APIs for low-sensitivity', owner: 'ML Engineering', timeframe: 'Weeks 12-20' });
+    items.push({ priority: 'high', title: 'Deploy Pilot GPU Infrastructure', desc: 'Procure Dell R760xa (4× A100) or XE8640 (4× H100), install NVIDIA AI Enterprise', owner: 'Head of Infrastructure', timeframe: 'Weeks 4-12' });
+    items.push({ priority: 'high', title: 'Set Up Hybrid Orchestration', desc: 'Workload routing: sensitive on-prem, burst to cloud, unified monitoring', owner: 'Platform Engineering', timeframe: 'Weeks 8-14' });
   } else {
-    items.push({ priority: 'high', title: 'Procure & Deploy AI Factory', desc: 'Dell PowerEdge XE9680 with 8x NVIDIA H100, PowerScale storage, NVIDIA NIM/Triton serving stack', owner: 'Head of Infrastructure', timeframe: 'Weeks 4-12' });
-    items.push({ priority: 'high', title: 'Build MLOps Pipeline', desc: 'CI/CD for models, drift detection, A/B testing, model registry with version control', owner: 'Platform Engineering', timeframe: 'Weeks 6-14' });
-    items.push({ priority: 'medium', title: 'Implement Cloud-Burst Capacity', desc: 'Set up hybrid scaling: on-prem as primary, cloud GPU instances for peak load overflow', owner: 'Platform Engineering', timeframe: 'Weeks 12-20' });
+    items.push({ priority: 'high', title: 'Procure & Deploy AI Factory', desc: 'Dell XE9680 (8× H100), PowerScale storage, NVIDIA NIM/Triton serving', owner: 'Head of Infrastructure', timeframe: 'Weeks 4-12' });
+    items.push({ priority: 'high', title: 'Build MLOps Pipeline', desc: 'CI/CD for models, drift detection, A/B testing, model registry', owner: 'Platform Engineering', timeframe: 'Weeks 6-14' });
   }
-  
-  // Skills
-  if (scores.skills <= 3) {
-    items.push({ priority: 'medium', title: 'Build AI Talent Pipeline', desc: 'Hire or train 2-3 ML platform engineers. Consider Dell AI Factory workshop and NVIDIA certifications.', owner: 'HR / CTO', timeframe: 'Weeks 4-16' });
-  }
-  
-  // Governance (if not urgent)
-  if (scores.governance >= 4) {
-    items.push({ priority: 'low', title: 'Automate Compliance Monitoring', desc: 'Implement automated bias/fairness checks, regulatory change detection, model audit trails', owner: 'AI Governance Board', timeframe: 'Weeks 16-24' });
-  }
-  
-  // ROI tracking
-  items.push({ priority: 'medium', title: 'Establish ROI Tracking', desc: 'Define KPIs for each AI use case, implement value tracking dashboard, report quarterly to board', owner: 'CFO / Strategy', timeframe: 'Weeks 6-12' });
-  
+  if (scores.skills <= 3) items.push({ priority: 'medium', title: 'Build AI Talent Pipeline', desc: 'Hire or train 2-3 ML platform engineers. NVIDIA certifications.', owner: 'HR / CTO', timeframe: 'Weeks 4-16' });
+  items.push({ priority: 'medium', title: 'Establish ROI Tracking', desc: 'Define KPIs for each use case, implement value tracking dashboard', owner: 'CFO / Strategy', timeframe: 'Weeks 6-12' });
   return items.slice(0, 7);
 }
 
-// ─── REGULATORY ───
-function getRegulatory(answers) {
-  var region = answers.region || 'eu';
+// ═══ REGULATORY ═══
+function getRegulatory(ans) {
+  var region = ans.region || 'eu';
   var sector = document.getElementById('org-sector').value;
-  var sensitivity = answers.sensitivity || 'internal';
-  
+  var sensitivity = ans.sensitivity || 'internal';
   var regs = [];
-  
   if (region === 'eu' || region === 'global') {
-    var aiActRisk = (sector === 'financial' || sector === 'healthcare' || sector === 'public') ? 'HIGH RISK' : 'Limited/Minimal Risk';
-    var aiActColor = aiActRisk === 'HIGH RISK' ? 'high' : 'low';
-    regs.push({
-      name: 'EU AI Act',
-      status: aiActRisk,
-      statusColor: aiActColor,
-      note: aiActRisk === 'HIGH RISK' ? 'Annex III systems — conformity assessment, risk management, human oversight required. Compliance deadline: August 2026.' : 'Transparency obligations only. Register AI systems in EU database if limited risk.',
-    });
-    
-    var gdprLevel = (sensitivity === 'sensitive' || sensitivity === 'restricted') ? 'HIGH' : 'MODERATE';
-    regs.push({
-      name: 'GDPR',
-      status: gdprLevel + ' PRIORITY',
-      statusColor: gdprLevel === 'HIGH' ? 'high' : 'medium',
-      note: gdprLevel === 'HIGH' ? 'DPIA mandatory for AI processing personal data. Data processing agreements with all vendors. Right to explanation for automated decisions.' : 'Standard compliance. Ensure lawful basis for AI processing, transparency to data subjects.',
-    });
-    
+    var highRisk = ['financial', 'healthcare', 'public'].indexOf(sector) >= 0;
+    regs.push({ name: 'EU AI Act', status: highRisk ? 'HIGH RISK' : 'Limited Risk', level: highRisk ? 'high' : 'low', note: highRisk ? 'Annex III — conformity assessment, human oversight required. Deadline: August 2026.' : 'Transparency obligations only.' });
+    var gdprHigh = sensitivity === 'sensitive' || sensitivity === 'restricted';
+    regs.push({ name: 'GDPR', status: gdprHigh ? 'HIGH PRIORITY' : 'Standard', level: gdprHigh ? 'high' : 'medium', note: gdprHigh ? 'DPIA mandatory. Data processing agreements with all vendors.' : 'Standard compliance. Lawful basis for AI processing.' });
     var nis2Sectors = ['financial', 'energy', 'telecom', 'healthcare', 'manufacturing'];
-    if (nis2Sectors.indexOf(sector) >= 0) {
-      regs.push({
-        name: 'NIS2 Directive',
-        status: 'IN SCOPE',
-        statusColor: 'high',
-        note: 'Mandatory cybersecurity risk management measures. Incident reporting within 24 hours. Supply chain security requirements for AI systems.',
-      });
-    } else {
-      regs.push({
-        name: 'NIS2 Directive',
-        status: 'CHECK APPLICABILITY',
-        statusColor: 'medium',
-        note: 'May apply if classified as digital provider or critical infrastructure. Assess supply chain security obligations.',
-      });
-    }
+    regs.push({ name: 'NIS2 Directive', status: nis2Sectors.indexOf(sector) >= 0 ? 'IN SCOPE' : 'CHECK', level: nis2Sectors.indexOf(sector) >= 0 ? 'high' : 'medium', note: nis2Sectors.indexOf(sector) >= 0 ? 'Mandatory cybersecurity measures. 24-hour incident reporting.' : 'Assess applicability.' });
   }
-  
-  if (region === 'uk' || region === 'global') {
-    regs.push({
-      name: 'UK GDPR + Data Protection Act',
-      status: 'APPLIES',
-      statusColor: 'medium',
-      note: 'Similar to EU GDPR. ICO guidance on AI and data protection. Automated decision-making provisions apply.',
-    });
-  }
-  
-  if (sector === 'financial') {
-    regs.push({
-      name: 'DORA (Digital Operational Resilience)',
-      status: 'IN SCOPE',
-      statusColor: 'high',
-      note: 'ICT risk management for financial entities. AI systems classified as ICT must meet operational resilience requirements. Compliance: January 2025.',
-    });
-  }
-  
+  if (region === 'uk' || region === 'global') regs.push({ name: 'UK GDPR + DPA', status: 'APPLIES', level: 'medium', note: 'Similar to EU GDPR. ICO guidance on AI. Automated decision-making provisions.' });
+  if (sector === 'financial') regs.push({ name: 'DORA', status: 'IN SCOPE', level: 'high', note: 'ICT risk management for financial entities. AI systems must meet operational resilience requirements.' });
   return regs;
 }
 
-// ─── FORMATTING ───
+// ═══ FORMATTING ═══
 function fmtEUR(n) {
-  if (n >= 1e6) return '\u20AC' + (n / 1e6).toFixed(2) + 'M';
-  if (n >= 1e3) return '\u20AC' + (n / 1e3).toFixed(0) + 'K';
+  if (n >= 1e6) return '\u20AC' + (n/1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return '\u20AC' + (n/1e3).toFixed(0) + 'K';
   return '\u20AC' + n.toFixed(0);
 }
 function fmtEURfull(n) { return '\u20AC' + n.toLocaleString('en-IE', { maximumFractionDigits: 0 }); }
 function fmtTok(n) {
-  if (n >= 1e12) return (n / 1e12).toFixed(1) + 'T';
-  if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
-  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e12) return (n/1e12).toFixed(1) + 'T';
+  if (n >= 1e9) return (n/1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
   return n.toFixed(0);
 }
 
-// ─── RENDER RESULTS ───
-function generateResults() {
+// ═══ LLM EXECUTIVE NARRATIVE ═══
+async function generateNarrative(scores, rec, costs, ans) {
+  var orgName = document.getElementById('org-name').value.trim() || 'Your organisation';
+  var sector = document.getElementById('org-sector').selectedOptions[0].text;
+  var size = document.getElementById('org-size').selectedOptions[0].text;
+  var total = getTotal(scores);
+  var level = getLevel(total);
+
+  // Build the assessment context
+  var context = {
+    organisation: orgName,
+    sector: sector,
+    size: size,
+    region: ans.region,
+    maturityScore: total + '/40',
+    maturityLevel: level.name,
+    recommendation: rec.path,
+    confidence: rec.confidence + '%',
+    scores: {
+      strategy: scores.strategy + '/5',
+      data: scores.data + '/5',
+      infrastructure: scores.infra + '/5',
+      governance: scores.governance + '/5',
+      skills: scores.skills + '/5',
+      budget: scores.budget + '/5',
+    },
+    dataSensitivity: ans.sensitivity,
+    riskTolerance: ans.risk,
+    modelStrategy: ans.modeltype,
+    expectedScale: ans.scale,
+    timeline: ans.timeline + ' months',
+    costProjection: {
+      cloudAPI_3yr: fmtEURfull(costs.cloudApi),
+      onPrem_3yr: fmtEURfull(costs.onprem),
+      cloudGPU_3yr: fmtEURfull(costs.cloudGpu),
+      serversNeeded: costs.servers,
+    },
+    decisionSignals: { cloud: rec.cloud, hybrid: rec.hybrid, onprem: rec.onprem },
+  };
+
+  var systemPrompt = [
+    'You are a senior AI strategy consultant at a top-tier firm.',
+    'Write a concise executive assessment report for the C-level leadership of the assessed organisation.',
+    '',
+    'STRICT RULES:',
+    '- Do NOT include your reasoning process, thinking steps, or analysis methodology.',
+    '- Do NOT use phrases like "Based on the assessment", "Looking at the data", "After analysing", or similar meta-commentary.',
+    '- Do NOT mention that you are an AI or that this was generated.',
+    '- Write as a human consultant would write — direct, confident, specific.',
+    '- Output EXACTLY 3 short paragraphs separated by blank lines.',
+    '- Paragraph 1: State the recommendation and why (2-3 sentences). Be specific to their inputs.',
+    '- Paragraph 2: Key risk or gap and what to do about it (2-3 sentences).',
+    '- Paragraph 3: Next step and timeline (1-2 sentences).',
+    '- Total output: 150-200 words. No bullet points. No headers. Just the 3 paragraphs.',
+    '- Use the organisation name naturally.',
+  ].join('\n');
+
+  var userPrompt = 'Assessment data:\n' + JSON.stringify(context, null, 2);
+
+  try {
+    var token = localStorage.getItem('ai_demo_token') || '';
+    var resp = await fetch('/api/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({
+        model: 'z-ai/glm-4.5',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.6,
+        max_tokens: 400,
+      }),
+    });
+    if (!resp.ok) throw new Error('API returned ' + resp.status);
+    var data = await resp.json();
+    var content = data.choices?.[0]?.message?.content?.trim();
+    if (!content) throw new Error('No content in response');
+    return content;
+  } catch (e) {
+    console.error('Narrative generation failed:', e);
+    return null;
+  }
+}
+
+// ═══ RENDER RESULTS ═══
+function renderResultsHTML(scores, rec, costs, risks, roadmap, regs, narrative) {
+  var total = getTotal(scores);
+  var level = getLevel(total);
+  var orgName = document.getElementById('org-name').value.trim() || 'Your Organisation';
+  var html = '';
+
+  // SCORE GAUGE
+  var pct = total / 40;
+  var circumference = 2 * Math.PI * 70;
+  var dashOffset = circumference * (1 - pct);
+  html += '<div class="score-section">';
+  html += '<div class="gauge-wrap">';
+  html += '<svg class="gauge-svg" width="160" height="160" viewBox="0 0 160 160">';
+  html += '<circle class="gauge-bg" cx="80" cy="80" r="70" />';
+  html += '<circle class="gauge-fill" cx="80" cy="80" r="70" stroke="' + level.color + '" stroke-dasharray="' + circumference + '" stroke-dashoffset="' + dashOffset + '" />';
+  html += '</svg>';
+  html += '<div class="gauge-center"><div class="gauge-score">' + total + '/40</div><div class="gauge-label">' + level.name + '</div></div>';
+  html += '</div>';
+  html += '<div class="score-info">';
+  html += '<h3>AI Maturity Assessment: ' + orgName + '</h3>';
+  html += '<div class="maturity-level" style="background:' + level.color + '22;color:' + level.color + '">Level ' + level.num + ' of 5 — ' + level.name + '</div>';
+  html += '<p>Confidence: ' + rec.confidence + '% · Based on ' + Object.keys(answers).length + ' assessment factors</p>';
+  html += '</div></div>';
+
+  // RECOMMENDATION
+  var recColor = rec.path === 'Cloud-First' ? 'var(--amber)' : rec.path === 'Hybrid Cloud' ? 'var(--green)' : 'var(--accent2)';
+  html += '<div class="rec-card" style="border-left-color:' + recColor + '">';
+  html += '<div class="rec-label">Recommended Deployment Strategy</div>';
+  html += '<div class="rec-path" style="color:' + recColor + '">' + rec.path + '</div>';
+  html += '<div class="rec-signal">';
+  html += '<span><span class="signal-dot" style="background:var(--amber)"></span>Cloud: ' + rec.cloud + '</span>';
+  html += '<span><span class="signal-dot" style="background:var(--green)"></span>Hybrid: ' + rec.hybrid + '</span>';
+  html += '<span><span class="signal-dot" style="background:var(--accent2)"></span>On-Prem: ' + rec.onprem + '</span>';
+  html += '</div></div>';
+
+  // EXECUTIVE NARRATIVE (LLM)
+  html += '<div class="narrative-card">';
+  html += '<h3>Executive Assessment</h3>';
+  if (narrative) {
+    // Parse paragraphs and wrap in <p>
+    var paragraphs = narrative.split(/\n\n+/).filter(function(p) { return p.trim(); });
+    html += '<div class="narrative-content">';
+    paragraphs.forEach(function(p) {
+      html += '<p>' + p.trim() + '</p>';
+    });
+    html += '</div>';
+  } else {
+    html += '<div class="narrature-error">Executive narrative unavailable. See structured analysis below.</div>';
+  }
+  html += '</div>';
+
+  // TCO LINK
+  html += '<div class="tco-link" onclick="window.parent.postMessage({action:\'openTCO\'},\'*\')">';
+  html += '<span style="font-size:1.3rem">💰</span>';
+  html += '<div class="tco-text"><div class="tco-title">Open Inference TCO Calculator</div><div class="tco-desc">Detailed 3-year cost comparison with adjustable parameters</div></div>';
+  html += '<span style="color:var(--green);font-size:1.2rem">→</span></div>';
+
+  // RADAR + DIMENSIONS
+  html += '<div class="chart-row">';
+  html += '<div class="chart-card"><h3>Maturity Radar</h3><div class="chart-wrap short"><canvas id="radarChart"></canvas></div></div>';
+  html += '<div class="chart-card"><h3>Dimension Scores</h3>';
+  html += '<div class="dim-grid">';
+  var levelNames = ['Nascent', 'Emerging', 'Defined', 'Managed', 'Optimised'];
+  var barColors = ['#f87171', '#fbbf24', '#34d399', '#38bdf8', '#818cf8'];
+  DIMENSIONS.forEach(function(d) {
+    var v = scores[d.id];
+    html += '<div class="dim-card"><div class="dim-name">' + d.name + '</div><div class="dim-score">' + v + '/5</div>';
+    html += '<div class="dim-bar"><div class="dim-bar-fill" style="width:' + (v/5*100) + '%;background:' + barColors[v-1] + '"></div></div>';
+    html += '<div class="dim-level">' + levelNames[v-1] + '</div></div>';
+  });
+  html += '</div></div></div>';
+
+  // COST PROJECTION
+  html += '<div class="chart-card"><h3>3-Year Cost Projection (EUR)</h3>';
+  html += '<div class="chart-wrap"><canvas id="costChart"></canvas></div>';
+  html += '<table class="data-table cost-table"><thead><tr><th>Option</th><th>Year 1</th><th>3-Year Total</th><th>Per 1M tok</th></tr></thead><tbody>';
+  var rows = [
+    { name: 'Cloud API (DeepInfra)', yr1: costs.cloudApi/3, total: costs.cloudApi, best: rec.path === 'Cloud-First' },
+    { name: 'On-Prem (' + costs.servers + '× XE9680)', yr1: (320000*costs.servers)+(90000*costs.servers), total: costs.onprem, best: rec.path !== 'Cloud-First' },
+    { name: 'Cloud GPU (AWS p5 24/7)', yr1: costs.cloudGpu/3, total: costs.cloudGpu, best: false },
+  ];
+  rows.forEach(function(r) {
+    var perM = r.total / (costs.annualTokens * 3 / 1e6);
+    html += '<tr' + (r.best ? ' class="highlight"' : '') + '><td>' + r.name + (r.best ? ' ★' : '') + '</td><td>' + fmtEUR(r.yr1) + '</td><td>' + fmtEURfull(r.total) + '</td><td>\u20AC' + perM.toFixed(4) + '</td></tr>';
+  });
+  html += '</tbody></table></div>';
+
+  // RISKS
+  html += '<div class="chart-card"><h3>Top Risks & Mitigations</h3>';
+  html += '<table class="data-table"><thead><tr><th>Risk</th><th>Severity</th><th>Mitigation</th></tr></thead><tbody>';
+  risks.forEach(function(r) {
+    html += '<tr><td style="font-weight:600">' + r.risk + '</td><td><span class="badge ' + r.severity + '">' + r.severity.toUpperCase() + '</span></td><td style="font-size:0.78rem;color:var(--text-dim)">' + r.mitigation + '</td></tr>';
+  });
+  html += '</tbody></table></div>';
+
+  // REGULATORY
+  html += '<div class="chart-card"><h3>Regulatory Landscape</h3><div class="reg-grid">';
+  regs.forEach(function(r) {
+    html += '<div class="reg-card"><div class="reg-name">' + r.name + '</div><span class="badge ' + r.level + '">' + r.status + '</span><div class="reg-note">' + r.note + '</div></div>';
+  });
+  html += '</div></div>';
+
+  // ROADMAP
+  html += '<div class="chart-card"><h3>Priority Roadmap — Next 12 Months</h3><div class="roadmap-list">';
+  roadmap.forEach(function(item, i) {
+    html += '<div class="roadmap-item"><div class="roadmap-num ' + item.priority + '">' + (i+1) + '</div>';
+    html += '<div><div class="roadmap-title">' + item.title + '</div><div class="roadmap-desc">' + item.desc + '</div>';
+    html += '<div class="roadmap-meta">Owner: ' + item.owner + ' · Timeline: ' + item.timeframe + '</div></div></div>';
+  });
+  html += '</div></div>';
+
+  return html;
+}
+
+// ═══ GENERATE ═══
+async function generateResults() {
   if (!validateStep(4)) return;
-  
+
+  // Show loading
   document.getElementById('step-4').classList.remove('active');
   document.getElementById('progressWrap').style.display = 'none';
-  
-  var scores = getScoreMap();
-  var total = getTotalScore(scores);
+  document.getElementById('loadingScreen').style.display = 'block';
+
+  var scores = getScores();
   var rec = getRecommendation(scores, answers);
-  var costs = getCostProjection(answers, rec);
+  var costs = getCosts(answers);
   var risks = getRisks(scores, answers, rec);
   var roadmap = getRoadmap(scores, answers, rec);
   var regs = getRegulatory(answers);
-  
-  var orgName = document.getElementById('org-name').value.trim() || 'Your Organisation';
-  var sector = document.getElementById('org-sector').selectedOptions[0].text;
-  
-  // KPI Row
-  var kpiHtml = '';
-  kpiHtml += '<div class="kpi-card"><div class="kpi-label">Maturity Score</div><div class="kpi-value">' + total + '/40</div><div class="kpi-sub">Level ' + rec.levelNum + ': ' + rec.level.name + '</div></div>';
-  kpiHtml += '<div class="kpi-card ' + (rec.path === 'Cloud-First' ? 'orange' : rec.path === 'Hybrid Cloud' ? 'green' : 'purple') + '"><div class="kpi-label">Recommended Path</div><div class="kpi-value" style="font-size:1.1rem">' + rec.path + '</div><div class="kpi-sub">' + rec.confidence + '% confidence</div></div>';
-  kpiHtml += '<div class="kpi-card green"><div class="kpi-label">3-Year Cost (Recommended)</div><div class="kpi-value">' + (rec.path === 'Cloud-First' ? fmtEUR(costs.cloudApi) : rec.path === 'Hybrid Cloud' ? fmtEUR(costs.onprem) : fmtEUR(costs.onprem)) + '</div><div class="kpi-sub">' + (rec.path === 'Cloud-First' ? 'Cloud API' : costs.serversNeeded + ' server(s)') + '</div></div>';
-  kpiHtml += '<div class="kpi-card"><div class="kpi-label">Annual Token Volume</div><div class="kpi-value">' + fmtTok(costs.annualTokens) + '</div><div class="kpi-sub">Est. inference demand</div></div>';
-  document.getElementById('kpiRow').innerHTML = kpiHtml;
-  
-  // Recommendation banner
-  var recHtml = '<h3>Strategic Recommendation</h3>';
-  recHtml += '<div class="rec-path" style="color:' + rec.level.color + '">' + rec.path + '</div>';
-  recHtml += '<div class="rec-rationale">' + rec.rationale + '</div>';
-  recHtml += '<div class="rec-confidence"><div class="conf-bar"><div class="conf-fill" style="width:' + rec.confidence + '%"></div></div><span class="conf-label">' + rec.confidence + '% confidence based on ' + Object.keys(answers).length + ' assessment factors</span></div>';
-  recHtml += '<div style="margin-top:0.7rem;display:flex;gap:0.5rem;flex-wrap:wrap;font-size:0.75rem">';
-  recHtml += '<span style="color:var(--text-dim)">Decision signals:</span>';
-  recHtml += '<span style="color:var(--accent)">Cloud: ' + rec.cloudScore + '</span>';
-  recHtml += '<span style="color:var(--success)">Hybrid: ' + rec.hybridScore + '</span>';
-  recHtml += '<span style="color:var(--accent2)">On-Prem: ' + rec.onpremScore + '</span>';
-  recHtml += '</div>';
-  document.getElementById('recBanner').innerHTML = recHtml;
-  
-  // Radar chart
-  renderRadar(scores);
-  
-  // Dimension scorecards
-  var levelNames = ['Nascent', 'Emerging', 'Defined', 'Managed', 'Optimised'];
-  var colors = ['#f87171', '#fbbf24', '#34d399', '#53d8fb', '#8b5cf6'];
-  var dimHtml = DIMENSIONS.map(function(d) {
-    var v = scores[d.id];
-    var pct = (v / 5 * 100);
-    return '<div class="dim-card"><div class="dim-name">' + d.short + '</div><div class="dim-score">' + v + '/5</div><div class="dim-bar"><div class="dim-bar-fill" style="width:' + pct + '%;background:' + colors[v-1] + '"></div></div><div class="dim-level">' + levelNames[v-1] + '</div></div>';
-  }).join('');
-  document.getElementById('dimGrid').innerHTML = dimHtml;
-  
-  // Cost chart
-  renderCostChart(costs);
-  
-  // Cost table
-  var costRows = [
-    { name: 'Cloud API (DeepInfra)', yr1: costs.cloudApi/3, total: costs.cloudApi, best: rec.path === 'Cloud-First' },
-    { name: 'On-Prem (' + costs.serversNeeded + 'x XE9680)', yr1: (320000*costs.serversNeeded) + (90000*costs.serversNeeded), total: costs.onprem, best: rec.path !== 'Cloud-First' },
-    { name: 'Cloud GPU (AWS p5 24/7)', yr1: costs.cloudGpu/3, total: costs.cloudGpu, best: false },
-  ];
-  var costHtml = '<thead><tr><th>Option</th><th>Year 1</th><th>3-Year Total</th><th>Cost / 1M tok</th></tr></thead><tbody>';
-  costRows.forEach(function(r) {
-    var perM = (r.total / (costs.annualTokens * 3 / 1e6));
-    costHtml += '<tr' + (r.best ? ' class="highlight"' : '') + '><td>' + r.name + (r.best ? ' ★' : '') + '</td><td>' + fmtEUR(r.yr1) + '</td><td>' + fmtEURfull(r.total) + '</td><td>\u20AC' + perM.toFixed(4) + '</td></tr>';
-  });
-  costHtml += '</tbody>';
-  document.getElementById('costTable').innerHTML = costHtml;
-  
-  // Risk table
-  var riskHtml = '<thead><tr><th>Risk</th><th>Severity</th><th>Mitigation</th></tr></thead><tbody>';
-  risks.forEach(function(r) {
-    riskHtml += '<tr><td style="font-weight:600">' + r.risk + '</td><td><span class="risk-badge ' + r.severity + '">' + r.severity.toUpperCase() + '</span></td><td style="font-size:0.78rem;color:var(--text-dim)">' + r.mitigation + '</td></tr>';
-  });
-  riskHtml += '</tbody>';
-  document.getElementById('riskTable').innerHTML = riskHtml;
-  
-  // Regulatory
-  var regHtml = regs.map(function(r) {
-    return '<div class="reg-card"><div class="reg-name">' + r.name + '</div><div class="reg-status"><span class="risk-badge ' + r.statusColor + '">' + r.status + '</span></div><div class="reg-note">' + r.note + '</div></div>';
-  }).join('');
-  document.getElementById('regGrid').innerHTML = regHtml;
-  
-  // Roadmap
-  var roadmapHtml = roadmap.map(function(item, i) {
-    return '<div class="roadmap-item"><div class="roadmap-num ' + item.priority + '">' + (i+1) + '</div><div class="roadmap-body"><div class="roadmap-title">' + item.title + '</div><div class="roadmap-desc">' + item.desc + '</div><div class="roadmap-meta">Owner: ' + item.owner + ' · Timeline: ' + item.timeframe + '</div></div></div>';
-  }).join('');
-  document.getElementById('roadmapList').innerHTML = roadmapHtml;
-  
-  // Show results
+
+  // Generate LLM narrative
+  var narrative = await generateNarrative(scores, rec, costs, answers);
+
+  // Hide loading
+  document.getElementById('loadingScreen').style.display = 'none';
+
+  // Render
+  var html = renderResultsHTML(scores, rec, costs, risks, roadmap, regs, narrative);
+  document.getElementById('resultsContent').innerHTML = html;
   document.getElementById('results').classList.add('active');
+
+  // Render charts
+  setTimeout(function() {
+    renderRadar(scores);
+    renderCostChart(costs);
+  }, 100);
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ═══ CHARTS ═══
 function renderRadar(scores) {
-  var ctx = document.getElementById('radarChart').getContext('2d');
+  var ctx = document.getElementById('radarChart');
+  if (!ctx) return;
   if (radarChart) radarChart.destroy();
-  radarChart = new Chart(ctx, {
+  radarChart = new Chart(ctx.getContext('2d'), {
     type: 'radar',
     data: {
-      labels: DIMENSIONS.map(function(d) { return d.short; }),
-      datasets: [{
-        label: 'Your Maturity',
-        data: DIMENSIONS.map(function(d) { return scores[d.id]; }),
-        backgroundColor: 'rgba(139,92,246,0.15)',
-        borderColor: '#8b5cf6', borderWidth: 2,
-        pointBackgroundColor: '#8b5cf6', pointRadius: 4,
-      }]
+      labels: DIMENSIONS.map(function(d) { return d.name; }),
+      datasets: [{ data: DIMENSIONS.map(function(d) { return scores[d.id]; }), backgroundColor: 'rgba(129,140,248,0.15)', borderColor: '#818cf8', borderWidth: 2, pointBackgroundColor: '#818cf8', pointRadius: 3 }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      scales: { r: {
-        min: 0, max: 5,
-        ticks: { stepSize: 1, color: '#8888aa', backdropColor: 'transparent', font: { size: 9 } },
-        grid: { color: '#2a2a5a' }, angleLines: { color: '#2a2a5a' },
-        pointLabels: { color: '#e8e8f0', font: { size: 11, weight: '600' } }
-      }},
+      scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, color: '#64748b', backdropColor: 'transparent', font: { size: 8 } }, grid: { color: '#334155' }, angleLines: { color: '#334155' }, pointLabels: { color: '#cbd5e1', font: { size: 10, weight: '600' } } } },
       plugins: { legend: { display: false } }
     }
   });
 }
 
 function renderCostChart(costs) {
-  var ctx = document.getElementById('costChart').getContext('2d');
+  var ctx = document.getElementById('costChart');
+  if (!ctx) return;
   if (costChart) costChart.destroy();
-  costChart = new Chart(ctx, {
+  costChart = new Chart(ctx.getContext('2d'), {
     type: 'bar',
     data: {
-      labels: ['Cloud API', 'On-Prem (' + costs.serversNeeded + 'x XE9680)', 'Cloud GPU (24/7)'],
-      datasets: [{
-        label: '3-Year Total Cost (EUR)',
-        data: [costs.cloudApi, costs.onprem, costs.cloudGpu],
-        backgroundColor: ['rgba(83,216,251,0.8)', 'rgba(124,92,252,0.8)', 'rgba(248,113,113,0.8)'],
-        borderColor: ['#53d8fb', '#7c5cfc', '#f87171'],
-        borderWidth: 1, borderRadius: 6,
-      }]
+      labels: ['Cloud API', 'On-Prem (' + costs.servers + '× XE9680)', 'Cloud GPU 24/7'],
+      datasets: [{ data: [costs.cloudApi, costs.onprem, costs.cloudGpu], backgroundColor: ['rgba(56,189,248,0.7)', 'rgba(129,140,248,0.7)', 'rgba(248,113,113,0.7)'], borderColor: ['#38bdf8', '#818cf8', '#f87171'], borderWidth: 1, borderRadius: 6 }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c) { return fmtEURfull(c.raw); } } } },
-      scales: {
-        y: { ticks: { color: '#8888aa', callback: function(v) { return fmtEUR(v); } }, grid: { color: 'rgba(42,42,90,0.3)' } },
-        x: { ticks: { color: '#8888aa', font: { size: 10 } }, grid: { display: false } }
-      }
+      scales: { y: { ticks: { color: '#64748b', callback: function(v) { return fmtEUR(v); } }, grid: { color: '#1e293b' } }, x: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { display: false } } }
     }
   });
 }
 
-// ─── RESET ───
+// ═══ RESET ═══
 function resetAssessment() {
   answers = {};
   currentStep = 0;
@@ -1361,24 +939,14 @@ function resetAssessment() {
   document.querySelectorAll('.q-input, .q-select').forEach(function(el) { el.value = ''; });
   document.getElementById('step-0').classList.add('active');
   document.getElementById('results').classList.remove('active');
+  document.getElementById('loadingScreen').style.display = 'none';
   document.getElementById('progressWrap').style.display = 'none';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ─── TCO LINK MESSAGE ───
-window.addEventListener('message', function(event) {
-  if (event.data && event.data.action === 'openTCO') {
-    // If in iframe, tell parent to open TCO
-    window.parent.postMessage({ action: 'openTCO' }, '*');
-  }
-});
-
-// ─── INIT ───
-// Disable next buttons initially
+// ═══ INIT ═══
 document.querySelectorAll('.step .btn-primary').forEach(function(btn) {
-  if (btn.textContent.indexOf('Begin') === -1 && btn.textContent.indexOf('Generate') === -1) {
-    btn.disabled = true;
-  }
+  if (btn.textContent.indexOf('Begin') === -1 && btn.textContent.indexOf('Generate') === -1) btn.disabled = true;
 });
 </script>
 </body>
