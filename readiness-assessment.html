@@ -880,11 +880,16 @@ async function generateResults() {
   document.getElementById('resultsContent').innerHTML = html;
   document.getElementById('results').classList.add('active');
 
-  // Render charts
+  // Render charts — delay to ensure container has dimensions
   setTimeout(function() {
     renderRadar(scores);
     renderCostChart(costs);
-  }, 100);
+    // Resize after another tick to handle iframe layout
+    setTimeout(function() {
+      if (radarChart) radarChart.resize();
+      if (costChart) costChart.resize();
+    }, 200);
+  }, 200);
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
