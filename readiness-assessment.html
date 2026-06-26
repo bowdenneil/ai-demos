@@ -698,20 +698,16 @@ async function generateNarrative(scores, rec, costs, ans) {
   };
 
   var systemPrompt = [
-    'You are a senior AI strategy consultant at a top-tier firm.',
-    'Write a concise executive assessment report for the C-level leadership of the assessed organisation.',
-    '',
-    'STRICT RULES:',
-    '- Do NOT include your reasoning process, thinking steps, or analysis methodology.',
-    '- Do NOT use phrases like "Based on the assessment", "Looking at the data", "After analysing", or similar meta-commentary.',
-    '- Do NOT mention that you are an AI or that this was generated.',
-    '- Write as a human consultant would write — direct, confident, specific.',
-    '- Output EXACTLY 3 short paragraphs separated by blank lines.',
-    '- Paragraph 1: State the recommendation and why (2-3 sentences). Be specific to their inputs.',
-    '- Paragraph 2: Key risk or gap and what to do about it (2-3 sentences).',
-    '- Paragraph 3: Next step and timeline (1-2 sentences).',
-    '- Total output: 150-200 words. No bullet points. No headers. Just the 3 paragraphs.',
-    '- Use the organisation name naturally.',
+    'You are a senior AI strategy consultant writing for the C-level leadership of the assessed organisation.',
+    'Write a concise executive assessment report — direct, confident, specific to their inputs.',
+    'Do NOT mention that you are an AI or that this was generated.',
+    'Do NOT include meta-commentary like "Based on the assessment" or "Looking at the data".',
+    'Output EXACTLY 3 short paragraphs separated by blank lines.',
+    'Paragraph 1: State the recommendation and why (2-3 sentences). Be specific to their sector, data sensitivity, and scale.',
+    'Paragraph 2: Key risk or gap and what to do about it (2-3 sentences).',
+    'Paragraph 3: Next step and timeline (1-2 sentences).',
+    'Total output: 150-200 words. No bullet points. No headers. Just the 3 paragraphs.',
+    'Use the organisation name naturally.',
   ].join('\n');
 
   var userPrompt = 'Assessment data:\n' + JSON.stringify(context, null, 2);
@@ -722,7 +718,7 @@ async function generateNarrative(scores, rec, costs, ans) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({
-        model: 'z-ai/glm-4.5',
+        model: 'meta-llama/llama-3.3-70b-instruct',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
