@@ -38,6 +38,7 @@ ICON_PROMPTS = {
     'rfp': 'Minimalist flat icon of a document with a pen and checkmark, dark teal background, teal glowing accents, simple clean vector style',
     'image': 'Minimalist flat icon of an artists paint palette with a glowing brush stroke, dark purple-teal gradient background, teal and purple glowing accents, simple clean vector style',
     'onprem': 'Minimalist flat icon of a server rack with glowing GPU chips and a EU flag star, dark violet-blue gradient background, violet and blue glowing accents, simple clean vector style',
+    'tco': 'Minimalist flat icon of a calculator with a euro symbol and bar chart, dark emerald-teal gradient background, emerald and cyan glowing accents, simple clean vector style',
 }
 
 # ─── AUTH DATABASE ───

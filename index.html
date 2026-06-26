@@ -150,6 +150,7 @@
     .card-header-img.rfp { background: linear-gradient(135deg, rgba(6,182,212,0.12) 0%, rgba(6,182,212,0.04) 100%); }
     .card-header-img.image { background: linear-gradient(135deg, rgba(124,92,252,0.12) 0%, rgba(83,216,251,0.08) 100%); }
     .card-header-img.onprem { background: linear-gradient(135deg, rgba(139,92,246,0.12) 0%, rgba(59,130,246,0.08) 100%); }
+    .card-header-img.tco { background: linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(6,182,212,0.08) 100%); }
     .card-icon {
       width: 56px; height: 56px;
       border-radius: 14px;
@@ -169,6 +170,7 @@
     .card-icon.rfp { background: rgba(6,182,212,0.15); }
     .card-icon.image { background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(83,216,251,0.15)); }
     .card-icon.onprem { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.15)); }
+    .card-icon.tco { background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.15)); }
     .card-icon.hidden { display: none; }
     .card-body {
       padding: 1.5rem;
@@ -192,6 +194,7 @@
     .tag.rfp { background: rgba(6,182,212,0.15); color: var(--accent7); }
     .tag.image { background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(83,216,251,0.15)); color: var(--accent2); }
     .tag.onprem { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.15)); color: #8b5cf6; }
+    .tag.tco { background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.15)); color: #10b981; }
     /* Icon generating overlay */
     .card-gen-overlay {
       position: absolute;
@@ -1253,6 +1256,20 @@
       <span class="tag onprem">Infrastructure</span>
     </div>
   </div>
+
+  <!-- TCO CALCULATOR CARD -->
+  <div class="card" onclick="openDemo('tco')">
+    <div class="card-header-img tco" id="card-header-tco">
+      <img src="/icons/tco.png" alt="" id="card-img-tco">
+      <div class="card-icon tco" id="card-emoji-tco"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><line x1="7" y1="6" x2="7" y2="6"/><line x1="12" y1="6" x2="12" y2="6"/><line x1="17" y1="6" x2="17" y2="6"/><line x1="7" y1="10" x2="7" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="17" y1="10" x2="17" y2="10"/><line x1="7" y1="14" x2="7" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><path d="M15 18h2"/><circle cx="7" cy="6" r="0.8" fill="#10b981" stroke="none"/><circle cx="12" cy="6" r="0.8" fill="#10b981" stroke="none"/><circle cx="17" cy="6" r="0.8" fill="#10b981" stroke="none"/><circle cx="7" cy="10" r="0.8" fill="#10b981" stroke="none"/><circle cx="12" cy="10" r="0.8" fill="#10b981" stroke="none"/><circle cx="17" cy="10" r="0.8" fill="#10b981" stroke="none"/><circle cx="7" cy="14" r="0.8" fill="#10b981" stroke="none"/><circle cx="12" cy="14" r="0.8" fill="#10b981" stroke="none"/></svg></div>
+      <div class="card-gen-overlay" id="card-gen-tco">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Inference TCO Calculator</h2>
+      <p>Compare on-premise GPU inference vs cloud APIs and GPU instances. Adjust workload, model, and hardware to build a 3-year TCO business case. Supports Llama, DeepSeek, GLM, Qwen, and more.</p>
+      <span class="tag tco">Infrastructure</span>
+    </div>
+  </div>
 </div>
 
 <!-- RAG DEMO -->
@@ -1732,6 +1749,16 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- TCO CALCULATOR DEMO -->
+<div class="demo-overlay" id="demo-tco">
+  <div class="demo-panel" style="max-width:1400px;padding:1rem">
+    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
+    <h2 class="demo-title" style="font-size:1.4rem;margin:0.5rem 0">💰 Inference TCO Calculator</h2>
+    <p class="demo-desc" style="margin-bottom:0.5rem">Adjust sliders to compare on-premise vs cloud inference costs in real-time. All prices in EUR.</p>
+    <iframe src="/tco-calculator.html" style="width:100%;height:calc(100vh - 140px);border:none;border-radius:12px;background:var(--bg)"></iframe>
   </div>
 </div>
 
