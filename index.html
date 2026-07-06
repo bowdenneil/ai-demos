@@ -1201,6 +1201,21 @@
     .an-scenario-btn:hover { border-color: var(--accent2); background: var(--surface2); }
     .an-scenario-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .an-scenario-btn .an-scenario-icon { font-size: 1rem; margin-right: 0.3rem; }
+
+    /* Category section headers */
+    .category-header {
+      font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-dim); margin: 2rem 0 0.8rem;
+      padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .category-header:first-child { margin-top: 0; }
+    .category-header .cat-icon { font-size: 1rem; }
+    .category-header .cat-count {
+      font-size: 0.65rem; font-weight: 400; color: var(--text-dim);
+      background: var(--surface); padding: 0.15rem 0.5rem; border-radius: 10px;
+      border: 1px solid var(--border); letter-spacing: 0;
+    }
   </style>
   <script src="chart.min.js"></script>
 </head>
@@ -1270,6 +1285,8 @@
   </div>
 </div>
 
+<!-- GENERAL DEMOS -->
+<div class="category-header"><span class="cat-icon">⚙️</span> General Demos <span class="cat-count">6</span></div>
 <div class="cards">
   <div class="card" onclick="openDemo('rag')">
     <div class="card-header-img rag" id="card-header-rag">
@@ -1295,6 +1312,60 @@
       <span class="tag market">Competitive Intel</span>
     </div>
   </div>
+  <div class="card" onclick="openDemo('rfp')">
+    <div class="card-header-img rfp" id="card-header-rfp">
+      <img src="/icons/rfp.png" alt="" id="card-img-rfp">
+      <div class="card-icon rfp" id="card-emoji-rfp">📝</div>
+      <div class="card-gen-overlay" id="card-gen-rfp">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>RFP Drafter</h2>
+      <p>Paste RFP text or describe requirements — the system searches for relevant capabilities and case studies, then AI drafts section-by-section responses.</p>
+      <span class="tag rfp">Bid &amp; Proposals</span>
+    </div>
+  </div>
+  <div class="card" onclick="openDemo('image')">
+    <div class="card-header-img image" id="card-header-image">
+      <img src="/icons/image.png" alt="" id="card-img-image">
+      <div class="card-icon image" id="card-emoji-image"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#7c5cf6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5" fill="#53d8fb" stroke="none"/><path d="M21 15l-5-5L5 21"/></svg></div>
+      <div class="card-gen-overlay" id="card-gen-image">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Image Generator</h2>
+      <p>Enter a text prompt and select a style — the AI generates a high-quality image using gpt-image-1.</p>
+      <span class="tag image">Image Generation</span>
+    </div>
+  </div>
+  <div class="card" onclick="openDemo('onprem')">
+    <div class="card-header-img onprem" id="card-header-onprem">
+      <img src="/icons/onprem.png" alt="" id="card-img-onprem">
+      <div class="card-icon onprem" id="card-emoji-onprem"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#8b5cf6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="6" rx="1.5"/><rect x="4" y="10" width="16" height="6" rx="1.5"/><rect x="4" y="18" width="16" height="4" rx="1.5"/><circle cx="7.5" cy="5" r="1" fill="#8b5cf6" stroke="none"/><circle cx="7.5" cy="13" r="1" fill="#8b5cf6" stroke="none"/><line x1="10" y1="5" x2="17" y2="5"/><line x1="10" y1="13" x2="17" y2="13"/><circle cx="12" cy="19.8" r="0.7" fill="#8b5cf6" stroke="none"/></svg></div>
+      <div class="card-gen-overlay" id="card-gen-onprem">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>AI Readiness Assessment</h2>
+      <p>Executive diagnostic for C-level leaders. Guided 5-step assessment evaluates your AI maturity across strategy, data, infrastructure, governance, and investment — then recommends cloud, hybrid, or on-premise deployment with cost projections and a priority roadmap.</p>
+      <span class="tag onprem">Infrastructure</span>
+    </div>
+  </div>
+  <!-- TCO CALCULATOR CARD -->
+  <div class="card" onclick="openDemo('tco')">
+    <div class="card-header-img tco" id="card-header-tco">
+      <img src="/icons/tco.png" alt="" id="card-img-tco">
+      <div class="card-icon tco" id="card-emoji-tco"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><line x1="7" y1="6" x2="7" y2="6"/><line x1="12" y1="6" x2="12" y2="6"/><line x1="17" y1="6" x2="17" y2="6"/><line x1="7" y1="10" x2="7" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="17" y1="10" x2="17" y2="10"/><line x1="7" y1="14" x2="7" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><path d="M15 18h2"/><circle cx="7" cy="6" r="0.8" fill="#10b981" stroke="none"/><circle cx="12" cy="6" r="0.8" fill="#10b981" stroke="none"/><circle cx="17" cy="6" r="0.8" fill="#10b981" stroke="none"/><circle cx="7" cy="10" r="0.8" fill="#10b981" stroke="none"/><circle cx="12" cy="10" r="0.8" fill="#10b981" stroke="none"/><circle cx="17" cy="10" r="0.8" fill="#10b981" stroke="none"/><circle cx="7" cy="14" r="0.8" fill="#10b981" stroke="none"/><circle cx="12" cy="14" r="0.8" fill="#10b981" stroke="none"/></svg></div>
+      <div class="card-gen-overlay" id="card-gen-tco">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Inference TCO Calculator</h2>
+      <p>Compare on-premise GPU inference vs cloud APIs and GPU instances. Adjust workload, model, and hardware to build a 3-year TCO business case. Supports Llama, DeepSeek, GLM, Qwen, and more.</p>
+      <span class="tag tco">Infrastructure</span>
+    </div>
+  </div>
+</div>
+
+<!-- FINANCE DEMOS -->
+<div class="category-header"><span class="cat-icon">💰</span> Finance Demos <span class="cat-count">4</span></div>
+<div class="cards">
   <div class="card" onclick="openDemo('finance')">
     <div class="card-header-img finance" id="card-header-finance">
       <img src="/icons/finance.png" alt="" id="card-img-finance">
@@ -1343,57 +1414,11 @@
       <span class="tag churn">Customer Retention</span>
     </div>
   </div>
-  <div class="card" onclick="openDemo('rfp')">
-    <div class="card-header-img rfp" id="card-header-rfp">
-      <img src="/icons/rfp.png" alt="" id="card-img-rfp">
-      <div class="card-icon rfp" id="card-emoji-rfp">📝</div>
-      <div class="card-gen-overlay" id="card-gen-rfp">✨ Generating...</div>
-    </div>
-    <div class="card-body">
-      <h2>RFP Drafter</h2>
-      <p>Paste RFP text or describe requirements — the system searches for relevant capabilities and case studies, then AI drafts section-by-section responses.</p>
-      <span class="tag rfp">Bid &amp; Proposals</span>
-    </div>
-  </div>
-  <div class="card" onclick="openDemo('image')">
-    <div class="card-header-img image" id="card-header-image">
-      <img src="/icons/image.png" alt="" id="card-img-image">
-      <div class="card-icon image" id="card-emoji-image"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#7c5cf6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5" fill="#53d8fb" stroke="none"/><path d="M21 15l-5-5L5 21"/></svg></div>
-      <div class="card-gen-overlay" id="card-gen-image">✨ Generating...</div>
-    </div>
-    <div class="card-body">
-      <h2>Image Generator</h2>
-      <p>Enter a text prompt and select a style — the AI generates a high-quality image using gpt-image-1.</p>
-      <span class="tag image">Image Generation</span>
-    </div>
-  </div>
-  <div class="card" onclick="openDemo('onprem')">
-    <div class="card-header-img onprem" id="card-header-onprem">
-      <img src="/icons/onprem.png" alt="" id="card-img-onprem">
-      <div class="card-icon onprem" id="card-emoji-onprem"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#8b5cf6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="6" rx="1.5"/><rect x="4" y="10" width="16" height="6" rx="1.5"/><rect x="4" y="18" width="16" height="4" rx="1.5"/><circle cx="7.5" cy="5" r="1" fill="#8b5cf6" stroke="none"/><circle cx="7.5" cy="13" r="1" fill="#8b5cf6" stroke="none"/><line x1="10" y1="5" x2="17" y2="5"/><line x1="10" y1="13" x2="17" y2="13"/><circle cx="12" cy="19.8" r="0.7" fill="#8b5cf6" stroke="none"/></svg></div>
-      <div class="card-gen-overlay" id="card-gen-onprem">✨ Generating...</div>
-    </div>
-    <div class="card-body">
-      <h2>AI Readiness Assessment</h2>
-      <p>Executive diagnostic for C-level leaders. Guided 5-step assessment evaluates your AI maturity across strategy, data, infrastructure, governance, and investment — then recommends cloud, hybrid, or on-premise deployment with cost projections and a priority roadmap.</p>
-      <span class="tag onprem">Infrastructure</span>
-    </div>
-  </div>
+</div>
 
-  <!-- TCO CALCULATOR CARD -->
-  <div class="card" onclick="openDemo('tco')">
-    <div class="card-header-img tco" id="card-header-tco">
-      <img src="/icons/tco.png" alt="" id="card-img-tco">
-      <div class="card-icon tco" id="card-emoji-tco"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><line x1="7" y1="6" x2="7" y2="6"/><line x1="12" y1="6" x2="12" y2="6"/><line x1="17" y1="6" x2="17" y2="6"/><line x1="7" y1="10" x2="7" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="17" y1="10" x2="17" y2="10"/><line x1="7" y1="14" x2="7" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><path d="M15 18h2"/><circle cx="7" cy="6" r="0.8" fill="#10b981" stroke="none"/><circle cx="12" cy="6" r="0.8" fill="#10b981" stroke="none"/><circle cx="17" cy="6" r="0.8" fill="#10b981" stroke="none"/><circle cx="7" cy="10" r="0.8" fill="#10b981" stroke="none"/><circle cx="12" cy="10" r="0.8" fill="#10b981" stroke="none"/><circle cx="17" cy="10" r="0.8" fill="#10b981" stroke="none"/><circle cx="7" cy="14" r="0.8" fill="#10b981" stroke="none"/><circle cx="12" cy="14" r="0.8" fill="#10b981" stroke="none"/></svg></div>
-      <div class="card-gen-overlay" id="card-gen-tco">✨ Generating...</div>
-    </div>
-    <div class="card-body">
-      <h2>Inference TCO Calculator</h2>
-      <p>Compare on-premise GPU inference vs cloud APIs and GPU instances. Adjust workload, model, and hardware to build a 3-year TCO business case. Supports Llama, DeepSeek, GLM, Qwen, and more.</p>
-      <span class="tag tco">Infrastructure</span>
-    </div>
-  </div>
-
+<!-- TELCO DEMOS -->
+<div class="category-header"><span class="cat-icon">📡</span> Telco Demos <span class="cat-count">2</span></div>
+<div class="cards">
   <!-- TELCO NETWORK INTELLIGENCE CARD -->
   <div class="card" onclick="openDemo('network')">
     <div class="card-header-img network" id="card-header-network">
