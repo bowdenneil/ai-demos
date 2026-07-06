@@ -1181,6 +1181,26 @@
     }
     .email-draft-actions button:hover { border-color: var(--accent); color: var(--accent); }
     .email-draft-actions button.copied { border-color: var(--success); color: var(--success); }
+
+    /* Autonomous Network Simulator */
+    .card-header-img.autonomous { background: linear-gradient(135deg, rgba(124,92,252,0.15) 0%, rgba(6,182,212,0.08) 100%); }
+    .tag.autonomous { background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(6,182,212,0.15)); color: #7c5cfc; }
+    .btn-autonomous { background: linear-gradient(135deg, #7c5cfc, #06b6d4); color: #fff; }
+    .btn-autonomous:hover:not(:disabled) { background: linear-gradient(135deg, #a78bfa, #22d3ee); }
+    .an-event-log {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 0.5rem 0.7rem; max-height: 320px; overflow-y: auto; font-size: 0.76rem;
+    }
+    .an-event-log::-webkit-scrollbar { width: 4px; }
+    .an-event-log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .an-scenario-btn {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.5rem 0.7rem; cursor: pointer; transition: all 0.2s; text-align: left;
+      font-size: 0.78rem; color: var(--text); width: 100%;
+    }
+    .an-scenario-btn:hover { border-color: var(--accent2); background: var(--surface2); }
+    .an-scenario-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .an-scenario-btn .an-scenario-icon { font-size: 1rem; margin-right: 0.3rem; }
   </style>
   <script src="chart.min.js"></script>
 </head>
@@ -1385,6 +1405,20 @@
       <h2>Telco Network Intelligence</h2>
       <p>Dashboard for telco CTOs. Visualise network traffic and customer usage data, segment subscribers by behaviour, and let AI recommend personalised data, roaming, and 5G offers with revenue uplift projections.</p>
       <span class="tag network">Network Analytics</span>
+    </div>
+  </div>
+
+  <!-- AUTONOMOUS NETWORK SIMULATOR CARD -->
+  <div class="card" onclick="openDemo('autonomous')">
+    <div class="card-header-img autonomous" id="card-header-autonomous">
+      <img src="/icons/autonomous.png" alt="" id="card-img-autonomous">
+      <div class="card-icon autonomous" id="card-emoji-autonomous"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#7c5cfc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3" fill="none" stroke="#06b6d4"/><path d="M12 9v-3"/><path d="M12 18v-3"/></svg></div>
+      <div class="card-gen-overlay" id="card-gen-autonomous">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Autonomous Network Simulator</h2>
+      <p>Interactive simulation of the Vodafone / Google Cloud / TM Forum autonomous networks framework. Inject network events into a 5G network slice and watch the three-tier loop-of-loops (Business → Service → Resource) cycle through the AADE closed-loop in real time — then get an AI-generated CTO briefing.</p>
+      <span class="tag autonomous">Closed-Loop Automation</span>
     </div>
   </div>
 </div>
@@ -1885,6 +1919,74 @@
         </div>
         <div id="network-sources"></div>
         <div id="network-email" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTONOMOUS NETWORK SIMULATOR DEMO -->
+<div class="demo-overlay" id="demo-autonomous">
+  <div class="demo-panel" style="max-width:1400px">
+    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
+    <h2 class="demo-title">🤖 Autonomous Network Simulator</h2>
+    <p class="demo-desc">Interactive simulation of the TM Forum / Vodafone / Google Cloud autonomous networks framework. Inject network events into a 5G URLLC slice and watch the three-tier loop-of-loops cycle through the AADE closed loop (Awareness → Analysis → Decision → Execution) in real time. Based on the white paper "Self-Optimizing Autonomous Networks" (June 2026).</p>
+
+    <!-- KPI strip -->
+    <div id="an-kpis" style="margin-bottom:1rem"></div>
+
+    <div class="demo-body" style="display:grid;grid-template-columns:260px 1fr;gap:1rem;align-items:start">
+      <!-- Left sidebar: event injector -->
+      <div style="display:flex;flex-direction:column;gap:0.5rem">
+        <h3 style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--accent);margin-bottom:0.3rem">⚡ Inject Network Event</h3>
+        <button class="an-scenario-btn" id="an-btn-congestion"><span class="an-scenario-icon">📶</span>Radio Congestion Spike</button>
+        <button class="an-scenario-btn" id="an-btn-degradation"><span class="an-scenario-icon">🌐</span>Transport Path Degradation</button>
+        <button class="an-scenario-btn" id="an-btn-capacity"><span class="an-scenario-icon">🖥️</span>Core Capacity Shortfall</button>
+        <button class="an-scenario-btn" id="an-btn-escalation"><span class="an-scenario-icon">⬆️</span>Cross-Domain Escalation</button>
+        <button class="an-scenario-btn" id="an-btn-surge"><span class="an-scenario-icon">📈</span>Traffic Surge (2x Load)</button>
+        <div style="height:0.5rem"></div>
+        <button class="an-scenario-btn" id="an-btn-analyze" style="border-color:var(--accent2);color:var(--accent2)"><span class="an-scenario-icon">🧠</span>Generate CTO Briefing</button>
+        <button class="an-scenario-btn" id="an-btn-reset" style="border-color:var(--danger);color:var(--danger)"><span class="an-scenario-icon">🔄</span>Reset Simulator</button>
+        <div style="margin-top:0.5rem;font-size:0.68rem;color:var(--text-dim);line-height:1.4;padding:0.5rem;background:var(--surface);border-radius:8px;border:1px solid var(--border)">
+          <strong style="color:var(--accent)">AADE Cycle:</strong> Awareness → Analysis → Decision → Execution. Each loop cycles through phases with ~800ms delay. KPIs degrade on event, recover on resolution. MTTR tracked automatically.
+        </div>
+      </div>
+
+      <!-- Right: diagram + log + charts + output -->
+      <div style="display:flex;flex-direction:column;gap:1rem;min-width:0">
+        <!-- Architecture diagram -->
+        <div>
+          <h3 style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--accent);margin-bottom:0.5rem">🏗️ Loop-of-Loops Architecture</h3>
+          <div id="an-diagram"></div>
+        </div>
+
+        <!-- Event log -->
+        <div>
+          <h3 style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--accent);margin-bottom:0.5rem">📋 AADE Event Log</h3>
+          <div id="an-event-log" class="an-event-log"></div>
+        </div>
+
+        <!-- Charts -->
+        <div id="an-charts" class="chart-container" style="display:none">
+          <div class="chart-grid">
+            <div class="chart-box">
+              <h4>KPI Time-Series (Availability / Latency / Throughput)</h4>
+              <canvas id="an-kpi-chart"></canvas>
+            </div>
+            <div class="chart-box">
+              <h4>Loop Activity Timeline</h4>
+              <canvas id="an-activity-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI analysis output -->
+        <div class="demo-output">
+          <h3>AI CTO Briefing <div class="output-spinner" id="an-spinner"></div></h3>
+          <div id="an-output" class="output-content">
+            <div class="output-placeholder">Inject a network event to begin the closed-loop simulation — the three-tier loop-of-loops will cycle through AADE and an AI CTO briefing will be generated on resolution.</div>
+          </div>
+          <div id="an-sources"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -4741,6 +4843,525 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Check auth on page load
 checkAuth();
+
+// ─── AUTONOMOUS NETWORK SIMULATOR ───
+/**
+ * Autonomous Network Closed-Loop Simulator
+ * Vodafone / Google Cloud / TM Forum autonomous networks framework demo.
+ *
+ * Renders a three-tier "loop-of-loops" (Business → Service → Resource) over a
+ * 5G URLLC network slice. Users inject network events and watch each closed
+ * loop cycle through the AADE state machine (Awareness → Analysis → Decision →
+ * Execution → Resolution) in real time, with live KPIs, an event log, charts and
+ * a streamed CTO-level briefing generated by the LLM.
+ *
+ * Depends on portal globals (do NOT redefine):
+ *   callLLM, webSearch, searchContext, renderSearchResults,
+ *   formatMarkdown, postProcessLLMOutput, showToast, Chart
+ * CSS theme variables are used throughout (no hard-coded colours).
+ */
+
+// ── 1. SYNTHETIC DATA MODEL ────────────────────────────────────────────────
+const AN_SLICE = {
+  name: 'Ultra-Reliable Low-Latency',
+  type: 'URLLC',
+  baseline: { availability: 99.99, latency: 8, throughput: 1.2 }
+};
+const AN_BASELINE_KPI = { ...AN_SLICE.baseline };
+
+const AN_PHASES = {
+  idle:      { badge: '🟢', label: 'Idle',        color: '--success'  },
+  observing: { badge: '🟡', label: 'Awareness',   color: '--accent7'  },
+  analysing: { badge: '🔵', label: 'Analysis',    color: '--accent'   },
+  deciding:  { badge: '🟠', label: 'Decision',    color: '--accent5'  },
+  acting:    { badge: '🔴', label: 'Execution',   color: '--danger'   },
+  resolved:  { badge: '✅', label: 'Resolution',  color: '--success'  }
+};
+
+const AN_LOOPS = [
+  {
+    id: 'business', name: 'Business Operations Loop', layer: 'business',
+    intent: 'Maintain 99.99% availability & <10ms latency for the URLLC slice; protect SLA commitments',
+    observeText: 'Aggregating KPIs from the network data lake — availability, latency, throughput vs. business SLAs',
+    analyseText: 'Evaluating commercial impact, SLA-breach exposure and customer-experience risk against intent',
+    decideText: 'Setting policy intent & budget envelope; authorising autonomous remediation within guardrails',
+    actText: 'Issuing intent-driven delegation to the Service Operations Loop; updating the digital-twin policy model'
+  },
+  {
+    id: 'service', name: 'Service Operations Loop', layer: 'service',
+    intent: 'Supervise end-to-end slice performance; coordinate cross-domain closed-loop response',
+    observeText: 'Correlating cross-domain telemetry; detecting intent violations that exceed single-loop scope',
+    analyseText: 'Consulting the knowledge graph & digital twin to assess end-to-end impact and dependencies',
+    decideText: 'Overriding local loop decisions where necessary; orchestrating a cross-domain remediation plan',
+    actText: 'Delegating coordinated actions to the relevant Resource Loops; tracking MTTR against target'
+  },
+  {
+    id: 'ran', name: 'RAN Resource Loop', layer: 'resource',
+    intent: 'Optimise radio resource allocation on the RIC; keep PRB utilisation <85% and scheduling latency minimal',
+    observeText: 'RIC telemetry: sudden PRB utilisation spike, CQI degradation and rising scheduling latency on URLLC cells',
+    analyseText: 'GNN-based traffic forecasting on the digital twin; identifying congested cells and interference patterns',
+    decideText: 'Reallocate radio resources dynamically via an rApp on the RIC; rebalance PRBs and adjust scheduling weights',
+    actText: 'Executing rApp-driven PRB reallocation on the RIC; shifting load to neighbouring cells'
+  },
+  {
+    id: 'transport', name: 'Transport Resource Loop', layer: 'resource',
+    intent: 'Preserve transport path integrity; keep packet loss <0.1% and optical path latency within budget',
+    observeText: 'Telemetry: link BER rising, optical path latency degrading, LSP utilisation exceeding threshold',
+    analyseText: 'Querying the transport knowledge graph; computing alternate LSP paths with GNN-based congestion prediction',
+    decideText: 'Trigger traffic engineering; reroute LSPs across the alternate path; adjust IGP metrics',
+    actText: 'Executing SDN traffic engineering; LSP reroute confirmed, IGP metrics adjusted'
+  },
+  {
+    id: 'core', name: 'Core Resource Loop', layer: 'resource',
+    intent: 'Maintain CNF capacity headroom; scale UPF instances ahead of demand using predictive AI/ML',
+    observeText: 'Cloud-native function (CNF) utilisation trending up; UPF CPU/memory approaching the scaling threshold',
+    analyseText: 'Predictive AI/ML model forecasts a capacity shortfall within the horizon window',
+    decideText: 'Trigger horizontal scale-out of UPF instances; pre-warm spare capacity from the pool',
+    actText: 'Scaling out UPF replicas via the cloud-native orchestrator; new instances healthy and serving traffic'
+  }
+];
+
+// ── 2. SCENARIO DEFINITIONS (white paper §2.4) ─────────────────────────────
+const AN_SCENARIOS = {
+  radio_congestion: {
+    key: 'radio_congestion', btn: 'congestion',
+    name: 'Radio Congestion Spike',
+    desc: 'Sudden RAN congestion increase on the URLLC slice; PRB utilisation spikes above threshold.',
+    loops: ['ran'],
+    severity: { availability: 99.91, latency: 14, throughput: 1.05 },
+    escalation: false
+  },
+  transport_degradation: {
+    key: 'transport_degradation', btn: 'degradation',
+    name: 'Transport Path Degradation',
+    desc: 'Transport telemetry detects optical path degradation and rising packet loss on the primary LSP.',
+    loops: ['transport'],
+    severity: { availability: 99.85, latency: 19, throughput: 0.92 },
+    escalation: false
+  },
+  core_capacity: {
+    key: 'core_capacity', btn: 'capacity',
+    name: 'Core Capacity Shortfall',
+    desc: 'CNF utilisation trending toward a capacity shortfall; UPF scaling threshold approached.',
+    loops: ['core'],
+    severity: { availability: 99.78, latency: 17, throughput: 0.88 },
+    escalation: false
+  },
+  cross_domain: {
+    key: 'cross_domain', btn: 'escalation',
+    name: 'Cross-Domain Escalation',
+    desc: 'RAN loop cannot resolve congestion locally; escalates to the Service Operations Loop which overrides and coordinates a cross-domain response.',
+    loops: ['ran', 'service'],
+    severity: { availability: 99.62, latency: 23, throughput: 0.85 },
+    escalation: true
+  },
+  traffic_surge: {
+    key: 'traffic_surge', btn: 'surge',
+    name: 'Traffic Surge (2x Load)',
+    desc: '2x load surge activates multiple Resource Loops simultaneously — RAN handles congestion, Transport reroutes, Core scales capacity.',
+    loops: ['ran', 'transport', 'core'],
+    severity: { availability: 99.55, latency: 25, throughput: 0.80 },
+    escalation: false
+  }
+};
+
+// ── 3. STATE MACHINE ───────────────────────────────────────────────────────
+let anState = {
+  loops: {}, active: [], lastScenario: null, log: [],
+  kpi: { ...AN_BASELINE_KPI }, target: { ...AN_BASELINE_KPI },
+  kpiHistory: { availability: [], latency: [], throughput: [] },
+  activityHistory: [], timer: null, eventStart: null, mttr: 0, running: false
+};
+let anCharts = { kpi: null, activity: null };
+
+function anCssVar(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function anRGBA(hex, alpha) {
+  let h = (hex || '#888888').replace('#', '');
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  const n = parseInt(h, 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
+}
+const AN_LOOP_COLORS = { business: '--accent2', service: '--accent3', ran: '--accent', transport: '--accent7', core: '--accent4' };
+
+// ── 4. ARCHITECTURE DIAGRAM ────────────────────────────────────────────────
+function anLoopName(id) { return (AN_LOOPS.find(l => l.id === id) || {}).name || id; }
+
+function anRenderDiagram() {
+  const el = document.getElementById('an-diagram');
+  if (!el) return;
+  const bus = AN_LOOPS.find(l => l.id === 'business');
+  const svc = AN_LOOPS.find(l => l.id === 'service');
+  const res = AN_LOOPS.filter(l => l.layer === 'resource');
+  const loopCard = (l) => {
+    const st = anState.loops[l.id] || 'idle';
+    const meta = AN_PHASES[st] || AN_PHASES.idle;
+    return `<div id="an-loop-${l.id}" style="flex:1;min-width:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0.7rem 0.8rem;position:relative;transition:border-color .35s, box-shadow .35s">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:0.4rem">
+        <span style="font-weight:700;font-size:0.82rem;color:var(--text)">${l.name}</span>
+        <span id="an-badge-${l.id}" style="font-size:0.95rem">${meta.badge}</span>
+      </div>
+      <div style="font-size:0.71rem;color:var(--text-dim);margin-top:0.3rem;line-height:1.3">${l.intent}</div>
+      <div id="an-status-${l.id}" style="margin-top:0.4rem;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.05em;font-weight:700;color:var(${meta.color})">${meta.label}</div>
+    </div>`;
+  };
+  const connector = (id) => `<div id="${id}" style="width:2px;height:16px;margin:0 auto;background:var(--border);transition:background .4s, box-shadow .4s"></div>`;
+  el.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:0">
+    <div style="width:60%;max-width:340px">${loopCard(bus)}</div>${connector('an-conn-bus-svc')}
+    <div style="width:72%;max-width:380px">${loopCard(svc)}</div>${connector('an-conn-svc-res')}
+    <div style="display:flex;gap:0.6rem;align-items:stretch;width:100%">${res.map(loopCard).join('')}</div></div>`;
+}
+
+function anUpdateLoopCard(id) {
+  const st = anState.loops[id] || 'idle';
+  const meta = AN_PHASES[st] || AN_PHASES.idle;
+  const badge = document.getElementById('an-badge-' + id);
+  const status = document.getElementById('an-status-' + id);
+  const card = document.getElementById('an-loop-' + id);
+  if (badge) badge.textContent = meta.badge;
+  if (status) { status.textContent = meta.label; status.style.color = `var(${meta.color})`; }
+  if (card) { card.style.borderColor = `var(${meta.color})`; card.style.boxShadow = st === 'idle' ? 'none' : `0 0 12px -4px var(${meta.color})`; }
+}
+function anSetLoopStatus(id, status) { anState.loops[id] = status; anUpdateLoopCard(id); }
+function anAnimateConnector(connId, colorVar) {
+  const c = document.getElementById(connId);
+  if (!c) return;
+  const col = `var(${colorVar || '--accent3'})`;
+  c.style.background = col; c.style.boxShadow = `0 0 10px ${col}`;
+  setTimeout(() => { c.style.background = 'var(--border)'; c.style.boxShadow = 'none'; }, 1600);
+}
+
+// ── 5. KPI STRIP ───────────────────────────────────────────────────────────
+function anRenderKPIs() {
+  const el = document.getElementById('an-kpis');
+  if (!el) return;
+  const k = anState.kpi;
+  const activeCount = AN_LOOPS.filter(l => anState.loops[l.id] && anState.loops[l.id] !== 'idle').length;
+  const availCol = k.availability >= 99.95 ? '--success' : k.availability >= 99.7 ? '--warning' : '--danger';
+  const latCol = k.latency <= 10 ? '--success' : k.latency <= 18 ? '--warning' : '--danger';
+  const tpCol = k.throughput >= 1.1 ? '--success' : k.throughput >= 0.9 ? '--warning' : '--danger';
+  const actCol = activeCount > 0 ? '--accent3' : '--success';
+  const mttrCol = anState.mttr === 0 ? '--text-dim' : anState.mttr <= 5 ? '--success' : anState.mttr <= 10 ? '--warning' : '--danger';
+  const card = (label, val, col, sub) =>
+    `<div style="flex:1;min-width:120px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.6rem 0.7rem">
+      <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-dim)">${label}</div>
+      <div style="font-size:1.15rem;font-weight:700;color:var(${col});margin-top:0.2rem">${val}</div>
+      <div style="font-size:0.62rem;color:var(--text-dim);margin-top:0.15rem">${sub}</div></div>`;
+  el.innerHTML = `<div style="display:flex;gap:0.6rem;flex-wrap:wrap">
+    ${card('Availability', k.availability.toFixed(2) + '%', availCol, 'SLA ≥ 99.99%')}
+    ${card('Latency', k.latency.toFixed(1) + ' ms', latCol, 'Target ≤ 10ms')}
+    ${card('Throughput', k.throughput.toFixed(2) + ' Gbps', tpCol, 'Baseline 1.2')}
+    ${card('Active Loops', activeCount + '/' + AN_LOOPS.length, actCol, 'AADE cycles running')}
+    ${card('MTTR', anState.mttr > 0 ? anState.mttr + 's' : '—', mttrCol, 'Mean time to restore')}</div>`;
+}
+
+// ── 6. EVENT LOG ───────────────────────────────────────────────────────────
+function anLogEvent(loopName, phase, detail) {
+  const ts = new Date().toTimeString().slice(0, 8);
+  anState.log.unshift({ ts, loopName, phase, detail });
+  const el = document.getElementById('an-event-log');
+  if (!el) return;
+  const meta = AN_PHASES[phase] || { label: phase, color: '--text-dim' };
+  const div = document.createElement('div');
+  div.style.cssText = "font-family:'SFMono-Regular',Consolas,'Liberation Mono',monospace;font-size:0.76rem;padding:0.28rem 0;border-bottom:1px solid var(--border);line-height:1.35;color:var(--text)";
+  div.innerHTML = `<span style="color:var(--text-dim)">[${ts}]</span> <span style="color:var(--accent2);font-weight:600">[${loopName}]</span> <span style="color:var(${meta.color});font-weight:600">${meta.label}:</span> <span style="color:var(--text-dim)">${detail}</span>`;
+  el.prepend(div);
+  while (el.children.length > 90) el.removeChild(el.lastChild);
+}
+
+// ── 7. LIVE TICKER + HISTORY ───────────────────────────────────────────────
+function anStartTicker() { if (!anState.timer) anState.timer = setInterval(anTick, 500); }
+function anStopTicker() { if (anState.timer) { clearInterval(anState.timer); anState.timer = null; } }
+function anTick() {
+  const k = anState.kpi, t = anState.target;
+  k.availability = +(k.availability + (t.availability - k.availability) * 0.3).toFixed(2);
+  k.latency = +(k.latency + (t.latency - k.latency) * 0.3).toFixed(2);
+  k.throughput = +(k.throughput + (t.throughput - k.throughput) * 0.3).toFixed(3);
+  anPushHistory(); anPushActivity(); anRenderKPIs(); anUpdateCharts();
+}
+function anPushHistory() {
+  const k = anState.kpi;
+  ['availability', 'latency', 'throughput'].forEach(m => {
+    anState.kpiHistory[m].push(k[m]);
+    if (anState.kpiHistory[m].length > 50) anState.kpiHistory[m].shift();
+  });
+}
+function anPushActivity() {
+  const snap = {};
+  AN_LOOPS.forEach(l => { snap[l.id] = (anState.loops[l.id] && anState.loops[l.id] !== 'idle') ? 1 : 0; });
+  anState.activityHistory.push(snap);
+  if (anState.activityHistory.length > 50) anState.activityHistory.shift();
+}
+
+// ── 8. CHARTS ──────────────────────────────────────────────────────────────
+function anRenderCharts() {
+  const wrap = document.getElementById('an-charts');
+  if (!wrap || typeof Chart === 'undefined') return;
+  wrap.style.display = 'block';
+  if (anCharts.kpi) { anCharts.kpi.destroy(); anCharts.kpi = null; }
+  if (anCharts.activity) { anCharts.activity.destroy(); anCharts.activity = null; }
+  const kpiCanvas = document.getElementById('an-kpi-chart');
+  const actCanvas = document.getElementById('an-activity-chart');
+  if (!kpiCanvas || !actCanvas) return;
+  const labels = anState.kpiHistory.availability.map((_, i) => i + 1);
+  const tick = anCssVar('--text-dim');
+  const grid = 'rgba(42,42,90,0.2)';
+  const cAvail = anCssVar('--success'), cLat = anCssVar('--accent5'), cTp = anCssVar('--accent');
+  anCharts.kpi = new Chart(kpiCanvas, {
+    type: 'line',
+    data: { labels, datasets: [
+      { label: 'Availability %', data: anState.kpiHistory.availability, borderColor: cAvail, backgroundColor: anRGBA(cAvail, 0.12), yAxisID: 'yAvail', tension: 0.35, pointRadius: 0, borderWidth: 2, fill: true },
+      { label: 'Latency ms (inv.)', data: anState.kpiHistory.latency, borderColor: cLat, backgroundColor: anRGBA(cLat, 0.10), yAxisID: 'yLat', tension: 0.35, pointRadius: 0, borderWidth: 2, fill: false },
+      { label: 'Throughput Gbps', data: anState.kpiHistory.throughput, borderColor: cTp, backgroundColor: anRGBA(cTp, 0.10), yAxisID: 'yThr', tension: 0.35, pointRadius: 0, borderWidth: 2, fill: false }
+    ]},
+    options: { responsive: true, animation: { duration: 300 }, interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { color: tick, font: { size: 10 }, boxWidth: 10 } }, tooltip: { backgroundColor: 'rgba(20,20,40,0.92)', titleColor: anCssVar('--text'), bodyColor: tick } },
+      scales: {
+        x: { ticks: { color: tick, maxTicksLimit: 8 }, grid: { color: grid } },
+        yAvail: { type: 'linear', position: 'left', min: 98.5, max: 100, title: { display: true, text: 'Avail %', color: tick }, ticks: { color: tick }, grid: { color: grid } },
+        yLat: { type: 'linear', position: 'right', reverse: true, min: 5, max: 30, title: { display: true, text: 'Lat ms', color: tick }, ticks: { color: tick }, grid: { display: false } },
+        yThr: { type: 'linear', position: 'right', min: 0.7, max: 1.3, display: false, grid: { display: false } }
+      }
+    }
+  });
+  const actLabels = anState.activityHistory.map((_, i) => i + 1);
+  const dsets = AN_LOOPS.map(l => ({
+    label: l.name.replace(' Resource Loop', '').replace(' Operations Loop', ''),
+    data: anState.activityHistory.map(a => a[l.id] || 0),
+    backgroundColor: anRGBA(anCssVar(AN_LOOP_COLORS[l.id] || '--accent'), 0.78),
+    stack: 'loops'
+  }));
+  anCharts.activity = new Chart(actCanvas, {
+    type: 'bar', data: { labels: actLabels, datasets: dsets },
+    options: { responsive: true, animation: { duration: 200 },
+      plugins: { legend: { labels: { color: tick, font: { size: 9 }, boxWidth: 9 } }, tooltip: { backgroundColor: 'rgba(20,20,40,0.92)', titleColor: anCssVar('--text'), bodyColor: tick } },
+      scales: {
+        x: { stacked: true, ticks: { color: tick, maxTicksLimit: 8 }, grid: { display: false } },
+        y: { stacked: true, beginAtZero: true, max: AN_LOOPS.length, ticks: { color: tick, stepSize: 1 }, grid: { color: grid } }
+      }
+    }
+  });
+}
+function anUpdateCharts() {
+  if (anCharts.kpi) {
+    anCharts.kpi.data.labels = anState.kpiHistory.availability.map((_, i) => i + 1);
+    anCharts.kpi.data.datasets[0].data = anState.kpiHistory.availability;
+    anCharts.kpi.data.datasets[1].data = anState.kpiHistory.latency;
+    anCharts.kpi.data.datasets[2].data = anState.kpiHistory.throughput;
+    anCharts.kpi.update('none');
+  }
+  if (anCharts.activity) {
+    anCharts.activity.data.labels = anState.activityHistory.map((_, i) => i + 1);
+    AN_LOOPS.forEach((l, idx) => { anCharts.activity.data.datasets[idx].data = anState.activityHistory.map(a => a[l.id] || 0); });
+    anCharts.activity.update('none');
+  }
+}
+
+// ── 9. STATE MACHINE RUNNER ────────────────────────────────────────────────
+function anPhaseDetail(loop, phase) {
+  switch (phase) {
+    case 'observing': return loop.observeText;
+    case 'analysing': return loop.analyseText;
+    case 'deciding':  return loop.decideText;
+    case 'acting':    return loop.actText;
+    case 'resolved':  return 'Remediation complete — intent restored; loop returning to idle';
+    default:          return '';
+  }
+}
+function anRunSequence(loopId, phases, onDone) {
+  let i = 0;
+  const step = () => {
+    if (i >= phases.length) { if (onDone) onDone(); return; }
+    const phase = phases[i++];
+    const loop = AN_LOOPS.find(l => l.id === loopId);
+    anSetLoopStatus(loopId, phase);
+    anLogEvent(loop.name, phase, anPhaseDetail(loop, phase));
+    anRenderKPIs();
+    setTimeout(step, 820);
+  };
+  step();
+}
+function anTriggerScenario(key) {
+  const sc = AN_SCENARIOS[key];
+  if (!sc) return;
+  if (anState.running) { showToast('A simulation is already running — reset to start a new one', true); return; }
+  anState.running = true;
+  anState.lastScenario = sc;
+  anState.active.push(key);
+  anState.eventStart = Date.now();
+  anState.mttr = 0;
+  anState.target = { availability: sc.severity.availability, latency: sc.severity.latency, throughput: sc.severity.throughput };
+  anLogEvent(sc.name, 'observing', 'EVENT INJECTED — ' + sc.desc);
+  showToast('Injecting event: ' + sc.name);
+  anStartTicker();
+  const fullCycle = ['observing', 'analysing', 'deciding', 'acting', 'resolved'];
+  if (sc.escalation) {
+    anRunSequence('ran', ['observing', 'analysing', 'deciding'], () => {
+      anAnimateConnector('an-conn-svc-res', '--accent3');
+      anLogEvent(anLoopName('ran'), 'deciding', 'Local remediation insufficient — escalating to Service Operations Loop (intent-driven delegation)');
+      anRunSequence('service', fullCycle, () => {
+        anAnimateConnector('an-conn-bus-svc', '--accent2');
+        anRunSequence('ran', ['resolved'], () => anOnScenarioComplete(sc));
+      });
+    });
+  } else {
+    let pending = sc.loops.length;
+    sc.loops.forEach((lid, i) => {
+      setTimeout(() => {
+        anRunSequence(lid, fullCycle, () => { if (--pending === 0) anOnScenarioComplete(sc); });
+      }, i * 200);
+    });
+  }
+}
+function anOnScenarioComplete(sc) {
+  anState.target = { ...AN_BASELINE_KPI };
+  anState.mttr = +((Date.now() - anState.eventStart) / 1000).toFixed(1);
+  anLogEvent(sc.name, 'resolved', 'All loops resolved — KPI recovery initiated');
+  anRenderKPIs();
+  setTimeout(() => {
+    anState.active = anState.active.filter(k => k !== sc.key);
+    AN_LOOPS.forEach(l => anSetLoopStatus(l.id, 'idle'));
+    anState.running = false;
+    anStopTicker();
+    anRenderKPIs();
+    anRenderCharts();
+    showToast(sc.name + ' resolved — MTTR ' + anState.mttr + 's · generating CTO briefing…');
+    anRunAnalysis();
+  }, 3500);
+}
+
+// ── 10. LLM ANALYSIS ───────────────────────────────────────────────────────
+async function anRunAnalysis() {
+  const spinner = document.getElementById('an-spinner');
+  const output = document.getElementById('an-output');
+  if (spinner) spinner.classList.add('active');
+  if (output) output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching TM Forum / Vodafone autonomous networks references…</span>';
+  let webResults = [];
+  try {
+    const r1 = await webSearch('autonomous networks TM Forum closed loop 5G 2025 2026');
+    const r2 = await webSearch('Vodafone autonomous networks implementation');
+    webResults = r1.concat(r2.slice(0, 5));
+  } catch (e) { console.warn('AN web search failed:', e); }
+  renderSearchResults(webResults, 'an-sources');
+  const webCtx = searchContext(webResults);
+  const webSection = webResults.length ? `\n\n## Web Search Context (cite as [web N])\n${webCtx}` : '';
+  const sc = anState.lastScenario || {};
+  const loopsState = AN_LOOPS.map(l => `- ${l.name} (${l.layer} layer): status=${anState.loops[l.id] || 'idle'} — intent: "${l.intent}"`).join('\n');
+  const logText = (anState.log.slice(0, 30).reverse()).map(e => `[${e.ts}] [${e.loopName}] ${e.phase}: ${e.detail}`).join('\n') || '(no events)';
+  const k = anState.kpi, b = AN_BASELINE_KPI;
+  const peakImpact = `Availability: ${b.availability}% → ${k.availability.toFixed(2)}% | Latency: ${b.latency}ms → ${k.latency.toFixed(1)}ms | Throughput: ${b.throughput} → ${k.throughput.toFixed(2)} Gbps | MTTR: ${anState.mttr}s`;
+  const loopNames = (sc.loops || []).map(anLoopName).join(', ') || 'N/A';
+  const userContent = `You are analysing a live autonomous-network closed-loop simulation on a 5G URLLC network slice ("Ultra-Reliable Low-Latency"), based on the TM Forum / Vodafone / Google Cloud autonomous networks framework — loop-of-loops, intent-driven delegation, AADE cycle (Awareness → Analysis → Decision → Execution), network data lake, digital twin, GNNs and rApps/RIC.
+
+## Simulated Incident
+- Scenario: ${sc.name || 'N/A'}
+- Description: ${sc.desc || 'N/A'}
+- Loops activated: ${loopNames}
+- Escalation: ${sc.escalation ? 'Yes — RAN escalated to the Service Operations Loop' : 'No — resolved within the Resource layer'}
+
+## Loop-of-Loops State
+${loopsState}
+
+## KPI Impact
+${peakImpact}
+
+## AADE Event Log (most recent)
+${logText}
+
+Produce a CTO-level briefing with these sections:
+1. **Incident Summary** — what happened, blast radius and customer/SLA impact
+2. **Loop Behaviour Analysis** — how each tier (Business → Service → Resource) performed and where intent-driven delegation was observed
+3. **AADE Cycle Breakdown** — time spent in Awareness/Analysis/Decision/Execution and an MTTR assessment vs. industry benchmarks
+4. **Benchmark Comparison** — compare to TM Forum / Vodafone autonomous-networks maturity and peer telco closed-loop targets (use the web sources)
+5. **Recommendations** — concrete next steps to raise autonomy, reduce MTTR and harden the loop (rApps/RIC, GNNs, digital twin, network data lake), with indicative EUR cost/benefit where relevant
+6. **Executive Summary** — 3–4 sentence board-ready brief
+
+Reference the framework concepts explicitly: AADE cycle, intent-driven delegation, loop-of-loops, network data lake, digital twin, GNNs, rApps/RIC.${webSection}`;
+  const messages = [
+    { role: 'system', content: 'You are a telecom network architect advising a CTO on autonomous network implementation based on the TM Forum / Vodafone / Google Cloud framework. Use EUR for financial figures. Cite web sources as [web N]. Format with markdown headers, bullets, and bold highlights.' },
+    { role: 'user', content: userContent }
+  ];
+  if (output) output.innerHTML = '<span class="typing-cursor"></span>';
+  try {
+    const result = await callLLM(messages, (text) => { output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>'; });
+    output.innerHTML = postProcessLLMOutput(formatMarkdown(result));
+  } catch (e) {
+    output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
+  } finally {
+    if (spinner) spinner.classList.remove('active');
+  }
+}
+
+// ── 11. SEED / RESET HELPERS ───────────────────────────────────────────────
+function anSeedBaselineHistory() {
+  anState.kpiHistory = { availability: [], latency: [], throughput: [] };
+  anState.activityHistory = [];
+  for (let i = 0; i < 50; i++) {
+    anState.kpiHistory.availability.push(AN_BASELINE_KPI.availability);
+    anState.kpiHistory.latency.push(AN_BASELINE_KPI.latency);
+    anState.kpiHistory.throughput.push(AN_BASELINE_KPI.throughput);
+    const snap = {};
+    AN_LOOPS.forEach(l => snap[l.id] = 0);
+    anState.activityHistory.push(snap);
+  }
+}
+
+// ── 12. INIT ───────────────────────────────────────────────────────────────
+function anInit() {
+  anStopTicker();
+  AN_LOOPS.forEach(l => anState.loops[l.id] = 'idle');
+  anState.active = []; anState.log = []; anState.lastScenario = null;
+  anState.kpi = { ...AN_BASELINE_KPI }; anState.target = { ...AN_BASELINE_KPI };
+  anState.mttr = 0; anState.running = false;
+  anSeedBaselineHistory();
+  anRenderDiagram(); anRenderKPIs();
+  const log = document.getElementById('an-event-log');
+  if (log) log.innerHTML = '<div style="font-size:0.78rem;color:var(--text-dim);padding:0.3rem 0;font-family:monospace">Awaiting network events…</div>';
+  const out = document.getElementById('an-output');
+  if (out) out.innerHTML = '<div style="color:var(--text-dim)">Inject a network event to begin the closed-loop simulation — the three-tier loop-of-loops will cycle through AADE and an AI CTO briefing will be generated on resolution.</div>';
+  const src = document.getElementById('an-sources');
+  if (src) src.innerHTML = '';
+  const charts = document.getElementById('an-charts');
+  if (charts) charts.style.display = 'block';
+  anRenderCharts();
+  const btnMap = { congestion: 'radio_congestion', degradation: 'transport_degradation', capacity: 'core_capacity', escalation: 'cross_domain', surge: 'traffic_surge' };
+  Object.entries(btnMap).forEach(([btn, key]) => { const el = document.getElementById('an-btn-' + btn); if (el) el.onclick = () => anTriggerScenario(key); });
+  const reset = document.getElementById('an-btn-reset');
+  if (reset) reset.onclick = () => anReset();
+  const analyze = document.getElementById('an-btn-analyze');
+  if (analyze) analyze.onclick = () => anRunAnalysis();
+}
+
+// ── 13. RESET ───────────────────────────────────────────────────────────────
+function anReset() {
+  anStopTicker();
+  AN_LOOPS.forEach(l => anState.loops[l.id] = 'idle');
+  anState.active = []; anState.log = []; anState.lastScenario = null;
+  anState.kpi = { ...AN_BASELINE_KPI }; anState.target = { ...AN_BASELINE_KPI };
+  anState.mttr = 0; anState.running = false;
+  anSeedBaselineHistory();
+  anRenderDiagram(); anRenderKPIs();
+  const log = document.getElementById('an-event-log');
+  if (log) log.innerHTML = '<div style="font-size:0.78rem;color:var(--text-dim);padding:0.3rem 0;font-family:monospace">System reset — awaiting network events…</div>';
+  const out = document.getElementById('an-output');
+  if (out) out.innerHTML = '<div style="color:var(--text-dim)">Simulation reset. Inject an event to start again.</div>';
+  const src = document.getElementById('an-sources');
+  if (src) src.innerHTML = '';
+  anRenderCharts();
+  showToast('Autonomous network simulator reset');
+}
+
+// ── 14. HOOK INTO THE PORTAL ────────────────────────────────────────────────
+(function () {
+  const _origOpenDemo = window.openDemo;
+  if (typeof _origOpenDemo === 'function') {
+    window.openDemo = function (name) {
+      const r = _origOpenDemo.apply(this, arguments);
+      if (name === 'autonomous') setTimeout(() => { if (typeof anInit === 'function') anInit(); }, 60);
+      return r;
+    };
+  }
+})();
+// ─── END AUTONOMOUS NETWORK SIMULATOR ───
 
 // Load icons after auth
 loadIcons();
