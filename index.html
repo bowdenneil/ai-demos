@@ -151,6 +151,7 @@
     .card-header-img.image { background: linear-gradient(135deg, rgba(124,92,252,0.12) 0%, rgba(83,216,251,0.08) 100%); }
     .card-header-img.onprem { background: linear-gradient(135deg, rgba(139,92,246,0.12) 0%, rgba(59,130,246,0.08) 100%); }
     .card-header-img.tco { background: linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(6,182,212,0.08) 100%); }
+    .card-header-img.network { background: linear-gradient(135deg, rgba(59,130,246,0.12) 0%, rgba(14,165,233,0.08) 100%); }
     .card-icon {
       width: 56px; height: 56px;
       border-radius: 14px;
@@ -171,6 +172,7 @@
     .card-icon.image { background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(83,216,251,0.15)); }
     .card-icon.onprem { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.15)); }
     .card-icon.tco { background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.15)); }
+    .card-icon.network { background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(14,165,233,0.15)); }
     .card-icon.hidden { display: none; }
     .card-body {
       padding: 1.5rem;
@@ -195,6 +197,7 @@
     .tag.image { background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(83,216,251,0.15)); color: var(--accent2); }
     .tag.onprem { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.15)); color: #8b5cf6; }
     .tag.tco { background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.15)); color: #10b981; }
+    .tag.network { background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(14,165,233,0.15)); color: #3b82f6; }
     /* Icon generating overlay */
     .card-gen-overlay {
       position: absolute;
@@ -484,6 +487,8 @@
     .btn-image:hover:not(:disabled) { background: linear-gradient(135deg, #9678ff, #70e4ff); }
     .btn-onprem { background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: #fff; }
     .btn-onprem:hover:not(:disabled) { background: linear-gradient(135deg, #a78bfa, #60a5fa); }
+    .btn-network { background: linear-gradient(135deg, #3b82f6, #0ea5e9); color: #fff; }
+    .btn-network:hover:not(:disabled) { background: linear-gradient(135deg, #60a5fa, #38bdf8); }
     .btn-secondary {
       background: var(--surface2);
       color: var(--text-dim);
@@ -1078,6 +1083,104 @@
       .comparison-grid { grid-template-columns: 1fr; }
       .dim-scorecards { grid-template-columns: repeat(2, 1fr); }
     }
+    /* Telco network table */
+    .net-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    .net-table th { background: var(--surface2); color: var(--text-dim); padding: 0.4rem 0.5rem; text-align: left; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.03em; position: sticky; top: 0; z-index: 1; border-bottom: 1px solid var(--border); }
+    .net-table td { padding: 0.35rem 0.5rem; border-bottom: 1px solid rgba(42,42,90,0.4); color: var(--text); white-space: nowrap; }
+    .net-table tr:hover td { background: rgba(59,130,246,0.06); cursor: pointer; }
+    .net-table tr.selected td { background: rgba(59,130,246,0.12); }
+    .net-badge { display: inline-block; padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.65rem; font-weight: 600; }
+    .net-badge.power { background: rgba(59,130,246,0.2); color: #60a5fa; }
+    .net-badge.overage { background: rgba(251,191,36,0.2); color: var(--warning); }
+    .net-badge.roamer { background: rgba(52,211,153,0.2); color: var(--success); }
+    .net-badge.risk { background: rgba(248,113,113,0.2); color: var(--danger); }
+    .net-badge.normal { background: rgba(136,136,170,0.15); color: var(--text-dim); }
+    .net-kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 1rem; flex: 1; min-width: 130px; }
+    .net-kpi .kpi-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim); }
+    .net-kpi .kpi-value { font-size: 1.4rem; font-weight: 700; margin-top: 0.15rem; }
+    .net-kpi .kpi-value.blue { color: #60a5fa; }
+    .net-kpi .kpi-value.green { color: var(--success); }
+    .net-kpi .kpi-value.amber { color: var(--warning); }
+    .net-kpi .kpi-value.red { color: var(--danger); }
+
+    /* Draft email card */
+    .email-draft-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-top: 1.2rem;
+      overflow: hidden;
+    }
+    .email-draft-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 1rem;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    .email-draft-header h3 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .email-draft-header .email-draft-badge {
+      font-size: 0.6rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      background: rgba(251,191,36,0.15);
+      color: var(--warning);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .email-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid rgba(42,42,90,0.5);
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+    .email-meta .email-meta-row { display: flex; gap: 0.5rem; }
+    .email-meta .email-meta-label { color: var(--text-dim); min-width: 55px; }
+    .email-meta .email-meta-val { color: var(--text); }
+    .email-draft-body {
+      padding: 1rem 1.2rem;
+      font-size: 0.85rem;
+      line-height: 1.8;
+      color: var(--text);
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    .email-draft-body p { margin: 0.5rem 0; }
+    .email-draft-body strong { color: var(--accent); }
+    .email-draft-body ul, .email-draft-body ol { margin: 0.4rem 0 0.4rem 1.2rem; }
+    .email-draft-body li { margin: 0.2rem 0; }
+    .email-draft-actions {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      background: var(--surface2);
+      border-top: 1px solid var(--border);
+    }
+    .email-draft-actions button {
+      font-size: 0.72rem;
+      padding: 0.35rem 0.8rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .email-draft-actions button:hover { border-color: var(--accent); color: var(--accent); }
+    .email-draft-actions button.copied { border-color: var(--success); color: var(--success); }
   </style>
   <script src="chart.min.js"></script>
 </head>
@@ -1268,6 +1371,20 @@
       <h2>Inference TCO Calculator</h2>
       <p>Compare on-premise GPU inference vs cloud APIs and GPU instances. Adjust workload, model, and hardware to build a 3-year TCO business case. Supports Llama, DeepSeek, GLM, Qwen, and more.</p>
       <span class="tag tco">Infrastructure</span>
+    </div>
+  </div>
+
+  <!-- TELCO NETWORK INTELLIGENCE CARD -->
+  <div class="card" onclick="openDemo('network')">
+    <div class="card-header-img network" id="card-header-network">
+      <img src="/icons/network.png" alt="" id="card-img-network">
+      <div class="card-icon network" id="card-emoji-network"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/><circle cx="12" cy="20" r="1" fill="#3b82f6" stroke="none"/></svg></div>
+      <div class="card-gen-overlay" id="card-gen-network">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Telco Network Intelligence</h2>
+      <p>Dashboard for telco CTOs. Visualise network traffic and customer usage data, segment subscribers by behaviour, and let AI recommend personalised data, roaming, and 5G offers with revenue uplift projections.</p>
+      <span class="tag network">Network Analytics</span>
     </div>
   </div>
 </div>
@@ -1481,6 +1598,7 @@
         <div class="input-group" style="flex:1;min-width:80px">
           <label>Quarter</label>
           <select id="earn-quarter">
+            <option value="Latest">🔬 Latest</option>
             <option value="Q1">Q1</option>
             <option value="Q2">Q2</option>
             <option value="Q3">Q3</option>
@@ -1489,7 +1607,7 @@
         </div>
         <div class="input-group" style="flex:1;min-width:80px">
           <label>Year</label>
-          <input type="text" id="earn-year" placeholder="2026">
+          <input type="text" id="earn-year" placeholder="auto" style="opacity:0.5">
         </div>
         <div class="input-group" style="flex:2;min-width:140px">
           <label>Focus Area</label>
@@ -1698,6 +1816,80 @@
   </div>
 </div>
 
+<!-- TELCO NETWORK INTELLIGENCE DEMO -->
+<div class="demo-overlay" id="demo-network">
+  <div class="demo-panel" style="max-width:1300px">
+    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
+    <h2 class="demo-title">📡 Telco Network Intelligence</h2>
+    <p class="demo-desc">Visualise subscriber network traffic, segment by behaviour, and let AI recommend personalised offers with revenue uplift projections. Synthetic data based on European telco benchmarks (tefficient, Analysys Mason, Juniper Research).</p>
+
+    <!-- Dashboard KPI strip -->
+    <div id="network-kpis" class="net-kpi-strip" style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap"></div>
+
+    <div class="demo-body">
+      <div class="demo-input">
+        <div class="input-group" style="flex:2;min-width:200px">
+          <label>Subscriber</label>
+          <select id="network-customer" onchange="networkSelectCustomer()"></select>
+        </div>
+        <div class="input-group" style="flex:1;min-width:120px">
+          <label>Cohort Filter</label>
+          <select id="network-cohort">
+            <option value="all">All Subscribers</option>
+            <option value="power">📊 Power Users</option>
+            <option value="overage">⚠️ Overage-Prone</option>
+            <option value="roamer">🌍 Heavy Roamers</option>
+            <option value="prepay">📱 Prepay</option>
+            <option value="5g">📶 5G-Eligible</option>
+            <option value="risk">🔴 At-Risk</option>
+          </select>
+        </div>
+        <div class="input-group" style="flex:1;min-width:130px">
+          <label>Analysis</label>
+          <select id="network-type">
+            <option value="individual">Individual Subscriber</option>
+            <option value="cohort">Cohort Analysis</option>
+            <option value="network">Network-Wide Overview</option>
+          </select>
+        </div>
+        <div class="presets">
+          <button class="preset-btn" onclick="networkPreset('power')">📊 Power User</button>
+          <button class="preset-btn" onclick="networkPreset('roamer')">🌍 Heavy Roamer</button>
+          <button class="preset-btn" onclick="networkPreset('overage')">⚠️ Overage</button>
+          <button class="preset-btn" onclick="networkPreset('risk')">🔴 At-Risk</button>
+        </div>
+        <button class="btn btn-network" onclick="networkQuery()" style="margin-top:0">📡 Analyze &amp; Recommend</button>
+      </div>
+
+      <!-- Customer data table -->
+      <div id="network-table-wrap" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;max-height:280px;overflow-y:auto">
+        <table id="network-table" class="net-table"></table>
+      </div>
+
+      <div class="demo-output">
+        <h3>AI Traffic Analysis &amp; Offer Recommendations <div class="output-spinner" id="network-spinner"></div></h3>
+        <div id="network-output" class="output-content">
+          <div class="output-placeholder">Select a subscriber or cohort and click Analyze to see traffic insights and personalised offer recommendations</div>
+        </div>
+        <div id="network-charts" class="chart-container" style="display:none">
+          <div class="chart-grid">
+            <div class="chart-box">
+              <h4>Usage vs Plan vs Benchmark</h4>
+              <canvas id="network-usage-chart"></canvas>
+            </div>
+            <div class="chart-box">
+              <h4>Hourly Traffic Pattern</h4>
+              <canvas id="network-hourly-chart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div id="network-sources"></div>
+        <div id="network-email" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="footer">
   <p>AI Solutions Demo Portal — Powered by <a href="https://tensorx.ai" target="_blank">Tensorx</a> — Built with ❤️ by <a href="https://github.com/bowdenneil" target="_blank">Pug</a></p>
 </div>
@@ -1899,6 +2091,7 @@ function showToast(msg, isError) {
 function openDemo(name) {
   document.getElementById(`demo-${name}`).classList.add('active');
   document.body.style.overflow = 'hidden';
+  if (name === 'network') setTimeout(() => networkInit(), 50);
 }
 
 function closeDemo() {
@@ -3011,9 +3204,9 @@ Provide:
 
 // ─── EARNINGS CALL ANALYSER DEMO ───
 const EARN_PRESETS = {
-  msft: { company: 'Microsoft', quarter: 'Q2', year: '2026', focus: 'AI and cloud growth, Azure momentum, Copilot adoption' },
-  crm: { company: 'Salesforce', quarter: 'Q1', year: '2026', focus: 'AI agent revenue, Data Cloud traction, margin expansion' },
-  nvda: { company: 'NVIDIA', quarter: 'Q4', year: '2025', focus: 'Data centre revenue, Blackwell demand, China restrictions impact' }
+  msft: { company: 'Microsoft', quarter: 'Latest', year: '', focus: 'AI and cloud growth, Azure momentum, Copilot adoption' },
+  crm: { company: 'Salesforce', quarter: 'Latest', year: '', focus: 'AI agent revenue, Data Cloud traction, margin expansion' },
+  nvda: { company: 'NVIDIA', quarter: 'Latest', year: '', focus: 'Data centre revenue, Blackwell demand, China restrictions impact' }
 };
 
 function earnPreset(name) {
@@ -3021,28 +3214,151 @@ function earnPreset(name) {
   document.getElementById('earn-company').value = p.company;
   document.getElementById('earn-quarter').value = p.quarter;
   document.getElementById('earn-year').value = p.year;
+  document.getElementById('earn-year').style.opacity = p.quarter === 'Latest' ? '0.5' : '1';
   document.getElementById('earn-focus').value = p.focus;
+}
+
+// Toggle year field opacity based on quarter selection
+document.getElementById('earn-quarter').addEventListener('change', function() {
+  const yearInput = document.getElementById('earn-year');
+  if (this.value === 'Latest') {
+    yearInput.style.opacity = '0.5';
+    yearInput.placeholder = 'auto';
+    yearInput.value = '';
+  } else {
+    yearInput.style.opacity = '1';
+    yearInput.placeholder = '2026';
+  }
+});
+
+// Parse quarter and year from search result text
+function parseEarningsQuarterYear(results, company) {
+  // Build a combined text from titles and descriptions
+  const combined = results.map(r => `${r.title} ${r.description}`).join(' ');
+  const currentYear = new Date().getFullYear();
+
+  // Look for patterns like "Q1 2025", "Q4 2024", "first quarter 2025", "third quarter 2024 earnings"
+  const patterns = [
+    /Q([1-4])\s*(?:FY)?\s*(20\d{2})/gi,
+    /(first|second|third|fourth|1st|2nd|3rd|4th)\s+quarter\s+(?:FY\s*)?(20\d{2})/gi,
+    /(Q[1-4])\s*(?:earnings|results|call|report).*(20\d{2})/gi,
+    /(20\d{2}).*?(Q[1-4])/gi
+  ];
+
+  const quarterMap = { first: 'Q1', second: 'Q2', third: 'Q3', fourth: 'Q4', '1st': 'Q1', '2nd': 'Q2', '3rd': 'Q3', '4th': 'Q4' };
+  let bestMatch = null;
+
+  for (const pattern of patterns) {
+    let match;
+    while ((match = pattern.exec(combined)) !== null) {
+      let q, y;
+      const group1 = match[1]?.toUpperCase() || '';
+      const group2 = match[2] || '';
+
+      // Determine quarter
+      if (group1.startsWith('Q')) {
+        q = group1;
+      } else if (quarterMap[group1.toLowerCase()]) {
+        q = quarterMap[group1.toLowerCase()];
+      }
+
+      // Determine year
+      if (group2 && group2.match(/20\d{2}/)) {
+        y = group2;
+      } else if (group1.match(/20\d{2}/)) {
+        y = group1.match(/20\d{2}/)[0];
+        // In this pattern variant, quarter might be in group2
+        const qFromG2 = match[2]?.toUpperCase();
+        if (qFromG2 && qFromG2.startsWith('Q')) q = qFromG2;
+      }
+
+      if (q && y) {
+        // Prefer the most recent quarter
+        if (!bestMatch || parseInt(y) > parseInt(bestMatch.year) ||
+            (parseInt(y) === parseInt(bestMatch.year) && parseInt(q[1]) > parseInt(bestMatch.quarter[1]))) {
+          bestMatch = { quarter: q, year: y };
+        }
+      }
+    }
+  }
+
+  // Fallback: just find any year mention near "earnings"
+  if (!bestMatch) {
+    const yearMatch = combined.match(/(20\d{2})/g);
+    if (yearMatch) {
+      // Use the most recent year found (but not future)
+      const years = yearMatch.map(y => parseInt(y)).filter(y => y <= currentYear + 1);
+      const latestYear = Math.max(...years);
+      // Default to most recent quarter
+      const month = new Date().getMonth();
+      const defaultQ = month <= 2 ? 'Q4' : month <= 5 ? 'Q1' : month <= 8 ? 'Q2' : 'Q3';
+      bestMatch = { quarter: defaultQ, year: String(latestYear) };
+    }
+  }
+
+  return bestMatch;
 }
 
 async function earnQuery() {
   const company = document.getElementById('earn-company').value.trim();
-  const quarter = document.getElementById('earn-quarter').value;
-  const year = document.getElementById('earn-year').value.trim();
+  let quarter = document.getElementById('earn-quarter').value;
+  let year = document.getElementById('earn-year').value.trim();
   const focus = document.getElementById('earn-focus').value.trim();
 
-  if (!company || !year) { showToast('Fill in company name and year', true); return; }
+  if (!company) { showToast('Enter a company name', true); return; }
 
   const spinner = document.getElementById('earn-spinner');
   const output = document.getElementById('earn-output');
-  const sourcesEl = document.getElementById('earn-sources');
   spinner.classList.add('active');
-  output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching web for earnings data...</span>';
 
+  // ── Auto-discover latest earnings call ──
+  if (quarter === 'Latest') {
+    output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)">🔍 Searching for latest earnings call...</span>';
+
+    const discoverQ = `${company} latest quarterly earnings call results 2025 2026`;
+    const discoverResults = await webSearch(discoverQ, 10);
+
+    if (!discoverResults.length) {
+      output.innerHTML = '<span style="color:var(--danger)">No search results found. Try entering the quarter and year manually.</span>';
+      spinner.classList.remove('active');
+      return;
+    }
+
+    const discovered = parseEarningsQuarterYear(discoverResults, company);
+
+    if (discovered) {
+      quarter = discovered.quarter;
+      year = discovered.year;
+      // Update the UI to reflect what was found
+      document.getElementById('earn-quarter').value = quarter;
+      document.getElementById('earn-year').value = year;
+      document.getElementById('earn-year').style.opacity = '1';
+      output.innerHTML = `<div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.9rem">
+        <strong>✅ Found latest earnings call:</strong> ${company} ${quarter} ${year}
+        <div style="font-size:0.8rem;color:var(--text-dim);margin-top:0.25rem">Auto-detected from web search results. Now analysing...</div>
+      </div><span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching for detailed earnings data...</span>`;
+    } else {
+      // Couldn't parse — use search results as context with a general "latest" prompt
+      output.innerHTML = `<div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.9rem">
+        <strong>⚠️ Could not auto-detect the exact quarter.</strong> Using search results to identify the most recent earnings call.
+      </div><span class="typing-cursor"></span> <span style="color:var(--text-dim)">Analysing latest earnings data...</span>`;
+      quarter = 'latest';
+      year = '';
+    }
+  } else {
+    if (!year) { showToast('Enter a year or select "Latest"', true); spinner.classList.remove('active'); return; }
+    output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching web for earnings data...</span>';
+  }
+
+  // ── Search for detailed earnings data ──
   const searchQ = `${company} ${quarter} ${year} earnings call transcript results highlights`;
   const webResults = await webSearch(searchQ);
   const webCtx = searchContext(webResults);
   renderSearchResults(webResults, 'earn-sources');
-  output.innerHTML = '<span class="typing-cursor"></span>';
+
+  // Preserve the discovery banner if it existed
+  const discoveryBanner = output.innerHTML.includes('Found latest') ? output.innerHTML.split('<span class="typing-cursor">')[0] : '';
+  output.innerHTML = discoveryBanner + '<span class="typing-cursor"></span>';
 
   const webSection = webResults.length
     ? `\n\nWeb Search Results (use these for current earnings data and cite as [web N]):\n${webCtx}`
@@ -3071,9 +3387,9 @@ Provide:
     let fullText = '';
     await callLLM(messages, (text) => {
       fullText = text;
-      output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
+      output.innerHTML = discoveryBanner + formatMarkdown(text) + '<span class="typing-cursor"></span>';
     });
-    output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
+    output.innerHTML = discoveryBanner + postProcessLLMOutput(formatMarkdown(fullText));
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
@@ -3807,6 +4123,621 @@ function showIcon(demo) {
 
 // ─── ON-PREM ASSESSMENT (now standalone — see readiness-assessment.html) ───
 
+
+// ─── TELCO NETWORK INTELLIGENCE ───
+
+// Synthetic telco subscriber dataset (25 customers)
+// Based on European telco benchmarks: tefficient (avg data/sub ~18GB), Analysys Mason (ARPU), Juniper Research
+const TELCO_DATA = [
+  {id:'IE-1001',name:'Sarah Murphy',msisdn:'+353 86 123 4567',plan:'5G Premium 80',planType:'Bill Pay',allowance:100,dataGB:87.4,voiceMin:420,sms:35,peakPct:62,roamGB:12.3,has5G:true,arpu:80,tenure:34,contract:'Annual',tickets:1,churnRisk:15},
+  {id:'IE-1002',name:'Liam O\'Brien',msisdn:'+353 86 234 5678',plan:'Bill Pay 50',planType:'Bill Pay',allowance:50,dataGB:58.2,voiceMin:180,sms:8,peakPct:71,roamGB:3.1,has5G:false,arpu:50,tenure:18,contract:'Monthly',tickets:3,churnRisk:55},
+  {id:'IE-1003',name:'Emma Walsh',msisdn:'+353 86 345 6789',plan:'Prepay 15',planType:'Prepay',allowance:15,dataGB:14.1,voiceMin:95,sms:22,peakPct:55,roamGB:0.2,has5G:false,arpu:15,tenure:6,contract:'Prepay',tickets:0,churnRisk:35},
+  {id:'IE-1004',name:'Noah Kelly',msisdn:'+353 86 456 7890',plan:'Unlimited 65',planType:'Bill Pay',allowance:999,dataGB:142.7,voiceMin:680,sms:12,peakPct:68,roamGB:8.5,has5G:true,arpu:65,tenure:48,contract:'Annual',tickets:0,churnRisk:8},
+  {id:'IE-1005',name:'Aoife Ryan',msisdn:'+353 86 567 8901',plan:'Bill Pay 30',planType:'Bill Pay',allowance:30,dataGB:41.3,voiceMin:210,sms:5,peakPct:74,roamGB:1.0,has5G:false,arpu:30,tenure:12,contract:'Monthly',tickets:2,churnRisk:60},
+  {id:'IE-1006',name:'Cian Doyle',msisdn:'+353 86 678 9012',plan:'5G Premium 80',planType:'Bill Pay',allowance:100,dataGB:95.8,voiceMin:350,sms:18,peakPct:59,roamGB:22.1,has5G:true,arpu:80,tenure:29,contract:'Annual',tickets:1,churnRisk:18},
+  {id:'IE-1007',name:'Saoirse Byrne',msisdn:'+353 86 789 0123',plan:'Prepay 15',planType:'Prepay',allowance:15,dataGB:28.5,voiceMin:45,sms:40,peakPct:82,roamGB:0.0,has5G:false,arpu:15,tenure:3,contract:'Prepay',tickets:4,churnRisk:72},
+  {id:'IE-1008',name:'Tadhg McCarthy',msisdn:'+353 86 890 1234',plan:'Bill Pay 50',planType:'Bill Pay',allowance:50,dataGB:47.9,voiceMin:310,sms:15,peakPct:63,roamGB:5.8,has5G:true,arpu:50,tenure:22,contract:'Annual',tickets:1,churnRisk:22},
+  {id:'IE-1009',name:'Niamh Gallagher',msisdn:'+353 86 901 2345',plan:'Unlimited 65',planType:'Bill Pay',allowance:999,dataGB:118.3,voiceMin:520,sms:8,peakPct:65,roamGB:15.2,has5G:true,arpu:65,tenure:41,contract:'Annual',tickets:0,churnRisk:10},
+  {id:'IE-1010',name:'Oisin Fitzpatrick',msisdn:'+353 87 012 3456',plan:'Bill Pay 30',planType:'Bill Pay',allowance:30,dataGB:22.4,voiceMin:165,sms:12,peakPct:58,roamGB:0.8,has5G:false,arpu:30,tenure:15,contract:'Monthly',tickets:1,churnRisk:38},
+  {id:'IE-1011',name:'Cliodhna O\'Connor',msisdn:'+353 87 123 4567',plan:'5G Premium 80',planType:'Bill Pay',allowance:100,dataGB:73.2,voiceMin:280,sms:20,peakPct:61,roamGB:18.7,has5G:true,arpu:80,tenure:26,contract:'Annual',tickets:0,churnRisk:12},
+  {id:'IE-1012',name:'Darragh Walsh',msisdn:'+353 87 234 5678',plan:'Prepay 15',planType:'Prepay',allowance:15,dataGB:16.8,voiceMin:120,sms:30,peakPct:77,roamGB:0.1,has5G:false,arpu:15,tenure:4,contract:'Prepay',tickets:2,churnRisk:65},
+  {id:'IE-1013',name:'Maeve Kennedy',msisdn:'+353 87 345 6789',plan:'Bill Pay 50',planType:'Bill Pay',allowance:50,dataGB:52.1,voiceMin:340,sms:10,peakPct:66,roamGB:7.3,has5G:true,arpu:50,tenure:31,contract:'Annual',tickets:0,churnRisk:15},
+  {id:'IE-1014',name:'Fionn O\'Sullivan',msisdn:'+353 87 456 7890',plan:'Unlimited 65',planType:'Bill Pay',allowance:999,dataGB:165.4,voiceMin:450,sms:5,peakPct:70,roamGB:31.2,has5G:true,arpu:65,tenure:52,contract:'Annual',tickets:1,churnRisk:14},
+  {id:'IE-1015',name:'Siobhan Murray',msisdn:'+353 87 567 8901',plan:'Bill Pay 30',planType:'Bill Pay',allowance:30,dataGB:35.6,voiceMin:190,sms:8,peakPct:60,roamGB:2.4,has5G:false,arpu:30,tenure:9,contract:'Monthly',tickets:3,churnRisk:58},
+  {id:'IE-1016',name:'Cillian Moore',msisdn:'+353 87 678 9012',plan:'Prepay 15',planType:'Prepay',allowance:15,dataGB:12.3,voiceMin:60,sms:25,peakPct:53,roamGB:0.0,has5G:false,arpu:15,tenure:8,contract:'Prepay',tickets:0,churnRisk:30},
+  {id:'IE-1017',name:'Eabha Carroll',msisdn:'+353 87 789 0123',plan:'5G Premium 80',planType:'Bill Pay',allowance:100,dataGB:89.6,voiceMin:390,sms:14,peakPct:64,roamGB:11.0,has5G:true,arpu:80,tenure:37,contract:'Annual',tickets:0,churnRisk:10},
+  {id:'IE-1018',name:'Ruairi Nolan',msisdn:'+353 87 890 1234',plan:'Bill Pay 50',planType:'Bill Pay',allowance:50,dataGB:61.2,voiceMin:230,sms:6,peakPct:76,roamGB:4.1,has5G:false,arpu:50,tenure:14,contract:'Monthly',tickets:2,churnRisk:50},
+  {id:'IE-1019',name:'Cara Duffy',msisdn:'+353 87 901 2345',plan:'Bill Pay 30',planType:'Bill Pay',allowance:30,dataGB:19.7,voiceMin:140,sms:18,peakPct:57,roamGB:1.5,has5G:false,arpu:30,tenure:20,contract:'Monthly',tickets:1,churnRisk:28},
+  {id:'IE-1020',name:'Padraig Whelan',msisdn:'+353 83 012 3456',plan:'Unlimited 65',planType:'Bill Pay',allowance:999,dataGB:134.8,voiceMin:600,sms:10,peakPct:62,roamGB:26.5,has5G:true,arpu:65,tenure:45,contract:'Annual',tickets:0,churnRisk:8},
+  {id:'IE-1021',name:'Aisling Brennan',msisdn:'+353 83 123 4567',plan:'Prepay 15',planType:'Prepay',allowance:15,dataGB:31.2,voiceMin:75,sms:35,peakPct:85,roamGB:0.3,has5G:false,arpu:15,tenure:2,contract:'Prepay',tickets:5,churnRisk:80},
+  {id:'IE-1022',name:'Conor Maher',msisdn:'+353 83 234 5678',plan:'Bill Pay 50',planType:'Bill Pay',allowance:50,dataGB:44.8,voiceMin:290,sms:12,peakPct:64,roamGB:6.9,has5G:true,arpu:50,tenure:25,contract:'Annual',tickets:0,churnRisk:16},
+  {id:'IE-1023',name:'Roisin Farrell',msisdn:'+353 83 345 6789',plan:'5G Premium 80',planType:'Bill Pay',allowance:100,dataGB:78.1,voiceMin:310,sms:16,peakPct:60,roamGB:9.4,has5G:true,arpu:80,tenure:33,contract:'Annual',tickets:1,churnRisk:14},
+  {id:'IE-1024',name:'Darragh Lyons',msisdn:'+353 83 456 7890',plan:'Bill Pay 30',planType:'Bill Pay',allowance:30,dataGB:38.9,voiceMin:175,sms:9,peakPct:72,roamGB:1.8,has5G:false,arpu:30,tenure:11,contract:'Monthly',tickets:2,churnRisk:52},
+  {id:'IE-1025',name:'Orlaith Flanagan',msisdn:'+353 83 567 8901',plan:'Unlimited 65',planType:'Bill Pay',allowance:999,dataGB:102.5,voiceMin:480,sms:7,peakPct:63,roamGB:13.6,has5G:true,arpu:65,tenure:39,contract:'Annual',tickets:0,churnRisk:9}
+];
+
+// Industry benchmarks (sourced from tefficient, Analysys Mason, Juniper Research 2025)
+const TELCO_BENCHMARKS = {
+  avgDataPerSub: 18,        // GB/month — tefficient public analysis
+  powerUserThreshold: 80,   // GB/month — power users
+  avgARPU: 28,              // EUR/month — Juniper Research Europe 2025
+  churnIndustryAvg: 1.8,   // % monthly churn
+  dataGrowthYoY: 22,       // % — European mobile data growth
+  revenuePerGB: 1.45       // EUR/GB — tefficient benchmark
+};
+
+let networkSelectedId = null;
+let networkCharts = { usage: null, hourly: null };
+
+function networkGetSegment(c) {
+  if (c.churnRisk >= 60) return 'risk';
+  if (c.dataGB > 100 || (c.allowance < 999 && c.dataGB > c.allowance * 0.9)) return 'overage';
+  if (c.roamGB > 10) return 'roamer';
+  if (c.dataGB > 80) return 'power';
+  return 'normal';
+}
+
+function networkGetBadge(c) {
+  const seg = networkGetSegment(c);
+  const labels = { risk:'🔴 Risk', overage:'⚠️ Overage', roamer:'🌍 Roamer', power:'📊 Power', normal:'' };
+  if (labels[seg]) return `<span class="net-badge ${seg}">${labels[seg]}</span>`;
+  return '';
+}
+
+function networkInit() {
+  const sel = document.getElementById('network-customer');
+  if (!sel) return;
+  sel.innerHTML = TELCO_DATA.map(c =>
+    `<option value="${c.id}">${c.name} (${c.msisdn})</option>`
+  ).join('');
+  networkRenderTable();
+  networkRenderKPIs();
+}
+
+function networkRenderTable() {
+  const tbl = document.getElementById('network-table');
+  if (!tbl) return;
+  const cohort = document.getElementById('network-cohort')?.value || 'all';
+  let data = TELCO_DATA;
+  if (cohort !== 'all') {
+    data = data.filter(c => {
+      const seg = networkGetSegment(c);
+      if (cohort === '5g') return c.has5G;
+      if (cohort === 'prepay') return c.planType === 'Prepay';
+      return seg === cohort;
+    });
+  }
+  tbl.innerHTML = `<thead><tr>
+    <th>ID</th><th>Name</th><th>Plan</th><th>Data (GB)</th><th>Allow.</th><th>Voice</th><th>SMS</th><th>Peak%</th><th>Roam</th><th>5G</th><th>ARPU</th><th>Tenure</th><th>Seg</th><th>Risk</th>
+  </tr></thead><tbody>` +
+  data.map(c => {
+    const overage = c.allowance < 999 && c.dataGB > c.allowance;
+    return `<tr class="${networkSelectedId === c.id ? 'selected' : ''}" onclick="networkRowClick('${c.id}')">
+      <td style="color:var(--text-dim)">${c.id}</td>
+      <td style="font-weight:600">${c.name}</td>
+      <td>${c.plan}</td>
+      <td style="color:${overage?'var(--warning)':'var(--text)'};font-weight:${overage?'700':'400'}">${c.dataGB}${overage?' ⚠':''}</td>
+      <td style="color:var(--text-dim)">${c.allowance >= 999 ? '∞' : c.allowance}</td>
+      <td>${c.voiceMin}</td>
+      <td>${c.sms}</td>
+      <td>${c.peakPct}%</td>
+      <td>${c.roamGB > 10 ? `<span style="color:var(--success);font-weight:600">${c.roamGB}</span>` : c.roamGB}</td>
+      <td>${c.has5G ? '✅' : '—'}</td>
+      <td>€${c.arpu}</td>
+      <td>${c.tenure}m</td>
+      <td>${networkGetBadge(c)}</td>
+      <td style="color:${c.churnRisk>=60?'var(--danger)':c.churnRisk>=40?'var(--warning)':'var(--success)'};font-weight:600">${c.churnRisk}%</td>
+    </tr>`;
+  }).join('') + '</tbody>';
+}
+
+function networkRenderKPIs() {
+  const el = document.getElementById('network-kpis');
+  if (!el) return;
+  const totalSubs = TELCO_DATA.length;
+  const totalData = TELCO_DATA.reduce((s,c) => s + c.dataGB, 0);
+  const totalRevenue = TELCO_DATA.reduce((s,c) => s + c.arpu, 0);
+  const avgARPU = (totalRevenue / totalSubs).toFixed(0);
+  const avgData = (totalData / totalSubs).toFixed(1);
+  const totalRoaming = TELCO_DATA.reduce((s,c) => s + c.roamGB, 0).toFixed(0);
+  const atRisk = TELCO_DATA.filter(c => c.churnRisk >= 50).length;
+  const powerUsers = TELCO_DATA.filter(c => c.dataGB > 80).length;
+  const overageUsers = TELCO_DATA.filter(c => c.allowance < 999 && c.dataGB > c.allowance).length;
+
+  el.innerHTML = `
+    <div class="net-kpi"><div class="kpi-label">Subscribers</div><div class="kpi-value blue">${totalSubs}</div></div>
+    <div class="net-kpi"><div class="kpi-label">Total Data (TB/mo)</div><div class="kpi-value blue">${(totalData/1000).toFixed(2)}</div></div>
+    <div class="net-kpi"><div class="kpi-label">Avg ARPU</div><div class="kpi-value green">€${avgARPU}</div></div>
+    <div class="net-kpi"><div class="kpi-label">Avg Data/Sub</div><div class="kpi-value blue">${avgData} GB</div></div>
+    <div class="net-kpi"><div class="kpi-label">Roaming (GB)</div><div class="kpi-value green">${totalRoaming}</div></div>
+    <div class="net-kpi"><div class="kpi-label">Power Users</div><div class="kpi-value blue">${powerUsers}</div></div>
+    <div class="net-kpi"><div class="kpi-label">Overage Users</div><div class="kpi-value amber">${overageUsers}</div></div>
+    <div class="net-kpi"><div class="kpi-label">At-Risk</div><div class="kpi-value red">${atRisk}</div></div>
+  `;
+}
+
+function networkRowClick(id) {
+  networkSelectedId = id;
+  document.getElementById('network-customer').value = id;
+  networkRenderTable();
+}
+
+function networkSelectCustomer() {
+  networkSelectedId = document.getElementById('network-customer').value;
+  networkRenderTable();
+}
+
+function networkPreset(type) {
+  const presets = {
+    power: { customer: 'IE-1004', cohort: 'power', analysis: 'individual' },
+    roamer: { customer: 'IE-1014', cohort: 'roamer', analysis: 'individual' },
+    overage: { customer: 'IE-1002', cohort: 'overage', analysis: 'individual' },
+    risk: { customer: 'IE-1021', cohort: 'risk', analysis: 'individual' }
+  };
+  const p = presets[type];
+  if (!p) return;
+  document.getElementById('network-customer').value = p.customer;
+  document.getElementById('network-cohort').value = p.cohort;
+  document.getElementById('network-type').value = p.analysis;
+  networkSelectedId = p.customer;
+  networkRenderTable();
+}
+
+// Generate hourly traffic pattern (deterministic from seed for reproducibility)
+function networkHourlyPattern(c) {
+  const seed = c.id.charCodeAt(c.id.length - 1);
+  const hours = [];
+  // Typical telco daily pattern: low overnight, morning peak, midday dip, evening peak
+  const basePattern = [8,6,5,4,4,6,12,22,28,20,16,18,22,20,18,20,24,32,38,42,35,28,18,12];
+  for (let h = 0; h < 24; h++) {
+    const variation = ((seed * (h + 7)) % 11) / 10 - 0.5;
+    const val = Math.max(0, basePattern[h] * (c.dataGB / 50) * (1 + variation * 0.3));
+    hours.push(Math.round(val * 10) / 10);
+  }
+  return hours;
+}
+
+async function networkQuery() {
+  const analysisType = document.getElementById('network-type').value;
+  const cohort = document.getElementById('network-cohort').value;
+  const customerId = document.getElementById('network-customer').value;
+  const customer = TELCO_DATA.find(c => c.id === customerId);
+
+  if (!customer && analysisType === 'individual') { showToast('Select a subscriber first', true); return; }
+
+  const spinner = document.getElementById('network-spinner');
+  const output = document.getElementById('network-output');
+  const sourcesEl = document.getElementById('network-sources');
+  spinner.classList.add('active');
+  output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching for telco benchmarks and offer strategies...</span>';
+
+  // Web search for context
+  let webResults = await webSearch('telecom mobile data plan upsell offers 5G migration strategy 2025 2026');
+  const roamResults = await webSearch('EU roaming data usage trends telco revenue 2025');
+  webResults = webResults.concat(roamResults.slice(0, 4));
+  const webCtx = searchContext(webResults);
+  renderSearchResults(webResults, 'network-sources');
+  output.innerHTML = '<span class="typing-cursor"></span>';
+
+  const webSection = webResults.length
+    ? `\n\nWeb Search Results (use for industry benchmarks and competitor offers, cite as [web N]):\n${webCtx}`
+    : '';
+
+  const bench = TELCO_BENCHMARKS;
+
+  let messages;
+  if (analysisType === 'individual') {
+    const overage = customer.allowance < 999 && customer.dataGB > customer.allowance;
+    const overageGB = overage ? (customer.dataGB - customer.allowance).toFixed(1) : 0;
+    const hourly = networkHourlyPattern(customer);
+    const seg = networkGetSegment(customer);
+
+    messages = [
+      { role: 'system', content: `You are a senior telecom network strategist advising a CTO. Analyse subscriber network traffic data and recommend personalised commercial offers. Use EUR for all financial figures. When web results are provided, cite as [web N]. Format with markdown headers, bullets, and bold highlights. Be specific and data-driven.` },
+      { role: 'user', content: `Analyse the following subscriber and recommend personalised offers:
+
+## Subscriber Profile
+- Customer ID: ${customer.id}
+- Name: ${customer.name}
+- MSISDN: ${customer.msisdn}
+- Plan: ${customer.plan} (${customer.planType})
+- Data Allowance: ${customer.allowance >= 999 ? 'Unlimited' : customer.allowance + ' GB'}
+- Monthly Data Usage: ${customer.dataGB} GB${overage ? ` (⚠️ OVERAGE: ${overageGB} GB over plan)` : ''}
+- Voice Minutes: ${customer.voiceMin}
+- SMS: ${customer.sms}
+- Peak Hour Usage: ${customer.peakPct}% of traffic
+- Roaming Data: ${customer.roamGB} GB
+- 5G Device: ${customer.has5G ? 'Yes' : 'No'}
+- ARPU: €${customer.arpu}/month
+- Tenure: ${customer.tenure} months
+- Contract Type: ${customer.contract}
+- Support Tickets (6m): ${customer.tickets}
+- Churn Risk Score: ${customer.churnRisk}%
+
+## Hourly Traffic Distribution (GB by hour)
+${hourly.map((v, h) => `${String(h).padStart(2,'0')}:00=${v}`).join(', ')}
+
+## Industry Benchmarks
+- European avg data per subscriber: ${bench.avgDataPerSub} GB/month
+- European avg ARPU: €${bench.avgARPU}/month
+- Power user threshold: ${bench.powerUserThreshold}+ GB/month
+- Industry churn rate: ${bench.churnIndustryAvg}%/month
+- Data growth YoY: ${bench.dataGrowthYoY}%
+- Revenue per GB: €${bench.revenuePerGB}
+
+## Segment Classification
+Auto-detected: ${seg.toUpperCase()}
+
+Provide:
+1. **Traffic Profile Summary** — usage patterns, anomalies, peak/off-peak analysis
+2. **Benchmark Comparison** — how this subscriber compares to European averages
+3. **Segment Classification** — confirm/adjust the auto-detected segment with rationale
+4. **Recommended Offers** (2-4 specific, prioritised offers with rationale):
+   - For each: offer name, target behaviour, expected monthly revenue uplift (EUR), implementation channel
+5. **Revenue Impact** — projected annual revenue uplift if offers accepted
+6. **Churn Risk Assessment** — if applicable, retention actions
+7. **Network Impact** — capacity implications, cell load considerations
+8. **Executive Summary** — 2-3 sentence CTO-level brief${webSection}` }
+    ];
+  } else {
+    // Cohort or network-wide
+    let data = TELCO_DATA;
+    if (analysisType === 'cohort') {
+      data = TELCO_DATA.filter(c => {
+        const s = networkGetSegment(c);
+        if (cohort === '5g') return c.has5G;
+        if (cohort === 'prepay') return c.planType === 'Prepay';
+        return s === cohort;
+      });
+    }
+
+    const cohortLabel = analysisType === 'network' ? 'All subscribers (network-wide)' : `${cohort} cohort`;
+    const totalData = data.reduce((s,c) => s + c.dataGB, 0);
+    const totalRevenue = data.reduce((s,c) => s + c.arpu, 0);
+    const avgData = (totalData / data.length).toFixed(1);
+    const avgARPU = (totalRevenue / data.length).toFixed(0);
+    const totalRoaming = data.reduce((s,c) => s + c.roamGB, 0).toFixed(0);
+    const overageCount = data.filter(c => c.allowance < 999 && c.dataGB > c.allowance).length;
+    const fiveGCount = data.filter(c => c.has5G).length;
+    const prepayCount = data.filter(c => c.planType === 'Prepay').length;
+    const atRiskCount = data.filter(c => c.churnRisk >= 50).length;
+
+    const customerSummary = data.map(c => `- ${c.id} ${c.name}: ${c.plan}, ${c.dataGB}GB/${c.allowance>=999?'∞':c.allowance}GB, €${c.arpu}, roam ${c.roamGB}GB, 5G:${c.has5G?'Y':'N'}, risk ${c.churnRisk}%`).join('\n');
+
+    messages = [
+      { role: 'system', content: `You are a senior telecom network strategist advising a CTO on cohort/network-level analysis. Recommend commercial offers and network optimisations. Use EUR for all financial figures. Cite web sources as [web N]. Format with markdown headers, bullets, and bold highlights.` },
+      { role: 'user', content: `Analyse the following ${cohortLabel} (${data.length} subscribers) and recommend network-wide strategies:
+
+## Cohort Summary Metrics
+- Total Subscribers: ${data.length}
+- Total Monthly Data: ${totalData.toFixed(0)} GB (${(totalData/1000).toFixed(2)} TB)
+- Total Monthly Revenue: €${totalRevenue}
+- Average Data per Sub: ${avgData} GB
+- Average ARPU: €${avgARPU}
+- Total Roaming: ${totalRoaming} GB
+- Overage Users: ${overageCount}
+- 5G-Capable: ${fiveGCount}
+- Prepay: ${prepayCount}
+- At-Risk (≥50%): ${atRiskCount}
+
+## Industry Benchmarks
+- European avg data per subscriber: ${bench.avgDataPerSub} GB/month
+- European avg ARPU: €${bench.avgARPU}/month
+- Power user threshold: ${bench.powerUserThreshold}+ GB/month
+- Industry churn rate: ${bench.churnIndustryAvg}%/month
+- Data growth YoY: ${bench.dataGrowthYoY}%
+- Revenue per GB: €${bench.revenuePerGB}
+
+## Subscriber Detail
+${customerSummary}
+
+Provide:
+1. **Cohort Overview** — traffic patterns, distribution analysis, key insights
+2. **Benchmark Comparison** — vs European averages, gaps and opportunities
+3. **Segmentation Analysis** — behavioural clusters within this cohort
+4. **Offer Strategy** (3-5 prioritised recommendations):
+   - For each: offer name, target segment, expected adoption rate, monthly revenue uplift per subscriber, total cohort impact
+5. **Revenue Impact** — total projected annual revenue uplift across cohort
+6. **Network Capacity** — traffic forecasting, cell load implications, 5G migration opportunity
+7. **Churn & Retention** — at-risk subscribers, retention cost vs revenue protected
+8. **Executive Summary** — CTO-level brief with top 3 actions${webSection}` }
+    ];
+  }
+
+  try {
+    let fullText = '';
+    await callLLM(messages, (text) => {
+      fullText = text;
+      output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
+    });
+    output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
+    networkRenderCharts(fullText, analysisType === 'individual' ? customer : null);
+    // Generate draft email after analysis completes
+    networkGenerateEmail(fullText, analysisType, customer, cohort);
+  } catch (e) {
+    output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
+  }
+  spinner.classList.remove('active');
+}
+
+// ─── DRAFT EMAIL GENERATION ───
+
+async function networkGenerateEmail(analysisText, analysisType, customer, cohort) {
+  const emailContainer = document.getElementById('network-email');
+  if (!emailContainer) return;
+  emailContainer.style.display = 'block';
+  emailContainer.innerHTML = `
+    <div class="email-draft-card">
+      <div class="email-draft-header">
+        <h3>✉️ Draft Customer Email <span class="email-draft-badge">Draft</span></h3>
+        <div class="output-spinner active" id="email-spinner"></div>
+      </div>
+      <div class="email-draft-body" style="color:var(--text-dim)">
+        <span class="typing-cursor"></span> Generating personalised email with offer...
+      </div>
+    </div>`;
+
+  const bench = TELCO_BENCHMARKS;
+  let emailMessages;
+
+  if (analysisType === 'individual' && customer) {
+    const seg = networkGetSegment(customer);
+    const overage = customer.allowance < 999 && customer.dataGB > customer.allowance;
+    const overageGB = overage ? (customer.dataGB - customer.allowance).toFixed(1) : 0;
+
+    emailMessages = [
+      { role: 'system', content: `You are a telecom retention and sales copywriter. Write a personalised customer email offering a specific commercial offer based on the subscriber's usage data and the analysis provided. Use EUR for all prices. The email should be warm, professional, and actionable. Use the customer's first name. Do NOT use placeholders like [Name] — use the actual customer name. Format as: Subject line, then the email body with a greeting, 2-3 short paragraphs, bullet points for offer details, and a clear CTA. Keep it concise — no more than 250 words.` },
+      { role: 'user', content: `Write a personalised offer email to this subscriber:
+
+## Subscriber Details
+- Name: ${customer.name}
+- MSISDN: ${customer.msisdn}
+- Plan: ${customer.plan} (${customer.planType})
+- Monthly Data: ${customer.dataGB} GB / ${customer.allowance >= 999 ? 'Unlimited' : customer.allowance + ' GB'}${overage ? ` (over by ${overageGB} GB)` : ''}
+- Roaming: ${customer.roamGB} GB
+- ARPU: €${customer.arpu}/month
+- Tenure: ${customer.tenure} months
+- 5G Device: ${customer.has5G ? 'Yes' : 'No'}
+- Churn Risk: ${customer.churnRisk}%
+- Segment: ${seg}
+
+## AI Analysis Summary (extract key offers from this):
+${analysisText}
+
+Write ONE email to this customer with a specific, compelling offer based on their usage patterns. The offer must be specific (plan name, price, benefit). Include a subject line.` }
+    ];
+  } else {
+    // Cohort/network-wide — generate a template email for the segment
+    let data = TELCO_DATA;
+    if (analysisType === 'cohort' && cohort !== 'all') {
+      data = TELCO_DATA.filter(c => {
+        const s = networkGetSegment(c);
+        if (cohort === '5g') return c.has5G;
+        if (cohort === 'prepay') return c.planType === 'Prepay';
+        return s === cohort;
+      });
+    }
+    const cohortLabel = analysisType === 'network' ? 'all subscribers' : `${cohort} cohort`;
+    const avgData = (data.reduce((s,c) => s + c.dataGB, 0) / data.length).toFixed(1);
+    const avgARPU = (data.reduce((s,c) => s + c.arpu, 0) / data.length).toFixed(0);
+    const atRiskCount = data.filter(c => c.churnRisk >= 50).length;
+
+    emailMessages = [
+      { role: 'system', content: `You are a telecom marketing copywriter. Write a customer email template for a cohort/segment of subscribers. The email should offer a specific commercial upgrade or retention offer relevant to the segment. Use EUR for all prices. Use [Customer Name] and [MSISDN] as merge fields since this goes to multiple subscribers. Format as: Subject line, then the email body with a greeting, 2-3 short paragraphs, bullet points for offer details, and a clear CTA. Keep it concise — no more than 250 words.` },
+      { role: 'user', content: `Write a customer email template for the ${cohortLabel} (${data.length} subscribers):
+
+## Cohort Metrics
+- Average Monthly Data: ${avgData} GB
+- Average ARPU: €${avgARPU}
+- At-Risk Subscribers: ${atRiskCount}
+
+## AI Analysis Summary (extract the top recommended offer from this):
+${analysisText}
+
+Write ONE email template that could be sent to subscribers in this cohort. Base the offer on the top recommendation from the analysis. Include a subject line. Use [Customer Name] and [MSISDN] as merge fields.` }
+    ];
+  }
+
+  try {
+    let emailText = '';
+    await callLLM(emailMessages, (text) => {
+      emailText = text;
+      const body = emailContainer.querySelector('.email-draft-body');
+      if (body) body.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
+    });
+
+    // Store raw text for copy
+    emailContainer.dataset.rawEmail = emailText;
+
+    // Final render with actions
+    const analysisLabel = analysisType === 'individual'
+      ? `To: ${customer.name} (${customer.msisdn})`
+      : `To: ${cohort === 'all' || analysisType === 'network' ? 'All Subscribers' : cohort + ' cohort'} (template)`;
+
+    emailContainer.innerHTML = `
+      <div class="email-draft-card">
+        <div class="email-draft-header">
+          <h3>✉️ Draft Customer Email <span class="email-draft-badge">Draft</span></h3>
+        </div>
+        <div class="email-meta">
+          <div class="email-meta-row"><span class="email-meta-label">From:</span><span class="email-meta-val">Customer Retention Team &lt;retention@telco.ie&gt;</span></div>
+          <div class="email-meta-row"><span class="email-meta-label">To:</span><span class="email-meta-val">${analysisLabel}</span></div>
+        </div>
+        <div class="email-draft-body">${postProcessLLMOutput(formatMarkdown(emailText))}</div>
+        <div class="email-draft-actions">
+          <button onclick="copyEmailDraft(this)">📋 Copy Email</button>
+          <button onclick="downloadEmailDraft()">💾 Download .txt</button>
+        </div>
+      </div>`;
+  } catch (e) {
+    emailContainer.querySelector('.email-draft-body').innerHTML =
+      `<span style="color:var(--danger)">Email generation failed: ${e.message}</span>`;
+  }
+}
+
+function copyEmailDraft(btn) {
+  const container = document.getElementById('network-email');
+  const raw = container?.dataset?.rawEmail || '';
+  navigator.clipboard.writeText(raw).then(() => {
+    btn.classList.add('copied');
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '📋 Copy Email'; }, 2000);
+  });
+}
+
+function downloadEmailDraft() {
+  const container = document.getElementById('network-email');
+  const raw = container?.dataset?.rawEmail || '';
+  const blob = new Blob([raw], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'customer-offer-email.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function networkRenderCharts(llmText, customer) {
+  if (typeof Chart === 'undefined') return;
+  const container = document.getElementById('network-charts');
+  if (!container) return;
+  container.style.display = 'block';
+
+  // Destroy existing charts
+  if (networkCharts.usage) { networkCharts.usage.destroy(); networkCharts.usage = null; }
+  if (networkCharts.hourly) { networkCharts.hourly.destroy(); networkCharts.hourly = null; }
+
+  if (customer) {
+    // Individual: usage vs plan vs benchmark + hourly pattern
+    const usageCanvas = document.getElementById('network-usage-chart');
+    const hourlyCanvas = document.getElementById('network-hourly-chart');
+    if (!usageCanvas || !hourlyCanvas) return;
+
+    const overage = customer.allowance < 999 && customer.dataGB > customer.allowance;
+    const planLimit = customer.allowance >= 999 ? customer.dataGB * 1.2 : customer.allowance;
+
+    networkCharts.usage = new Chart(usageCanvas, {
+      type: 'bar',
+      data: {
+        labels: ['Plan Allowance', 'Actual Usage', 'EU Benchmark', 'Power User Avg'],
+        datasets: [{
+          label: 'GB/month',
+          data: [customer.allowance >= 999 ? 150 : customer.allowance, customer.dataGB, TELCO_BENCHMARKS.avgDataPerSub, 110],
+          backgroundColor: [
+            'rgba(136,136,170,0.4)',
+            overage ? 'rgba(251,191,36,0.7)' : 'rgba(59,130,246,0.7)',
+            'rgba(52,211,153,0.5)',
+            'rgba(124,92,252,0.5)'
+          ],
+          borderColor: ['rgba(136,136,170,0.6)', overage ? 'rgba(251,191,36,1)' : 'rgba(59,130,246,1)', 'rgba(52,211,153,0.8)', 'rgba(124,92,252,0.8)'],
+          borderWidth: 1.5
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { color: '#8888aa' }, grid: { color: 'rgba(42,42,90,0.3)' } }, x: { ticks: { color: '#8888aa' } } }
+      }
+    });
+
+    const hours = networkHourlyPattern(customer);
+    const labels = Array.from({length:24}, (_,i) => `${String(i).padStart(2,'0')}h`);
+    networkCharts.hourly = new Chart(hourlyCanvas, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Data (GB)',
+          data: hours,
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59,130,246,0.15)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 2,
+          pointHoverRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { color: '#8888aa' }, grid: { color: 'rgba(42,42,90,0.3)' } },
+          x: { ticks: { color: '#8888aa', maxRotation: 45, autoSkip: true, maxTicksLimit: 12 } }
+        }
+      }
+    });
+  } else {
+    // Cohort/network: top consumers bar chart + ARPU distribution
+    const usageCanvas = document.getElementById('network-usage-chart');
+    const hourlyCanvas = document.getElementById('network-hourly-chart');
+    if (!usageCanvas || !hourlyCanvas) return;
+
+    const cohort = document.getElementById('network-cohort')?.value || 'all';
+    let data = TELCO_DATA;
+    if (cohort !== 'all') {
+      data = data.filter(c => {
+        const s = networkGetSegment(c);
+        if (cohort === '5g') return c.has5G;
+        if (cohort === 'prepay') return c.planType === 'Prepay';
+        return s === cohort;
+      });
+    }
+
+    const sorted = [...data].sort((a,b) => b.dataGB - a.dataGB).slice(0, 12);
+    networkCharts.usage = new Chart(usageCanvas, {
+      type: 'bar',
+      data: {
+        labels: sorted.map(c => c.id),
+        datasets: [{
+          label: 'Data Usage (GB)',
+          data: sorted.map(c => c.dataGB),
+          backgroundColor: sorted.map(c => {
+            const seg = networkGetSegment(c);
+            if (seg === 'overage') return 'rgba(251,191,36,0.7)';
+            if (seg === 'risk') return 'rgba(248,113,113,0.7)';
+            if (seg === 'roamer') return 'rgba(52,211,153,0.7)';
+            if (seg === 'power') return 'rgba(59,130,246,0.7)';
+            return 'rgba(136,136,170,0.5)';
+          }),
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { color: '#8888aa' }, grid: { color: 'rgba(42,42,90,0.3)' } }, x: { ticks: { color: '#8888aa', maxRotation: 45 } } }
+      }
+    });
+
+    // ARPU vs Churn Risk scatter
+    networkCharts.hourly = new Chart(hourlyCanvas, {
+      type: 'scatter',
+      data: {
+        datasets: [{
+          label: 'Subscribers',
+          data: data.map(c => ({ x: c.arpu, y: c.churnRisk, r: Math.max(4, c.dataGB / 8) })),
+          backgroundColor: data.map(c => c.churnRisk >= 60 ? 'rgba(248,113,113,0.6)' : c.churnRisk >= 40 ? 'rgba(251,191,36,0.6)' : 'rgba(52,211,153,0.6)'),
+          borderColor: data.map(c => c.churnRisk >= 60 ? 'rgba(248,113,113,1)' : c.churnRisk >= 40 ? 'rgba(251,191,36,1)' : 'rgba(52,211,153,1)'),
+          borderWidth: 1.5
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `ARPU €${ctx.parsed.x}, Risk ${ctx.parsed.y}%` } } },
+        scales: {
+          x: { title: { display: true, text: 'ARPU (€)', color: '#8888aa' }, beginAtZero: true, ticks: { color: '#8888aa' }, grid: { color: 'rgba(42,42,90,0.3)' } },
+          y: { title: { display: true, text: 'Churn Risk (%)', color: '#8888aa' }, beginAtZero: true, ticks: { color: '#8888aa' }, grid: { color: 'rgba(42,42,90,0.3)' } }
+        }
+      }
+    });
+  }
+}
+
+// Cohort filter change → re-render table
+document.addEventListener('DOMContentLoaded', () => {
+  const cohortSel = document.getElementById('network-cohort');
+  if (cohortSel) cohortSel.addEventListener('change', () => networkRenderTable());
+});
 
 // Check auth on page load
 checkAuth();
