@@ -1187,6 +1187,181 @@
     .tag.autonomous { background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(6,182,212,0.15)); color: #7c5cfc; }
     .btn-autonomous { background: linear-gradient(135deg, #7c5cfc, #06b6d4); color: #fff; }
     .btn-autonomous:hover:not(:disabled) { background: linear-gradient(135deg, #a78bfa, #22d3ee); }
+
+    /* ─── SWARM DEMO ─── */
+    .card-header-img.swarm { background: linear-gradient(135deg, rgba(83,216,251,0.15) 0%, rgba(124,92,252,0.08) 100%); }
+    .tag.swarm { background: linear-gradient(135deg, rgba(83,216,251,0.15), rgba(124,92,252,0.15)); color: #53d8fb; }
+    .btn-swarm { background: linear-gradient(135deg, #53d8fb, #7c5cfc); color: #fff; }
+    .btn-swarm:hover:not(:disabled) { background: linear-gradient(135deg, #22d3ee, #a78bfa); }
+
+    .swarm-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .swarm-agent-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+      min-height: 280px;
+    }
+    .swarm-agent-card.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px -6px var(--accent);
+    }
+    .swarm-agent-card.synthesis {
+      border-color: var(--accent2);
+    }
+    .swarm-agent-card.synthesis.active {
+      border-color: var(--accent2);
+      box-shadow: 0 0 20px -6px var(--accent2);
+    }
+    .swarm-agent-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .swarm-agent-icon { font-size: 1.3rem; }
+    .swarm-agent-name { font-weight: 700; font-size: 0.9rem; }
+    .swarm-agent-status {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: auto;
+    }
+    .swarm-status-idle { background: var(--surface2); color: var(--text-dim); }
+    .swarm-status-planning { background: rgba(251,191,36,0.15); color: var(--warning); }
+    .swarm-status-searching { background: rgba(83,216,251,0.15); color: var(--accent); }
+    .swarm-status-reasoning { background: rgba(124,92,252,0.15); color: var(--accent2); }
+    .swarm-status-done { background: rgba(52,211,153,0.15); color: var(--success); }
+    .swarm-status-error { background: rgba(248,113,113,0.15); color: var(--danger); }
+
+    .swarm-agent-thinking {
+      font-size: 0.76rem;
+      color: var(--text-dim);
+      font-style: italic;
+      margin-bottom: 0.5rem;
+      min-height: 2rem;
+    }
+    .swarm-agent-tools {
+      font-size: 0.7rem;
+      margin-bottom: 0.4rem;
+      max-height: 60px;
+      overflow-y: auto;
+    }
+    .swarm-tool-entry {
+      padding: 2px 0;
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .swarm-tool-entry .tool-icon { color: var(--accent); }
+    .swarm-agent-output {
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: var(--text);
+      flex: 1;
+      overflow-y: auto;
+      max-height: 300px;
+      padding-right: 4px;
+    }
+    .swarm-agent-output::-webkit-scrollbar { width: 4px; }
+    .swarm-agent-output::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .swarm-pulse {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: swarm-pulse-anim 1.2s ease-in-out infinite;
+    }
+    @keyframes swarm-pulse-anim {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+
+    .swarm-report {
+      background: var(--surface);
+      border: 1px solid var(--accent2);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+      display: none;
+    }
+    .swarm-report.active { display: block; }
+    .swarm-report h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .swarm-report-content {
+      font-size: 0.85rem;
+      line-height: 1.65;
+      color: var(--text);
+    }
+    .swarm-report-content h1, .swarm-report-content h2, .swarm-report-content h3 {
+      color: var(--text);
+      margin-top: 1rem;
+    }
+    .swarm-report-content ul, .swarm-report-content ol {
+      padding-left: 1.5rem;
+      margin: 0.5rem 0;
+    }
+    .swarm-report-content strong { color: var(--accent); }
+    .swarm-report-content code {
+      background: var(--surface2);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.8em;
+    }
+
+    .swarm-progress-bar {
+      height: 4px;
+      background: var(--surface2);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 0.5rem 0 1rem;
+    }
+    .swarm-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .swarm-presets {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.5rem;
+    }
+    .swarm-preset-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 0.35rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .swarm-preset-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
     .an-event-log {
       background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
       padding: 0.5rem 0.7rem; max-height: 320px; overflow-y: auto; font-size: 0.76rem;
@@ -2019,6 +2194,66 @@
 
 <div class="footer">
   <p>AI Solutions Demo Portal — Powered by <a href="https://tensorx.ai" target="_blank">Tensorx</a> — Built with ❤️ by <a href="https://github.com/bowdenneil" target="_blank">Pug</a></p>
+</div>
+
+<!-- SWARM DEMO OVERLAY -->
+<div class="demo-overlay" id="demo-swarm">
+  <div class="demo-panel" style="max-width:1400px">
+    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
+    <h2 class="demo-title">🤖 Multi-Agent Research Swarm</h2>
+    <p class="demo-desc">Ask a complex business question. Three specialist AI agents work in parallel — each searching the web and reasoning independently — then a Synthesis Lead combines their findings into an executive briefing.</p>
+    <div class="demo-body">
+      <div class="demo-input" style="flex-wrap:wrap">
+        <div class="input-group" style="flex:3;min-width:300px">
+          <label>Research Question</label>
+          <input type="text" id="swarm-query" placeholder="e.g. Should Dell expand its AI infrastructure business into the European telecom market?">
+        </div>
+        <button class="btn btn-swarm" id="swarm-run-btn" onclick="swarmRun()">🚀 Launch Swarm</button>
+      </div>
+      <div class="swarm-presets" id="swarm-presets">
+        <button class="swarm-preset-btn" onclick="swarmPreset('dell')">Dell AI in Telecom</button>
+        <button class="swarm-preset-btn" onclick="swarmPreset('vodafone')">Vodafone vs Competitors</button>
+        <button class="swarm-preset-btn" onclick="swarmPreset('energy')">AI for Energy Grid</button>
+        <button class="swarm-preset-btn" onclick="swarmPreset('edge')">Edge Computing Market 2026</button>
+      </div>
+
+      <div class="swarm-progress-bar" id="swarm-progress" style="display:none">
+        <div class="swarm-progress-fill" id="swarm-progress-fill"></div>
+      </div>
+
+      <div class="swarm-grid" id="swarm-agent-grid"></div>
+
+      <div class="swarm-report" id="swarm-report">
+        <h3>📋 Executive Briefing</h3>
+        <div class="swarm-report-content" id="swarm-report-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AGENTIC DEMOS -->
+<div class="category-header"><span class="cat-icon">🤖</span> Agentic Demos <span class="cat-count">1</span></div>
+<div class="cards">
+  <div class="card" onclick="openDemo('swarm')">
+    <div class="card-header-img swarm" id="card-header-swarm">
+      <div class="card-icon swarm" id="card-emoji-swarm">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#53d8fb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="3"/>
+          <circle cx="5" cy="16" r="2.5"/>
+          <circle cx="19" cy="16" r="2.5"/>
+          <line x1="12" y1="11" x2="6.5" y2="14"/>
+          <line x1="12" y1="11" x2="17.5" y2="14"/>
+          <line x1="7.5" y1="16" x2="16.5" y2="16"/>
+        </svg>
+      </div>
+      <div class="card-gen-overlay" id="card-gen-swarm">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Multi-Agent Research Swarm</h2>
+      <p>Ask a complex business question and watch a team of specialist AI agents work in parallel — each searching the web, reasoning independently, then combining findings into an executive briefing.</p>
+      <span class="tag swarm">Agentic AI</span>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -5394,6 +5629,267 @@ loadIcons();
 // ─── KEY INPUT: Enter to submit ───
 document.getElementById('rag-question').addEventListener('keydown', e => { if (e.key === 'Enter') ragQuery(); });
 document.getElementById('image-prompt').addEventListener('keydown', e => { if (e.key === 'Enter') imageQuery(); });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MULTI-AGENT RESEARCH SWARM
+// ═══════════════════════════════════════════════════════════════════════════
+
+const SWARM_AGENTS = [
+  { id: 'market',     name: 'Market Researcher',  icon: '📊', color: '--accent'   },
+  { id: 'financial',  name: 'Financial Analyst',  icon: '💰', color: '--accent5'  },
+  { id: 'risk',       name: 'Risk & Regulatory',  icon: '⚖️', color: '--accent4' },
+  { id: 'synthesis',  name: 'Synthesis Lead',     icon: '🧠', color: '--accent2' },
+];
+
+let swarmRunning = false;
+let swarmAgentState = {};  // per-agent accumulated text + status
+
+function swarmPreset(key) {
+  const presets = {
+    dell: 'Should Dell expand its AI infrastructure business into the European telecom market?',
+    vodafone: 'Analyse the competitive positioning of Vodafone Ireland vs Three vs Eir in 5G enterprise services',
+    energy: 'Evaluate the market opportunity for AI-powered smart grid optimization in Europe',
+    edge: 'What is the market outlook for edge computing in telecom networks for 2026?',
+  };
+  const q = presets[key];
+  if (q) document.getElementById('swarm-query').value = q;
+}
+
+function swarmRenderGrid() {
+  const grid = document.getElementById('swarm-agent-grid');
+  grid.innerHTML = SWARM_AGENTS.map(a => `
+    <div class="swarm-agent-card ${a.id === 'synthesis' ? 'synthesis' : ''}" id="swarm-card-${a.id}">
+      <div class="swarm-agent-header">
+        <span class="swarm-agent-icon">${a.icon}</span>
+        <span class="swarm-agent-name">${a.name}</span>
+        <span class="swarm-agent-status swarm-status-idle" id="swarm-status-${a.id}">Idle</span>
+      </div>
+      <div class="swarm-agent-thinking" id="swarm-thinking-${a.id}"></div>
+      <div class="swarm-agent-tools" id="swarm-tools-${a.id}"></div>
+      <div class="swarm-agent-output" id="swarm-output-${a.id}"></div>
+    </div>
+  `).join('');
+  swarmAgentState = {};
+  SWARM_AGENTS.forEach(a => {
+    swarmAgentState[a.id] = { text: '', status: 'idle', tools: [] };
+  });
+}
+
+function swarmSetStatus(agentId, status) {
+  const el = document.getElementById(`swarm-status-${agentId}`);
+  const card = document.getElementById(`swarm-card-${agentId}`);
+  if (!el) return;
+  el.className = `swarm-agent-status swarm-status-${status}`;
+  el.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+  if (status === 'idle' || status === 'done' || status === 'error') {
+    card.classList.remove('active');
+  } else {
+    card.classList.add('active');
+  }
+  swarmAgentState[agentId].status = status;
+}
+
+function swarmSetThinking(agentId, text) {
+  const el = document.getElementById(`swarm-thinking-${agentId}`);
+  if (el) {
+    el.innerHTML = `<span class="swarm-pulse" style="background:var(--accent)"></span> ${text}`;
+  }
+}
+
+function swarmAddTool(agentId, tool, detail, url) {
+  const el = document.getElementById(`swarm-tools-${agentId}`);
+  if (!el) return;
+  const entry = document.createElement('div');
+  entry.className = 'swarm-tool-entry';
+  entry.innerHTML = `<span class="tool-icon">🔍</span> ${detail}`;
+  if (url) {
+    entry.innerHTML = `<span class="tool-icon">🔍</span> <a href="${url}" target="_blank" style="color:var(--text-dim);text-decoration:none">${detail}</a>`;
+  }
+  el.appendChild(entry);
+  el.scrollTop = el.scrollHeight;
+  swarmAgentState[agentId].tools.push({ tool, detail, url });
+}
+
+function swarmAppendChunk(agentId, text) {
+  const el = document.getElementById(`swarm-output-${agentId}`);
+  if (!el) return;
+  swarmAgentState[agentId].text += text;
+  el.innerHTML = formatMarkdown(swarmAgentState[agentId].text);
+  el.scrollTop = el.scrollHeight;
+}
+
+function swarmUpdateProgress(done, total, phase) {
+  const bar = document.getElementById('swarm-progress');
+  const fill = document.getElementById('swarm-progress-fill');
+  bar.style.display = 'block';
+  let pct = (done / total) * 100;
+  if (phase === 'synthesis') pct = Math.max(pct, 75);
+  fill.style.width = pct + '%';
+}
+
+async function swarmRun() {
+  const query = document.getElementById('swarm-query').value.trim();
+  if (!query) { showToast('Enter a research question', true); return; }
+  if (swarmRunning) { showToast('Swarm already running', true); return; }
+
+  swarmRunning = true;
+  const btn = document.getElementById('swarm-run-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Swarm Running...';
+
+  // Reset UI
+  swarmRenderGrid();
+  document.getElementById('swarm-report').classList.remove('active');
+  document.getElementById('swarm-progress').style.display = 'block';
+  document.getElementById('swarm-progress-fill').style.width = '5%';
+
+  // Get auth token
+  const token = localStorage.getItem(AUTH_TOKEN_KEY) || '';
+  const model = MODEL || 'deepseek/deepseek-v4-flash';
+
+  try {
+    const resp = await fetch('/api/swarm', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+      },
+      body: JSON.stringify({ query, model }),
+    });
+
+    if (!resp.ok) {
+      throw new Error(`Server error: ${resp.status}`);
+    }
+
+    // Read SSE stream
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ') || line.trim() === 'data: [DONE]') continue;
+        try {
+          const evt = JSON.parse(line.slice(6));
+          if (swarmHandleEvent(evt)) break;  // stream end signal
+        } catch (e) {
+          console.warn('Parse error:', e);
+        }
+      }
+    }
+  } catch (e) {
+    showToast('Swarm error: ' + e.message, true);
+    console.error('Swarm error:', e);
+  } finally {
+    swarmRunning = false;
+    btn.disabled = false;
+    btn.textContent = '🚀 Launch Swarm';
+  }
+}
+
+function swarmHandleEvent(evt) {
+  switch (evt.type) {
+    case 'swarm_start':
+      document.getElementById('swarm-progress-fill').style.width = '10%';
+      break;
+
+    case 'agent_status':
+      swarmSetStatus(evt.agent, evt.status);
+      if (evt.status === 'done' && evt.total_done) {
+        swarmUpdateProgress(evt.total_done, evt.total, 'specialists');
+      }
+      if (evt.status === 'done' && evt.agent === 'synthesis') {
+        document.getElementById('swarm-progress-fill').style.width = '100%';
+      }
+      break;
+
+    case 'agent_thinking':
+      swarmSetThinking(evt.agent, evt.text);
+      break;
+
+    case 'agent_tool':
+      swarmAddTool(evt.agent, evt.tool, evt.detail, evt.url);
+      break;
+
+    case 'agent_chunk':
+      swarmAppendChunk(evt.agent, evt.text);
+      break;
+
+    case 'agent_result':
+      // Final result — already accumulated via chunks, just ensure full text is set
+      if (!swarmAgentState[evt.agent] || !swarmAgentState[evt.agent].text) {
+        swarmAppendChunk(evt.agent, evt.text);
+      }
+      // Clear thinking indicator
+      const thinkEl = document.getElementById(`swarm-thinking-${evt.agent}`);
+      if (thinkEl) thinkEl.innerHTML = '';
+      break;
+
+    case 'agent_error':
+      const errEl = document.getElementById(`swarm-output-${evt.agent}`);
+      if (errEl) errEl.innerHTML = `<span style="color:var(--danger)">⚠ ${evt.message}</span>`;
+      break;
+
+    case 'phase':
+      if (evt.phase === 'synthesis') {
+        swarmUpdateProgress(3, 3, 'synthesis');
+      }
+      break;
+
+    case 'swarm_complete':
+      // Show the synthesis report from accumulated text
+      var report = document.getElementById('swarm-report');
+      var reportContent = document.getElementById('swarm-report-content');
+      var synthText = (swarmAgentState['synthesis'] || {}).text || '';
+      if (synthText) {
+        reportContent.innerHTML = formatMarkdown(synthText);
+        // Render collected source links
+        if (evt.sources && evt.sources.length > 0) {
+          var srcHtml = '<hr style="border:0;border-top:1px solid var(--border);margin:1rem 0">' +
+            '<h4 style="font-size:0.8rem;color:var(--text-dim);margin-bottom:0.5rem">📚 Source Materials</h4>' +
+            '<ul style="list-style:none;padding:0;margin:0">' +
+            evt.sources.map(function(s) {
+              return '<li style="margin-bottom:0.3rem;font-size:0.75rem">' +
+                '<a href="' + s.url + '" target="_blank" style="color:var(--accent);text-decoration:none">' +
+                s.title + '</a></li>';
+            }).join('') +
+            '</ul>';
+          reportContent.innerHTML += srcHtml;
+        }
+        report.classList.add('active');
+      }
+      // Clear the synthesis card output to avoid duplication with the report
+      var synthCard = document.getElementById('swarm-output-synthesis');
+      if (synthCard) synthCard.innerHTML = '';
+      // Clear any remaining thinking indicators
+      SWARM_AGENTS.forEach(a => {
+        var t = document.getElementById(`swarm-thinking-${a.id}`);
+        if (t) t.innerHTML = '';
+      });
+      return true;  // signal stream end
+
+    case 'done':
+      return true;  // signal stream end
+
+    case 'error':
+      showToast('Agent error: ' + evt.message, true);
+      break;
+  }
+  return false;
+}
+
+// Enter key to launch
+document.getElementById('swarm-query')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') swarmRun();
+});
+
 </script>
 </body>
 </html>

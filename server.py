@@ -9,8 +9,10 @@ import http.server
 import json
 import os
 import sys
+import time
 import urllib.request
 import urllib.error
+import urllib.parse
 import argparse
 import sqlite3
 import hashlib
@@ -39,6 +41,8 @@ ICON_PROMPTS = {
     'image': 'Minimalist flat icon of an artists paint palette with a glowing brush stroke, dark purple-teal gradient background, teal and purple glowing accents, simple clean vector style',
     'onprem': 'Minimalist flat icon of a server rack with glowing GPU chips and a EU flag star, dark violet-blue gradient background, violet and blue glowing accents, simple clean vector style',
     'tco': 'Minimalist flat icon of a calculator with a euro symbol and bar chart, dark emerald-teal gradient background, emerald and cyan glowing accents, simple clean vector style',
+    'network': 'Minimalist flat icon of a radio tower with signal waves and a network graph, dark blue-sky gradient background, blue and sky glowing accents, simple clean vector style',
+    'swarm': 'Minimalist flat icon of three connected nodes forming a network with a central brain symbol, dark cyan-purple gradient background, cyan and purple glowing accents, simple clean vector style',
 }
 
 # ─── AUTH DATABASE ───
@@ -178,6 +182,311 @@ def generate_icon_file(demo):
     except Exception as e:
         print(f'⚠ Icon generation failed for {demo}: {e}')
 
+
+# ═══════════════════════════════════════════════════════════════════════════
+# MULTI-AGENT RESEARCH SWARM
+# ═══════════════════════════════════════════════════════════════════════════
+
+import queue as _queue
+
+SWARM_AGENTS = [
+    {
+        'id': 'market',
+        'name': 'Market Researcher',
+        'icon': '📊',
+        'role': 'You are a market research specialist. You analyse market size, growth trends, competitive landscape, and customer segments. You provide data-driven insights with specific numbers and percentages.',
+    },
+    {
+        'id': 'financial',
+        'name': 'Financial Analyst',
+        'icon': '💰',
+        'role': 'You are a financial analyst. You evaluate revenue models, cost structures, margins, profitability, and investment implications. You think in terms of ROI, payback periods, and financial risk.',
+    },
+    {
+        'id': 'risk',
+        'name': 'Risk & Regulatory',
+        'icon': '⚖️',
+        'role': 'You are a risk and regulatory specialist. You identify regulatory barriers, compliance requirements, operational risks, and legal considerations. You think about what could go wrong and how to mitigate it.',
+    },
+    {
+        'id': 'synthesis',
+        'name': 'Synthesis Lead',
+        'icon': '🧠',
+        'role': 'You are the synthesis lead. You combine findings from other specialists into a cohesive executive briefing. You identify cross-cutting themes, resolve conflicts, and produce actionable recommendations.',
+    },
+]
+
+
+def _llm_call(messages, model, api_key, max_tokens=2048):
+    """Non-streaming LLM call to Tensorx. Returns the content string."""
+    req_data = json.dumps({
+        'model': model,
+        'messages': messages,
+        'stream': False,
+        'max_tokens': max_tokens,
+    }).encode()
+
+    req = urllib.request.Request(
+        f'{API_BASE}/chat/completions',
+        data=req_data,
+        headers={
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {api_key}',
+        },
+        method='POST'
+    )
+    resp = urllib.request.urlopen(req, timeout=90)
+    data = json.loads(resp.read())
+    return data.get('choices', [{}])[0].get('message', {}).get('content', '')
+
+
+def _brave_search(query, brave_key, count=6):
+    """Search Brave and return simplified results."""
+    if not brave_key:
+        return []
+    target = f'https://api.search.brave.com/res/v1/web/search?q={urllib.parse.quote(query)}&count={count}'
+    req = urllib.request.Request(target, headers={
+        'Accept': 'application/json',
+        'X-Subscription-Token': brave_key,
+    })
+    resp = urllib.request.urlopen(req, timeout=15)
+    data = json.loads(resp.read())
+    return [
+        {'title': r.get('title', ''), 'url': r.get('url', ''), 'description': r.get('description', '')}
+        for r in (data.get('web', {}).get('results', []))
+    ]
+
+
+def _agent_worker(agent, query, model, api_key, brave_key, event_q, agent_idx, total, shared_sources):
+    """Run a single specialist agent: search → reason → report.
+    shared_sources: list to append {title, url} dicts for the final briefing.
+    """
+    aid = agent['id']
+    aname = agent['name']
+
+    try:
+        # Phase 1: Planning
+        event_q.put({'type': 'agent_status', 'agent': aid, 'status': 'planning'})
+        event_q.put({'type': 'agent_thinking', 'agent': aid,
+                     'text': f'Analysing the query: "{query[:120]}..."\nDetermining what information I need to gather.'})
+
+        # Phase 2: Web search — stagger to avoid Brave rate limits
+        search_query = f'{query} {agent["role"].split(".")[1].strip()[:60] if "." in agent["role"] else ""}'
+        event_q.put({'type': 'agent_status', 'agent': aid, 'status': 'searching'})
+        # Stagger search start by agent index to avoid 429s
+        time.sleep(agent_idx * 1.5)
+        results = _brave_search(query, brave_key)
+        # Retry once if rate-limited
+        if not results and brave_key:
+            event_q.put({'type': 'agent_thinking', 'agent': aid, 'text': 'Search rate-limited, retrying...'})
+            time.sleep(2)
+            results = _brave_search(query, brave_key)
+
+        # Stream search results
+        for r in results[:4]:
+            event_q.put({'type': 'agent_tool', 'agent': aid,
+                         'tool': 'web_search', 'detail': r['title'], 'url': r['url']})
+            time.sleep(0.15)  # visual pacing
+            # Collect sources for the final briefing
+            shared_sources.append({'title': r['title'], 'url': r['url']})
+
+        # Build context from search results
+        search_context = '\n'.join(
+            f"[{i+1}] {r['title']}\n{r['description']}\nURL: {r['url']}"
+            for i, r in enumerate(results[:6])
+        ) if results else 'No web results available.'
+
+        # Phase 3: LLM reasoning
+        event_q.put({'type': 'agent_status', 'agent': aid, 'status': 'reasoning'})
+        event_q.put({'type': 'agent_thinking', 'agent': aid,
+                     'text': f'Synthesising {len(results)} sources into specialist analysis...'})
+
+        system_msg = agent['role'] + '\n\nYou are part of a multi-agent research team analysing the following query. Provide a focused, structured analysis from your specialist perspective. Use bullet points and specific data where possible. Keep it under 400 words.'
+
+        user_msg = f'RESEARCH QUERY: {query}\n\nWEB SEARCH CONTEXT:\n{search_context}\n\nProvide your specialist analysis:'
+
+        # Stream the reasoning by calling LLM and sending chunks
+        messages = [
+            {'role': 'system', 'content': system_msg},
+            {'role': 'user', 'content': user_msg},
+        ]
+
+        # Non-streaming call but simulate streaming for UX
+        full_response = _llm_call(messages, model, api_key, max_tokens=2048)
+
+        # Send response in ~3 chunks for visual streaming effect
+        chunk_size = max(1, len(full_response) // 4)
+        for i in range(0, len(full_response), chunk_size):
+            chunk = full_response[i:i+chunk_size]
+            event_q.put({'type': 'agent_chunk', 'agent': aid, 'text': chunk})
+            time.sleep(0.08)
+
+        # Phase 4: Complete
+        event_q.put({'type': 'agent_status', 'agent': aid, 'status': 'done'})
+        event_q.put({'type': 'agent_result', 'agent': aid, 'text': full_response})
+
+    except Exception as e:
+        event_q.put({'type': 'agent_status', 'agent': aid, 'status': 'error'})
+        event_q.put({'type': 'agent_error', 'agent': aid, 'message': str(e)})
+
+
+def _synthesis_worker(query, model, api_key, agent_results, event_q):
+    """Run the synthesis agent after specialists complete."""
+    aid = 'synthesis'
+    try:
+        event_q.put({'type': 'agent_status', 'agent': aid, 'status': 'planning'})
+        event_q.put({'type': 'agent_thinking', 'agent': aid,
+                     'text': 'Collecting specialist reports and identifying cross-cutting themes...'})
+
+        # Build context from all specialist results
+        specialist_context = ''
+        for agent in SWARM_AGENTS:
+            if agent['id'] == 'synthesis':
+                continue
+            result = agent_results.get(agent['id'], '')
+            specialist_context += f"\n\n{'='*60}\n{agent['icon']} {agent['name'].upper()}\n{'='*60}\n{result}"
+
+        system_msg = (
+            "You are the Synthesis Lead of a multi-agent research team. "
+            "Below are specialist analyses from your team members. "
+            "Synthesize them into a cohesive executive briefing with:\n"
+            "1. **Executive Summary** — Key findings in 2-3 sentences\n"
+            "2. **Strategic Insights** — Cross-cutting themes and patterns\n"
+            "3. **Recommendations** — 3-5 actionable next steps\n"
+            "4. **Risk Flags** — Key risks or conflicts identified\n"
+            "5. **Confidence Assessment** — How confident is the team and why\n\n"
+            "Use markdown formatting. Be specific and concise."
+        )
+
+        user_msg = f'RESEARCH QUERY: {query}\n\nSPECIALIST ANALYSES:{specialist_context}\n\nSynthesize into an executive briefing:'
+
+        messages = [
+            {'role': 'system', 'content': system_msg},
+            {'role': 'user', 'content': user_msg},
+        ]
+
+        event_q.put({'type': 'agent_status', 'agent': aid, 'status': 'reasoning'})
+        event_q.put({'type': 'agent_thinking', 'agent': aid,
+                     'text': 'Synthesising all specialist reports into executive briefing...'})
+
+        full_response = _llm_call(messages, model, api_key, max_tokens=3072)
+
+        # Stream in chunks
+        chunk_size = max(1, len(full_response) // 6)
+        for i in range(0, len(full_response), chunk_size):
+            chunk = full_response[i:i+chunk_size]
+            event_q.put({'type': 'agent_chunk', 'agent': aid, 'text': chunk})
+            time.sleep(0.06)
+
+        event_q.put({'type': 'agent_status', 'agent': aid, 'status': 'done'})
+        event_q.put({'type': 'agent_result', 'agent': aid, 'text': full_response})
+
+    except Exception as e:
+        event_q.put({'type': 'agent_status', 'agent': aid, 'status': 'error'})
+        event_q.put({'type': 'agent_error', 'agent': aid, 'message': str(e)})
+
+
+def _stream_sse(wfile, event):
+    """Write one SSE event to the response stream."""
+    msg = f'data: {json.dumps(event)}\n\n'
+    wfile.write(msg.encode())
+    wfile.flush()
+
+
+def run_swarm(wfile, query, model, api_key, brave_key):
+    """Orchestrate the multi-agent swarm with SSE streaming.
+
+    Flow:
+    1. Announce agents
+    2. Run 3 specialists in parallel (Market, Financial, Risk)
+    3. Wait for all to complete
+    4. Run Synthesis Lead with all specialist results
+    5. Send done event
+    """
+    import concurrent.futures
+
+    # Announce
+    _stream_sse(wfile, {'type': 'swarm_start', 'query': query, 'agents': [
+        {'id': a['id'], 'name': a['name'], 'icon': a['icon']} for a in SWARM_AGENTS
+    ]})
+
+    specialists = [a for a in SWARM_AGENTS if a['id'] != 'synthesis']
+    event_q = _queue.Queue()
+    agent_results = {}
+    all_sources = []  # collected from all specialists for the final briefing
+
+    # Run 3 specialists in parallel
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        futures = {}
+        for i, agent in enumerate(specialists):
+            future = executor.submit(
+                _agent_worker, agent, query, model, api_key, brave_key,
+                event_q, i, len(specialists), all_sources
+            )
+            futures[future] = agent['id']
+
+        # Drain the event queue while agents are running
+        done_count = 0
+        total_specialists = len(specialists)
+
+        while done_count < total_specialists:
+            try:
+                event = event_q.get(timeout=120)
+            except _queue.Empty:
+                _stream_sse(wfile, {'type': 'error', 'message': 'Agent timeout'})
+                break
+
+            # Check if this is a completion signal
+            if event.get('type') == 'agent_result':
+                aid = event.get('agent')
+                agent_results[aid] = event.get('text', '')
+
+            if event.get('type') == 'agent_status' and event.get('status') == 'done':
+                done_count += 1
+                event['total_done'] = done_count
+                event['total'] = total_specialists
+
+            # Check if this is an error
+            if event.get('type') == 'agent_status' and event.get('status') == 'error':
+                done_count += 1  # count errors as done too
+
+            _stream_sse(wfile, event)
+
+        # Wait for all threads to finish
+        concurrent.futures.wait(futures.keys(), timeout=5)
+
+    # Phase 2: Synthesis
+    _stream_sse(wfile, {'type': 'phase', 'phase': 'synthesis', 'message': 'All specialists complete — Synthesis Lead is combining findings...'})
+    time.sleep(0.3)
+
+    synth_q = _queue.Queue()
+    _synthesis_worker(query, model, api_key, agent_results, synth_q)
+
+    # Drain synthesis events
+    while True:
+        try:
+            event = synth_q.get(timeout=60)
+            if event.get('type') == 'agent_result':
+                agent_results['synthesis'] = event.get('text', '')
+            _stream_sse(wfile, event)
+            if event.get('type') == 'agent_status' and event.get('status') in ('done', 'error'):
+                break
+        except _queue.Empty:
+            _stream_sse(wfile, {'type': 'error', 'message': 'Synthesis timeout'})
+            break
+
+    # Deduplicate sources by URL and send with the completion event
+    seen_urls = set()
+    unique_sources = []
+    for s in all_sources:
+        if s['url'] not in seen_urls:
+            seen_urls.add(s['url'])
+            unique_sources.append(s)
+
+    # Send just a signal (not the full results — they're already streamed via chunks)
+    _stream_sse(wfile, {'type': 'swarm_complete', 'sources': unique_sources})
+
+
 class DemoHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(Path(__file__).parent), **kwargs)
@@ -197,6 +506,11 @@ class DemoHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_auth_error()
                 return
             self.handle_proxy()
+        elif self.path == '/api/swarm':
+            if not self.get_authenticated_user():
+                self.send_auth_error()
+                return
+            self.handle_swarm()
         elif self.path == '/api/generate-image':
             if not self.get_authenticated_user():
                 self.send_auth_error()
@@ -551,6 +865,55 @@ class DemoHandler(http.server.SimpleHTTPRequestHandler):
             self.send_cors_headers()
             self.end_headers()
             self.wfile.write(e.read())
+
+    # ─── MULTI-AGENT RESEARCH SWARM ───
+
+    def handle_swarm(self):
+        """Handle POST /api/swarm — multi-agent research with SSE streaming.
+
+        Spawns specialist agents (Market Researcher, Financial Analyst,
+        Risk/Regulatory, Synthesis Lead) that run in parallel threads.
+        Each agent performs web searches + LLM reasoning, streaming events
+        back to the browser via Server-Sent Events.
+        """
+        content_length = int(self.headers.get('Content-Length', 0))
+        body = self.rfile.read(content_length) if content_length else b''
+        try:
+            req_data = json.loads(body)
+            query = req_data.get('query', '').strip()
+            model = req_data.get('model', 'deepseek/deepseek-v4-flash')
+        except Exception:
+            self.send_json_response(400, {'error': 'Invalid JSON body'})
+            return
+
+        if not query:
+            self.send_json_response(400, {'error': 'query is required'})
+            return
+
+        # SSE headers
+        self.send_response(200)
+        self.send_cors_headers()
+        self.send_header('Content-Type', 'text/event-stream')
+        self.send_header('Cache-Control', 'no-cache')
+        self.send_header('Connection', 'close')
+        self.end_headers()
+
+        # Run the swarm — blocks until all agents complete
+        try:
+            run_swarm(self.wfile, query, model, API_KEY, BRAVE_KEY)
+        except Exception as e:
+            self._sse_send({'type': 'error', 'message': str(e)})
+        finally:
+            try:
+                self._sse_send({'type': 'done'})
+            except Exception:
+                pass
+
+    def _sse_send(self, data):
+        """Send a single SSE event."""
+        msg = f'data: {json.dumps(data)}\n\n'
+        self.wfile.write(msg.encode())
+        self.wfile.flush()
 
     def handle_generate_image(self):
         """Handle POST /api/generate-image — proxy to PiAPI gpt-image-1."""
