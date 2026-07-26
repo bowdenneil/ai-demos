@@ -1194,6 +1194,229 @@
     .btn-swarm { background: linear-gradient(135deg, #53d8fb, #7c5cfc); color: #fff; }
     .btn-swarm:hover:not(:disabled) { background: linear-gradient(135deg, #22d3ee, #a78bfa); }
 
+    /* ─── VODAFONE ROI DEMO ─── */
+    .card-header-img.vodafone { background: linear-gradient(135deg, rgba(230,0,0,0.15) 0%, rgba(230,0,0,0.04) 100%); }
+    .tag.vodafone { background: linear-gradient(135deg, rgba(230,0,0,0.15), rgba(230,0,0,0.08)); color: #ff3333; }
+    .btn-vodafone { background: linear-gradient(135deg, #e60000, #990000); color: #fff; }
+    .btn-vodafone:hover:not(:disabled) { background: linear-gradient(135deg, #ff1a1a, #b30000); }
+
+    .vf-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) { .vf-layout { grid-template-columns: 1fr; } }
+
+    .vf-sidebar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      position: sticky;
+      top: 1rem;
+    }
+    .vf-sidebar h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #ff3333;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .vf-slider-group { margin-bottom: 1rem; }
+    .vf-slider-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.35rem;
+    }
+    .vf-slider-label span:first-child {
+      font-size: 0.8rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .vf-slider-label .vf-amount {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #ff3333;
+      font-variant-numeric: tabular-nums;
+    }
+    .vf-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(to right, #e60000 0%, #e60000 var(--pct,0%), var(--surface2) var(--pct,0%));
+      outline: none;
+      cursor: pointer;
+    }
+    .vf-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #e60000;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(230,0,0,0.3);
+    }
+    .vf-slider::-moz-range-thumb {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #e60000;
+      cursor: pointer;
+    }
+    .vf-slider-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      margin-top: 0.2rem;
+    }
+
+    .vf-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 700px) { .vf-metric-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .vf-metric {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.85rem;
+      text-align: center;
+      transition: border-color 0.3s;
+    }
+    .vf-metric:hover { border-color: #e60000; }
+    .vf-metric .vf-metric-icon { font-size: 1.2rem; }
+    .vf-metric .vf-metric-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #ff3333;
+      margin: 0.2rem 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .vf-metric .vf-metric-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-dim);
+    }
+    .vf-metric .vf-metric-sub {
+      font-size: 0.6rem;
+      color: var(--success);
+      margin-top: 0.15rem;
+    }
+
+    .vf-chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 700px) { .vf-chart-grid { grid-template-columns: 1fr; } }
+
+    .vf-chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .vf-chart-card h4 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+    .vf-chart-card canvas { max-height: 220px; }
+
+    .vf-preset-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .vf-preset-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .vf-preset-btn:hover { border-color: #e60000; color: #ff3333; }
+
+    .vf-domain-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(42,42,90,0.4);
+      font-size: 0.8rem;
+    }
+    .vf-domain-row:last-child { border-bottom: none; }
+    .vf-domain-icon { font-size: 1rem; width: 24px; text-align: center; }
+    .vf-domain-name { flex: 1; }
+    .vf-domain-roi {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      min-width: 80px;
+      text-align: right;
+    }
+    .vf-domain-roi.positive { color: var(--success); }
+    .vf-domain-roi.negative { color: var(--danger); }
+
+    .vf-invest-display {
+      background: linear-gradient(135deg, rgba(230,0,0,0.08), rgba(230,0,0,0.02));
+      border: 1px solid rgba(230,0,0,0.2);
+      border-radius: 10px;
+      padding: 0.85rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .vf-invest-display .vf-total-invest {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #ff3333;
+    }
+    .vf-invest-display .vf-invest-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+    }
+
+    .vf-break-even-marker {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--success);
+      z-index: 1;
+    }
+    .vf-break-even-label {
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.6rem;
+      color: var(--success);
+      white-space: nowrap;
+    }
+
     .swarm-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -1592,7 +1815,7 @@
 </div>
 
 <!-- TELCO DEMOS -->
-<div class="category-header"><span class="cat-icon">📡</span> Telco Demos <span class="cat-count">2</span></div>
+<div class="category-header"><span class="cat-icon">📡</span> Telco Demos <span class="cat-count">3</span></div>
 <div class="cards">
   <!-- TELCO NETWORK INTELLIGENCE CARD -->
   <div class="card" onclick="openDemo('network')">
@@ -1619,6 +1842,27 @@
       <h2>Autonomous Network Simulator</h2>
       <p>Interactive simulation of the Vodafone / Google Cloud / TM Forum autonomous networks framework. Inject network events into a 5G network slice and watch the three-tier loop-of-loops (Business → Service → Resource) cycle through the AADE closed-loop in real time — then get an AI-generated CTO briefing.</p>
       <span class="tag autonomous">Closed-Loop Automation</span>
+    </div>
+  </div>
+
+  <!-- VODAFONE AI ROI OPTIMIZER CARD -->
+  <div class="card" onclick="openDemo('vodafone')">
+    <div class="card-header-img vodafone" id="card-header-vodafone">
+      <img src="/icons/vodafone.png" alt="" id="card-img-vodafone">
+      <div class="card-icon vodafone" id="card-emoji-vodafone">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#e60000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2C7 2 3 6 3 11c0 5 4 9 9 9s9-4 9-9c0-5-4-9-9-9z" fill="none"/>
+          <path d="M12 6c-2.5 0-4.5 2-4.5 4.5S9.5 15 12 15s4.5-2 4.5-4.5S14.5 6 12 6z" fill="rgba(230,0,0,0.15)"/>
+          <circle cx="12" cy="10.5" r="1.5" fill="#e60000" stroke="none"/>
+          <path d="M8 16c1.2 0.8 2.5 1.2 4 1.2s2.8-0.4 4-1.2" stroke-dasharray="2 2"/>
+        </svg>
+      </div>
+      <div class="card-gen-overlay" id="card-gen-vodafone">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Vodafone Ireland AI ROI Optimizer</h2>
+      <p>Interactive financial simulator. Allocate AI investment across Vodafone Ireland's operations — network automation, customer service, churn prevention, predictive maintenance — and see real-time ROI, payback period, and 5-year NPV with AI-generated strategic analysis.</p>
+      <span class="tag vodafone">Financial Simulation</span>
     </div>
   </div>
 </div>
@@ -2196,6 +2440,72 @@
   <p>AI Solutions Demo Portal — Powered by <a href="https://tensorx.ai" target="_blank">Tensorx</a> — Built with ❤️ by <a href="https://github.com/bowdenneil" target="_blank">Pug</a></p>
 </div>
 
+<!-- VODAFONE AI ROI OPTIMIZER DEMO -->
+<div class="demo-overlay" id="demo-vodafone">
+  <div class="demo-panel" style="max-width:1400px">
+    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
+    <h2 class="demo-title">🔴 Vodafone Ireland AI ROI Optimizer</h2>
+    <p class="demo-desc">Allocate AI investment across Vodafone Ireland's six operational domains. The simulator models real financial returns based on Vodafone Group's reported AI initiatives, Irish market scale, and industry benchmarks. Adjust sliders to see real-time ROI, payback period, and 5-year NPV. Generate an AI strategic briefing tailored to your allocation.</p>
+
+    <div class="vf-layout">
+      <!-- LEFT: Investment Sliders -->
+      <div class="vf-sidebar">
+        <h3>💰 AI Investment Allocation (€M/year)</h3>
+        <div id="vf-sliders"></div>
+        <div class="vf-invest-display">
+          <div class="vf-total-invest" id="vf-total-invest">€0M</div>
+          <div class="vf-invest-label">Total Annual AI Investment</div>
+        </div>
+        <div class="vf-preset-row">
+          <button class="vf-preset-btn" onclick="vfPreset('balanced')">⚖️ Balanced</button>
+          <button class="vf-preset-btn" onclick="vfPreset('aggressive')">🚀 Aggressive</button>
+          <button class="vf-preset-btn" onclick="vfPreset('lean')">🌱 Lean Start</button>
+          <button class="vf-preset-btn" onclick="vfPreset('customer')">📞 Customer-Centric</button>
+        </div>
+        <button class="btn btn-vodafone" id="vf-analyze-btn" onclick="vfAnalyze()" style="width:100%;margin-top:0.5rem">🧠 Generate Strategic Briefing</button>
+      </div>
+
+      <!-- RIGHT: Dashboard -->
+      <div>
+        <!-- KPI Strip -->
+        <div class="vf-metric-grid" id="vf-metrics"></div>
+
+        <!-- Charts -->
+        <div class="vf-chart-grid">
+          <div class="vf-chart-card">
+            <h4>ROI by Domain (Annual Return %)</h4>
+            <canvas id="vf-chart-roi"></canvas>
+          </div>
+          <div class="vf-chart-card">
+            <h4>5-Year Cumulative Cash Flow (€M)</h4>
+            <canvas id="vf-chart-cashflow"></canvas>
+          </div>
+        </div>
+        <div class="vf-chart-grid">
+          <div class="vf-chart-card">
+            <h4>Cost Savings Breakdown (€M/year)</h4>
+            <canvas id="vf-chart-savings"></canvas>
+          </div>
+          <div class="vf-chart-card">
+            <h4>Revenue Uplift vs Baseline (€M/year)</h4>
+            <canvas id="vf-chart-revenue"></canvas>
+          </div>
+        </div>
+
+        <!-- Domain Detail -->
+        <div class="vf-chart-card" style="margin-bottom:1rem">
+          <h4>Domain Breakdown</h4>
+          <div id="vf-domain-detail"></div>
+        </div>
+
+        <!-- AI Strategic Briefing -->
+        <div id="vf-output" class="demo-output" style="display:none"></div>
+        <div id="vf-sources" style="margin-top:1rem"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- SWARM DEMO OVERLAY -->
 <div class="demo-overlay" id="demo-swarm">
   <div class="demo-panel" style="max-width:1400px">
@@ -2401,23 +2711,23 @@ async function callLLM(messages, onChunk) {
 
 // ─── WEB SEARCH ───
 async function webSearch(query, count = 8) {
-  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const isGitHubPages = window.location.hostname === 'bowdenneil.github.io';
   let url;
   const headers = {};
 
-  if (isLocal) {
-    // Local proxy handles auth
-    url = `${SEARCH_BASE}?q=${encodeURIComponent(query)}&count=${count}`;
-  } else {
-    // Direct Brave API (GitHub Pages) — needs key
+  if (isGitHubPages) {
+    // Direct Brave API (GitHub Pages only) — needs key
     if (!BRAVE_KEY) { console.warn('Brave key not set — skipping web search'); return []; }
     url = `${SEARCH_BASE}?q=${encodeURIComponent(query)}&count=${count}`;
     headers['X-Subscription-Token'] = BRAVE_KEY;
+  } else {
+    // Same-origin proxy handles auth via fetch interceptor
+    url = `${SEARCH_BASE}?q=${encodeURIComponent(query)}&count=${count}`;
   }
 
   try {
     const res = await fetch(url, { headers });
-    if (!res.ok) { console.warn('Search failed:', res.status); return []; }
+    if (!res.ok) { console.warn('Search failed:', res.status, await res.text().catch(() => '')); return []; }
     const data = await res.json();
     return (data.web?.results || []).map(r => ({
       title: r.title,
@@ -2454,6 +2764,7 @@ function openDemo(name) {
   document.getElementById(`demo-${name}`).classList.add('active');
   document.body.style.overflow = 'hidden';
   if (name === 'network') setTimeout(() => networkInit(), 50);
+  if (name === 'vodafone') setTimeout(() => vfInit(), 50);
 }
 
 function closeDemo() {
@@ -3673,7 +3984,7 @@ async function earnQuery() {
   const output = document.getElementById('earn-output');
   spinner.classList.add('active');
 
-  // ── Auto-discover latest earnings call ──
+  // ── Step 1: Search for the latest earnings call ──
   if (quarter === 'Latest') {
     output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)">🔍 Searching for latest earnings call...</span>';
 
@@ -3681,7 +3992,10 @@ async function earnQuery() {
     const discoverResults = await webSearch(discoverQ, 10);
 
     if (!discoverResults.length) {
-      output.innerHTML = '<span style="color:var(--danger)">No search results found. Try entering the quarter and year manually.</span>';
+      output.innerHTML = `<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:1rem;font-size:0.95rem">
+        <strong>❌ I can't find the latest earnings.</strong><br>
+        <span style="color:var(--text-dim);font-size:0.85rem">Web search returned no results for "${company}". Try entering the quarter and year manually.</span>
+      </div>`;
       spinner.classList.remove('active');
       return;
     }
@@ -3697,13 +4011,13 @@ async function earnQuery() {
       document.getElementById('earn-year').style.opacity = '1';
       output.innerHTML = `<div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.9rem">
         <strong>✅ Found latest earnings call:</strong> ${company} ${quarter} ${year}
-        <div style="font-size:0.8rem;color:var(--text-dim);margin-top:0.25rem">Auto-detected from web search results. Now analysing...</div>
+        <div style="font-size:0.8rem;color:var(--text-dim);margin-top:0.25rem">Auto-detected from web search results. Now searching for detailed earnings data...</div>
       </div><span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching for detailed earnings data...</span>`;
     } else {
-      // Couldn't parse — use search results as context with a general "latest" prompt
+      // Couldn't parse exact quarter — use discovery results as context, search for more detail
       output.innerHTML = `<div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.9rem">
         <strong>⚠️ Could not auto-detect the exact quarter.</strong> Using search results to identify the most recent earnings call.
-      </div><span class="typing-cursor"></span> <span style="color:var(--text-dim)">Analysing latest earnings data...</span>`;
+      </div><span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching for detailed earnings data...</span>`;
       quarter = 'latest';
       year = '';
     }
@@ -3712,18 +4026,33 @@ async function earnQuery() {
     output.innerHTML = '<span class="typing-cursor"></span> <span style="color:var(--text-dim)">Searching web for earnings data...</span>';
   }
 
-  // ── Search for detailed earnings data ──
+  // ── Step 2: Search for detailed earnings data ──
   const searchQ = `${company} ${quarter} ${year} earnings call transcript results highlights`;
   const webResults = await webSearch(searchQ);
   const webCtx = searchContext(webResults);
   renderSearchResults(webResults, 'earn-sources');
 
+  // If no detailed results found, stop — don't call LLM with no data
+  if (!webResults.length) {
+    const discoveryBanner = output.innerHTML.includes('Found latest') || output.innerHTML.includes('Could not auto-detect')
+      ? output.innerHTML.split('<span class="typing-cursor">')[0]
+      : '';
+    output.innerHTML = discoveryBanner + `<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:1rem;font-size:0.95rem">
+      <strong>❌ I can't find the latest earnings.</strong><br>
+      <span style="color:var(--text-dim);font-size:0.85rem">Web search returned no detailed results for ${company} ${quarter} ${year}. Try a different quarter/year or check the company name.</span>
+    </div>`;
+    spinner.classList.remove('active');
+    return;
+  }
+
   // Preserve the discovery banner if it existed
-  const discoveryBanner = output.innerHTML.includes('Found latest') ? output.innerHTML.split('<span class="typing-cursor">')[0] : '';
+  const discoveryBanner = output.innerHTML.includes('Found latest') || output.innerHTML.includes('Could not auto-detect')
+    ? output.innerHTML.split('<span class="typing-cursor">')[0]
+    : '';
   output.innerHTML = discoveryBanner + '<span class="typing-cursor"></span>';
 
   const webSection = webResults.length
-    ? `\n\nWeb Search Results (use these for current earnings data and cite as [web N]):\n${webCtx}`
+    ? `\n\nWeb Search Results (use these for current earnings data and cite sources as [web N]):\n${webCtx}`
     : '';
 
   const focusSection = focus
@@ -3731,7 +4060,7 @@ async function earnQuery() {
     : '';
 
   const messages = [
-    { role: 'system', content: `You are a senior equity analyst at a top investment bank. Extract key themes from the earnings call, quantify sentiment shift (bullish/bearish signals), flag risk language and cautious phrasing, compare to previous quarter if possible. Provide a sentiment score from -100 (very bearish) to +100 (very bullish). When web search results are provided, use them for current data and cite sources as [web N]. Format with markdown headers, bullets, and bold highlights. Use USD for US companies and EUR for European companies.` },
+    { role: 'system', content: `You are a senior equity analyst at a top investment bank. Extract key themes from the earnings call, quantify sentiment shift (bullish/bearish signals), flag risk language and cautious phrasing, compare to previous quarter if possible. Provide a sentiment score from -100 (very bearish) to +100 (very bullish). IMPORTANT: Base your analysis ONLY on the web search results provided below. Do not use your own training data or prior knowledge for specific numbers, dates, or financial figures. If the search results don't contain enough information, say so explicitly. Cite sources as [web N]. Format with markdown headers, bullets, and bold highlights. Use USD for US companies and EUR for European companies.` },
     { role: 'user', content: `Analyse the ${quarter} ${year} earnings call for ${company}.${focusSection}${webSection}
 
 Provide:
@@ -4397,7 +4726,7 @@ window.fetch = function(url, options = {}) {
 };
 
 // ─── ICON LOADING ───
-const ICON_DEMOS = ['rag', 'market', 'finance', 'regulatory', 'earnings', 'churn', 'rfp', 'image', 'onprem'];
+const ICON_DEMOS = ['rag', 'market', 'finance', 'regulatory', 'earnings', 'churn', 'rfp', 'image', 'onprem', 'vodafone'];
 
 async function loadIcons() {
   for (const demo of ICON_DEMOS) {
@@ -5889,6 +6218,487 @@ function swarmHandleEvent(evt) {
 document.getElementById('swarm-query')?.addEventListener('keydown', e => {
   if (e.key === 'Enter') swarmRun();
 });
+
+// ═══════════════════════════════════════════════════════════════
+// ─── VODAFONE IRELAND AI ROI OPTIMIZER ─────────────────────────
+// ═══════════════════════════════════════════════════════════════
+
+const VF_DOMAINS = {
+  cx:     { icon:'📞', name:'Customer Service AI',   max:5, roi:3.2, savingsPct:0.70, revPct:0.30, desc:'TOBi chatbot, voice AI, agent assist' },
+  net:    { icon:'📡', name:'Network Automation',     max:8, roi:2.8, savingsPct:0.85, revPct:0.15, desc:'Self-optimizing RAN, fault detection, autonomous healing' },
+  churn:  { icon:'🔄', name:'Churn Prevention',       max:4, roi:4.5, savingsPct:0.20, revPct:0.80, desc:'Predictive churn scoring, retention campaigns, win-back' },
+  maint:  { icon:'🔧', name:'Predictive Maintenance', max:6, roi:3.5, savingsPct:0.90, revPct:0.10, desc:'Site equipment failure prediction, truck roll reduction' },
+  energy: { icon:'⚡', name:'Energy Optimization',    max:4, roi:2.2, savingsPct:0.95, revPct:0.05, desc:'Cell site power management, cooling, renewable scheduling' },
+  rev:    { icon:'📊', name:'Revenue Intelligence',   max:5, roi:3.8, savingsPct:0.15, revPct:0.85, desc:'Dynamic pricing, ARPU uplift, 5G upsell, personalized offers' },
+};
+
+const VF_PRESETS = {
+  balanced:  { cx:2, net:4, churn:2, maint:3, energy:2, rev:2.5 },
+  aggressive:{ cx:4, net:7, churn:3.5, maint:5, energy:3.5, rev:4 },
+  lean:      { cx:1, net:1.5, churn:0.8, maint:1, energy:0.5, rev:1 },
+  customer:  { cx:4, net:2, churn:3.5, maint:1.5, energy:1, rev:3 },
+};
+
+const VF_COLORS = ['#e60000','#ff3333','#ff6666','#cc0000','#ff1a1a','#b30000'];
+const VF_RAMP = [0.65, 0.85, 1.0, 1.0, 1.0]; // year 1-5 maturity ramp
+let vfCharts = {};
+let vfState = {};
+
+function vfInit() {
+  vfBuildSliders();
+  vfState = vfPresetValues('balanced');
+  vfApplyValues();
+  vfCalc();
+}
+
+function vfBuildSliders() {
+  const container = document.getElementById('vf-sliders');
+  container.innerHTML = '';
+  for (const [key, d] of Object.entries(VF_DOMAINS)) {
+    const group = document.createElement('div');
+    group.className = 'vf-slider-group';
+    group.innerHTML = `
+      <div class="vf-slider-label">
+        <span>${d.icon} ${d.name}</span>
+        <span class="vf-amount" id="vf-amt-${key}">€0M</span>
+      </div>
+      <input type="range" class="vf-slider" id="vf-slider-${key}"
+             min="0" max="${d.max}" step="0.1" value="0"
+             data-domain="${key}">
+      <div class="vf-slider-meta">
+        <span>€0M</span>
+        <span>€${d.max}M</span>
+      </div>`;
+    container.appendChild(group);
+    const slider = group.querySelector('input');
+    slider.addEventListener('input', () => {
+      vfState[key] = parseFloat(slider.value);
+      vfUpdateSliderTrack(slider);
+      vfUpdateAmount(key);
+      vfCalc();
+    });
+  }
+}
+
+function vfUpdateSliderTrack(slider) {
+  const pct = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+  slider.style.setProperty('--pct', pct + '%');
+}
+
+function vfUpdateAmount(key) {
+  const el = document.getElementById('vf-amt-' + key);
+  if (el) el.textContent = '€' + vfState[key].toFixed(1) + 'M';
+}
+
+function vfPresetValues(name) {
+  const preset = VF_PRESETS[name] || VF_PRESETS.balanced;
+  return { ...preset };
+}
+
+function vfApplyValues() {
+  for (const [key, val] of Object.entries(vfState)) {
+    const slider = document.getElementById('vf-slider-' + key);
+    if (slider) {
+      slider.value = val;
+      vfUpdateSliderTrack(slider);
+      vfUpdateAmount(key);
+    }
+  }
+}
+
+function vfPreset(name) {
+  vfState = vfPresetValues(name);
+  vfApplyValues();
+  vfCalc();
+}
+
+function vfCalc() {
+  const results = {};
+  let totalInvest = 0;
+  let totalReturnY1 = 0;
+  let totalReturnMature = 0;
+  let totalSavings = 0;
+  let totalRevenue = 0;
+
+  for (const [key, d] of Object.entries(VF_DOMAINS)) {
+    const invest = vfState[key] || 0;
+    totalInvest += invest;
+
+    // Diminishing returns above 60% of max
+    let dimMult = 1.0;
+    if (invest > 0.6 * d.max) {
+      dimMult = 1 - 0.3 * ((invest / d.max) - 0.6) / 0.4;
+    }
+
+    const baseReturn = invest * d.roi * dimMult;
+    const yearReturns = VF_RAMP.map(r => baseReturn * r);
+    const matureReturn = baseReturn; // year 3+
+
+    totalReturnY1 += yearReturns[0];
+    totalReturnMature += matureReturn;
+
+    const savings = matureReturn * d.savingsPct;
+    const revenue = matureReturn * d.revPct;
+    totalSavings += savings;
+    totalRevenue += revenue;
+
+    results[key] = {
+      invest,
+      baseReturn,
+      yearReturns,
+      matureReturn,
+      savings,
+      revenue,
+      roiPct: invest > 0 ? (matureReturn / invest) * 100 : 0,
+      netY1: yearReturns[0] - invest,
+      dimMult,
+    };
+  }
+
+  // Payback period (months)
+  const monthlyReturn = totalReturnY1 / 12;
+  let paybackMonths = 0;
+  if (totalInvest > 0 && monthlyReturn > 0) {
+    paybackMonths = Math.ceil(totalInvest / monthlyReturn);
+  }
+
+  // 5-year cumulative cash flow
+  const cashflow = [];
+  let cumulative = 0;
+  for (let y = 0; y < 5; y++) {
+    const yearReturn = Object.values(results).reduce((sum, r) => sum + r.yearReturns[y], 0);
+    const net = yearReturn - totalInvest;
+    cumulative += net;
+    cashflow.push(cumulative);
+  }
+
+  const summary = {
+    results, totalInvest, totalReturnY1, totalReturnMature,
+    totalSavings, totalRevenue, paybackMonths, cashflow,
+    roiPct: totalInvest > 0 ? (totalReturnMature / totalInvest) * 100 : 0,
+    netY1: totalReturnY1 - totalInvest,
+  };
+  vfUpdateUI(summary);
+  return summary;
+}
+
+function vfUpdateUI(data) {
+  // Total investment
+  document.getElementById('vf-total-invest').textContent = '€' + data.totalInvest.toFixed(1) + 'M';
+
+  // KPI cards
+  const metrics = document.getElementById('vf-metrics');
+  metrics.innerHTML = `
+    <div class="vf-metric">
+      <div class="vf-metric-icon">💰</div>
+      <div class="vf-metric-value">€${data.totalInvest.toFixed(1)}M</div>
+      <div class="vf-metric-label">Annual Investment</div>
+    </div>
+    <div class="vf-metric">
+      <div class="vf-metric-icon">📈</div>
+      <div class="vf-metric-value" style="color:${data.netY1 >= 0 ? 'var(--success)' : 'var(--danger)'}">
+        ${data.netY1 >= 0 ? '+' : ''}€${data.netY1.toFixed(1)}M
+      </div>
+      <div class="vf-metric-label">Year 1 Net Return</div>
+      <div class="vf-metric-sub">${data.netY1 >= 0 ? 'Profitable Y1' : 'Investment phase'}</div>
+    </div>
+    <div class="vf-metric">
+      <div class="vf-metric-icon">🎯</div>
+      <div class="vf-metric-value">${data.roiPct.toFixed(0)}%</div>
+      <div class="vf-metric-label">ROI at Maturity</div>
+      <div class="vf-metric-sub">Year 3+</div>
+    </div>
+    <div class="vf-metric">
+      <div class="vf-metric-icon">⏱️</div>
+      <div class="vf-metric-value">${data.paybackMonths > 0 ? data.paybackMonths + 'mo' : '—'}</div>
+      <div class="vf-metric-label">Payback Period</div>
+    </div>`;
+
+  // Domain detail rows
+  const detail = document.getElementById('vf-domain-detail');
+  detail.innerHTML = Object.entries(data.results).map(([key, r]) => {
+    const d = VF_DOMAINS[key];
+    const roiClass = r.roiPct > 0 ? 'positive' : 'negative';
+    return `<div class="vf-domain-row">
+      <span class="vf-domain-icon">${d.icon}</span>
+      <span class="vf-domain-name">
+        <strong>${d.name}</strong>
+        <div style="font-size:0.65rem;color:var(--text-dim)">${d.desc}</div>
+      </span>
+      <span style="color:var(--text-dim);font-size:0.75rem;min-width:60px;text-align:right">€${r.invest.toFixed(1)}M</span>
+      <span style="color:var(--text-dim);font-size:0.75rem;min-width:60px;text-align:right">→ €${r.matureReturn.toFixed(1)}M</span>
+      <span class="vf-domain-roi ${roiClass}">${r.invest > 0 ? r.roiPct.toFixed(0) + '%' : '—'}</span>
+    </div>`;
+  }).join('');
+
+  // Render charts
+  vfRenderROIChart(data);
+  vfRenderCashflowChart(data);
+  vfRenderSavingsChart(data);
+  vfRenderRevenueChart(data);
+}
+
+function vfDestroyChart(key) {
+  if (vfCharts[key]) { vfCharts[key].destroy(); delete vfCharts[key]; }
+}
+
+function vfRenderROIChart(data) {
+  vfDestroyChart('roi');
+  const ctx = document.getElementById('vf-chart-roi').getContext('2d');
+  const keys = Object.keys(VF_DOMAINS);
+  vfCharts.roi = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: keys.map(k => VF_DOMAINS[k].icon + ' ' + VF_DOMAINS[k].name),
+      datasets: [{
+        label: 'ROI %',
+        data: keys.map(k => data.results[k].roiPct),
+        backgroundColor: keys.map((_, i) => VF_COLORS[i]),
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { callback: v => v + '%' } }
+      }
+    }
+  });
+}
+
+function vfRenderCashflowChart(data) {
+  vfDestroyChart('cashflow');
+  const ctx = document.getElementById('vf-chart-cashflow').getContext('2d');
+  vfCharts.cashflow = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+      datasets: [{
+        label: 'Cumulative Net Cash Flow (€M)',
+        data: data.cashflow,
+        borderColor: '#e60000',
+        backgroundColor: 'rgba(230,0,0,0.1)',
+        borderWidth: 2.5,
+        fill: true,
+        tension: 0.3,
+        pointBackgroundColor: data.cashflow.map(v => v >= 0 ? '#34d399' : '#f87171'),
+        pointRadius: 5,
+      }, {
+        label: 'Break-even',
+        data: [0, 0, 0, 0, 0],
+        borderColor: '#34d399',
+        borderWidth: 1.5,
+        borderDash: [5, 5],
+        pointRadius: 0,
+        fill: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, labels: { boxWidth: 12, font: { size: 10 } } },
+        tooltip: { callbacks: { label: ctx => '€' + ctx.parsed.y.toFixed(1) + 'M' } }
+      },
+      scales: {
+        y: { ticks: { callback: v => '€' + v.toFixed(0) + 'M' } }
+      }
+    }
+  });
+}
+
+function vfRenderSavingsChart(data) {
+  vfDestroyChart('savings');
+  const ctx = document.getElementById('vf-chart-savings').getContext('2d');
+  const keys = Object.keys(VF_DOMAINS);
+  vfCharts.savings = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: keys.map(k => VF_DOMAINS[k].icon + ' ' + VF_DOMAINS[k].name),
+      datasets: [{
+        data: keys.map(k => data.results[k].savings),
+        backgroundColor: VF_COLORS,
+        borderColor: '#12122a',
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right', labels: { boxWidth: 10, font: { size: 9 } } },
+        tooltip: { callbacks: { label: ctx => ctx.label + ': €' + ctx.parsed.toFixed(1) + 'M' } }
+      }
+    }
+  });
+}
+
+function vfRenderRevenueChart(data) {
+  vfDestroyChart('revenue');
+  const ctx = document.getElementById('vf-chart-revenue').getContext('2d');
+  const keys = Object.keys(VF_DOMAINS);
+  vfCharts.revenue = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: keys.map(k => VF_DOMAINS[k].icon),
+      datasets: [
+        {
+          label: 'Year 1',
+          data: keys.map(k => data.results[k].yearReturns[0] * VF_DOMAINS[k].revPct),
+          backgroundColor: '#ff6666',
+          borderRadius: 3,
+        },
+        {
+          label: 'Year 3+ (Mature)',
+          data: keys.map(k => data.results[k].matureReturn * VF_DOMAINS[k].revPct),
+          backgroundColor: '#e60000',
+          borderRadius: 3,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, labels: { boxWidth: 12, font: { size: 10 } } },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': €' + ctx.parsed.y.toFixed(1) + 'M' } }
+      },
+      scales: {
+        y: { ticks: { callback: v => '€' + v + 'M' } }
+      }
+    }
+  });
+}
+
+async function vfAnalyze() {
+  const btn = document.getElementById('vf-analyze-btn');
+  const output = document.getElementById('vf-output');
+  const sourcesEl = document.getElementById('vf-sources');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyzing...';
+  output.style.display = 'block';
+  output.innerHTML = '<div class="spinner active"></div>';
+  sourcesEl.innerHTML = '';
+
+  // Gather current model data
+  const data = vfCalc();  // re-run to get fresh data
+  const domainSummary = Object.entries(VF_DOMAINS).map(([key, d]) => {
+    const r = vfState[key] || 0;
+    return `${d.icon} ${d.name}: €${r.toFixed(1)}M investment → €${(r * d.roi).toFixed(1)}M mature annual return (${r > 0 ? ((d.roi * 100) | 0) : 0}% ROI)`;
+  }).join('\n');
+
+  // Calculate aggregates for the prompt
+  let totalInv = Object.values(vfState).reduce((a, b) => a + b, 0);
+  let totalRet = Object.entries(VF_DOMAINS).reduce((sum, [key, d]) => {
+    const inv = vfState[key] || 0;
+    let dim = 1.0;
+    if (inv > 0.6 * d.max) dim = 1 - 0.3 * ((inv / d.max) - 0.6) / 0.4;
+    return sum + inv * d.roi * dim;
+  }, 0);
+  let totalSav = Object.entries(VF_DOMAINS).reduce((sum, [key, d]) => {
+    const inv = vfState[key] || 0;
+    let dim = 1.0;
+    if (inv > 0.6 * d.max) dim = 1 - 0.3 * ((inv / d.max) - 0.6) / 0.4;
+    return sum + inv * d.roi * dim * d.savingsPct;
+  }, 0);
+  let totalRev = Object.entries(VF_DOMAINS).reduce((sum, [key, d]) => {
+    const inv = vfState[key] || 0;
+    let dim = 1.0;
+    if (inv > 0.6 * d.max) dim = 1 - 0.3 * ((inv / d.max) - 0.6) / 0.4;
+    return sum + inv * d.roi * dim * d.revPct;
+  }, 0);
+
+  // Web search for Vodafone AI context
+  const searches = [
+    'Vodafone Ireland AI automation technology investment 2025 2026',
+    'Vodafone Group AI ROI savings results digital transformation'
+  ];
+
+  let allResults = [];
+  for (const q of searches) {
+    const results = await webSearch(q, 8);
+    allResults = allResults.concat(results);
+  }
+  // Dedupe by URL
+  const seen = new Set();
+  allResults = allResults.filter(r => {
+    if (seen.has(r.url)) return false;
+    seen.add(r.url);
+    return true;
+  });
+
+  const searchCtx = searchContext(allResults);
+
+  const systemPrompt = `You are a senior telecommunications strategy consultant specializing in AI transformation for European telcos. You are analyzing a Vodafone Ireland AI investment portfolio simulation.
+
+Your analysis must be:
+1. **Financially rigorous** — reference specific ROI figures, payback periods, and NPV from the simulation data
+2. **Contextually grounded** — use Vodafone's actual reported AI initiatives, partnerships, and market positioning from the web search results
+3. **Strategically actionable** — provide concrete recommendations on allocation optimization, timing, and risk mitigation
+4. **Industry-aware** — benchmark against other European telcos (Deutsche Telekom, Telefónica, BT) where relevant
+
+Structure your analysis as:
+## Executive Summary
+## Investment Portfolio Analysis
+## Financial Returns Assessment
+## Competitive Benchmarking
+## Risk Assessment
+## Recommendations
+## Implementation Roadmap
+
+Vodafone Ireland context:
+- ~2.3M mobile subscribers, part of Vodafone Group (€37B revenue)
+- Vodafone Ireland annual revenue ~€700M
+- TOBi digital assistant handles ~70% of customer queries
+- Partnerships with Google Cloud, Microsoft Azure for AI
+- TM Forum autonomous networks framework participant
+- Active 5G rollout across Ireland`;
+
+  const userMessage = `Analyze this AI investment allocation for Vodafone Ireland:
+
+## Current Allocation
+${domainSummary}
+
+## Aggregate Financial Model
+- Total Annual AI Investment: €${totalInv.toFixed(1)}M
+- Total Annual Return at Maturity (Year 3+): €${totalRet.toFixed(1)}M
+- Overall ROI: ${totalInv > 0 ? ((totalRet / totalInv) * 100).toFixed(0) : 0}%
+- Annual Cost Savings: €${totalSav.toFixed(1)}M
+- Annual Revenue Uplift: €${totalRev.toFixed(1)}M
+- Year 1 Net Return (after investment): €${(totalRet * 0.65 - totalInv).toFixed(1)}M
+- Payback Period: ~${totalInv > 0 ? Math.ceil(totalInv / (totalRet * 0.65 / 12)) : 0} months
+
+## Web Search Context (Latest Vodafone AI News)
+${searchCtx || 'No web results found — analyze based on simulation data and general industry knowledge.'}
+
+Provide a strategic briefing on this allocation. Is it optimal? What would you change? What are the risks? How does this compare to what Vodafone is actually doing?`;
+
+  try {
+    const fullText = await callLLM([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userMessage }
+    ], (chunk) => {
+      output.innerHTML = formatMarkdown(chunk) + '<span class="typing-cursor"></span>';
+    });
+
+    output.innerHTML = formatMarkdown(fullText);
+
+    if (allResults.length) {
+      renderSearchResults(allResults, 'vf-sources');
+    }
+
+    btn.disabled = false;
+    btn.textContent = '🧠 Generate Strategic Briefing';
+  } catch (e) {
+    output.innerHTML = '<div class="error-card"><strong>❌ Analysis failed.</strong><br><span class="dim">Error: ' + (e.message || 'Unknown error') + '</span></div>';
+    btn.disabled = false;
+    btn.textContent = '🧠 Generate Strategic Briefing';
+  }
+}
 
 </script>
 </body>

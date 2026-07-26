@@ -43,6 +43,7 @@ ICON_PROMPTS = {
     'tco': 'Minimalist flat icon of a calculator with a euro symbol and bar chart, dark emerald-teal gradient background, emerald and cyan glowing accents, simple clean vector style',
     'network': 'Minimalist flat icon of a radio tower with signal waves and a network graph, dark blue-sky gradient background, blue and sky glowing accents, simple clean vector style',
     'swarm': 'Minimalist flat icon of three connected nodes forming a network with a central brain symbol, dark cyan-purple gradient background, cyan and purple glowing accents, simple clean vector style',
+    'vodafone': 'Minimalist flat icon of a red circle with a euro symbol and upward trend arrow, dark red background, bright red glowing accents, simple clean vector style',
 }
 
 # ─── AUTH DATABASE ───
