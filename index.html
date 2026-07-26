@@ -6584,33 +6584,18 @@ async function vfAnalyze() {
   output.innerHTML = '<div class="spinner active"></div>';
   sourcesEl.innerHTML = '';
 
-  // Gather current model data
-  const data = vfCalc();  // re-run to get fresh data
+  // Gather current model data (vfCalc returns the summary + per-domain results)
+  const data = vfCalc();
   const domainSummary = Object.entries(VF_DOMAINS).map(([key, d]) => {
-    const r = vfState[key] || 0;
-    return `${d.icon} ${d.name}: €${r.toFixed(1)}M investment → €${(r * d.roi).toFixed(1)}M mature annual return (${r > 0 ? ((d.roi * 100) | 0) : 0}% ROI)`;
+    const r = data.results[key];
+    return `${d.icon} ${d.name}: €${r.invest.toFixed(1)}M investment → €${r.matureReturn.toFixed(1)}M mature annual return (${r.invest > 0 ? r.roiPct.toFixed(0) : 0}% ROI, dimMult ${r.dimMult.toFixed(2)})`;
   }).join('\n');
 
-  // Calculate aggregates for the prompt
-  let totalInv = Object.values(vfState).reduce((a, b) => a + b, 0);
-  let totalRet = Object.entries(VF_DOMAINS).reduce((sum, [key, d]) => {
-    const inv = vfState[key] || 0;
-    let dim = 1.0;
-    if (inv > 0.6 * d.max) dim = 1 - 0.3 * ((inv / d.max) - 0.6) / 0.4;
-    return sum + inv * d.roi * dim;
-  }, 0);
-  let totalSav = Object.entries(VF_DOMAINS).reduce((sum, [key, d]) => {
-    const inv = vfState[key] || 0;
-    let dim = 1.0;
-    if (inv > 0.6 * d.max) dim = 1 - 0.3 * ((inv / d.max) - 0.6) / 0.4;
-    return sum + inv * d.roi * dim * d.savingsPct;
-  }, 0);
-  let totalRev = Object.entries(VF_DOMAINS).reduce((sum, [key, d]) => {
-    const inv = vfState[key] || 0;
-    let dim = 1.0;
-    if (inv > 0.6 * d.max) dim = 1 - 0.3 * ((inv / d.max) - 0.6) / 0.4;
-    return sum + inv * d.roi * dim * d.revPct;
-  }, 0);
+  // Use the aggregate figures already computed by vfCalc.
+  const totalInv = data.totalInvest;
+  const totalRet = data.totalReturnMature;
+  const totalSav = data.totalSavings;
+  const totalRev = data.totalRevenue;
 
   // Web search for Vodafone AI context
   const searches = [
@@ -6669,8 +6654,11 @@ ${domainSummary}
 - Overall ROI: ${totalInv > 0 ? ((totalRet / totalInv) * 100).toFixed(0) : 0}%
 - Annual Cost Savings: €${totalSav.toFixed(1)}M
 - Annual Revenue Uplift: €${totalRev.toFixed(1)}M
-- Year 1 Net Return (after investment): €${(totalRet * 0.65 - totalInv).toFixed(1)}M
-- Payback Period: ~${totalInv > 0 ? Math.ceil(totalInv / (totalRet * 0.65 / 12)) : 0} months
+- Year 1 Net Return (after investment): €${data.netY1.toFixed(1)}M
+- Payback Period: ~${data.paybackMonths > 0 ? data.paybackMonths : 0} months
+
+## 5-Year Cumulative Cash Flow (€M)
+${data.cashflow.map((v, i) => `Year ${i+1}: €${v.toFixed(1)}M`).join('\n')}
 
 ## Web Search Context (Latest Vodafone AI News)
 ${searchCtx || 'No web results found — analyze based on simulation data and general industry knowledge.'}
