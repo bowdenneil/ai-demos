@@ -1320,26 +1320,27 @@
 
     .vf-chart-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1rem;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
     }
-    @media (max-width: 700px) { .vf-chart-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 1100px) { .vf-chart-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px) { .vf-chart-grid { grid-template-columns: 1fr; } }
 
     .vf-chart-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 1rem;
+      padding: 0.6rem 0.75rem;
     }
     .vf-chart-card h4 {
-      font-size: 0.75rem;
+      font-size: 0.65rem;
       text-transform: uppercase;
       letter-spacing: 0.04em;
       color: var(--text-dim);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.35rem;
     }
-    .vf-chart-card canvas { max-height: 220px; }
+    .vf-chart-card canvas { max-height: 140px; }
 
     .vf-preset-row {
       display: flex;
@@ -2473,21 +2474,19 @@
         <!-- Charts -->
         <div class="vf-chart-grid">
           <div class="vf-chart-card">
-            <h4>ROI by Domain (Annual Return %)</h4>
+            <h4>ROI by Domain (%)</h4>
             <canvas id="vf-chart-roi"></canvas>
           </div>
           <div class="vf-chart-card">
-            <h4>5-Year Cumulative Cash Flow (€M)</h4>
+            <h4>5-Year Cash Flow (€M)</h4>
             <canvas id="vf-chart-cashflow"></canvas>
           </div>
-        </div>
-        <div class="vf-chart-grid">
           <div class="vf-chart-card">
-            <h4>Cost Savings Breakdown (€M/year)</h4>
+            <h4>Cost Savings (€M/yr)</h4>
             <canvas id="vf-chart-savings"></canvas>
           </div>
           <div class="vf-chart-card">
-            <h4>Revenue Uplift vs Baseline (€M/year)</h4>
+            <h4>Revenue Uplift (€M/yr)</h4>
             <canvas id="vf-chart-revenue"></canvas>
           </div>
         </div>
