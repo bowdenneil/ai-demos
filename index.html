@@ -2994,9 +2994,9 @@
     <!-- Nav bar -->
     <div class="lg-navbar">
       <div class="lg-nav-item active" id="lg-nav-overview" onclick="lgShowScreen('overview'); lgRenderOverview();">📊 Line Overview</div>
-      <div class="lg-nav-item" id="lg-nav-asset" onclick="lgShowScreen('asset')">🏭 Asset Health</div>
+      <div class="lg-nav-item" id="lg-nav-asset" onclick="lgNavAsset()">🏭 Asset Health</div>
       <div class="lg-nav-item" id="lg-nav-investigation" onclick="lgShowScreen('investigation')">🔬 Investigation</div>
-      <div class="lg-nav-item" id="lg-nav-executive" onclick="lgShowScreen('executive')">📈 Executive</div>
+      <div class="lg-nav-item" id="lg-nav-executive" onclick="lgNavExecutive()">📈 Executive</div>
     </div>
 
     <div class="demo-body" style="min-height: 700px;">
@@ -3096,7 +3096,7 @@
   </div>
 </div>
 
-<script src="/lineguard.js?v=2"></script>
+<script src="/lineguard.js?v=3"></script>
 
 <script>
 // ─── CHART.JS DEFAULTS ───

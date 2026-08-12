@@ -140,6 +140,31 @@ function lgShowScreen(screen) {
   if (navEl) navEl.classList.add('active');
 }
 
+// Nav: Asset Health — needs an asset. Default to the anomalous press, else first asset.
+function lgNavAsset() {
+  const assetId = LG_STATE.selectedAsset
+    || (LG_STATE.assets['PRESS-02'] ? 'PRESS-02' : Object.keys(LG_STATE.assets)[0]);
+  if (assetId) lgOpenAsset(assetId);
+  else lgShowScreen('asset');
+}
+
+// Nav: Executive — render from investigation if one exists, else show a hint.
+function lgNavExecutive() {
+  if (LG_STATE.investigation) {
+    lgShowExecutive();
+    return;
+  }
+  lgShowScreen('executive');
+  const el = document.getElementById('lg-exec-content');
+  if (el) el.innerHTML = `
+    <div style="text-align:center;padding:3rem 2rem;color:var(--text-dim);">
+      <div style="font-size:2.5rem;margin-bottom:1rem;">📈</div>
+      <h3 style="color:var(--text);margin-bottom:0.5rem;">No investigation yet</h3>
+      <p style="font-size:0.9rem;max-width:420px;margin:0 auto 1.5rem;">The executive summary is generated after the agent pipeline completes an investigation — downtime avoided, cost breakdown, and role-specific briefings.</p>
+      <button class="btn lg-btn-primary" onclick="lgNavAsset()">🏭 Open Asset Health → Start Investigation</button>
+    </div>`;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // SCREEN 1: LINE OVERVIEW
 // ═══════════════════════════════════════════════════════════════════════════
