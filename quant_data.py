@@ -197,7 +197,9 @@ Your task:
 IMPORTANT RULES:
 - Do NOT echo back the market data in your response. Go straight to your analysis and code.
 - Write CONCISE code (under 50 lines). Do not write long explanations inside the code.
-- The data is available as a Python dict called `market_data` when your code executes.
+- The data is available as a Python dict called `market_data` when your code executes. Each series is a dict with 'dates' (list of strings) and 'values' (list of floats).
+- Wrap value lists with pd.Series(...) or np.array(...) before using pandas/numpy methods.
+- pandas 2.x: use .ffill()/.bfill(), NOT fillna(method=...). Use .iloc[i] for positional access, not [i].
 - End your code by setting a variable called `chart_data` with a JSON-serializable dict containing your forecast results for plotting.
 - Write the Python code in a SINGLE code block delimited by triple backticks.
 - Do NOT use matplotlib plt.show() or plt.savefig(). Do NOT import os, sys, or subprocess.
@@ -225,7 +227,9 @@ Your task:
 IMPORTANT RULES:
 - Do NOT echo back the market data in your response. Go straight to your analysis and code.
 - Write CONCISE code (under 50 lines). Do not write long explanations inside the code.
-- The data is available as a Python dict called `market_data` when your code executes.
+- The data is available as a Python dict called `market_data` when your code executes. Each series is a dict with 'dates' (list of strings) and 'values' (list of floats).
+- Wrap value lists with pd.Series(...) or np.array(...) before using pandas/numpy methods.
+- pandas 2.x: use .ffill()/.bfill(), NOT fillna(method=...). Use .iloc[i] for positional access, not [i].
 - End your code by setting a variable called `chart_data` with a JSON-serializable dict containing your forecast results for plotting.
 - Write the Python code in a SINGLE code block delimited by triple backticks.
 - Do NOT use matplotlib plt.show() or plt.savefig(). Do NOT import os, sys, or subprocess.
@@ -253,7 +257,9 @@ Your task:
 IMPORTANT RULES:
 - Do NOT echo back the market data in your response. Go straight to your analysis and code.
 - Write CONCISE code (under 50 lines). Do not write long explanations inside the code.
-- The data is available as a Python dict called `market_data` when your code executes.
+- The data is available as a Python dict called `market_data` when your code executes. Each series is a dict with 'dates' (list of strings) and 'values' (list of floats).
+- Wrap value lists with pd.Series(...) or np.array(...) before using pandas/numpy methods.
+- pandas 2.x: use .ffill()/.bfill(), NOT fillna(method=...). Use .iloc[i] for positional access, not [i].
 - End your code by setting a variable called `chart_data` with a JSON-serializable dict containing your forecast results for plotting.
 - Write the Python code in a SINGLE code block delimited by triple backticks.
 - Do NOT use matplotlib plt.show() or plt.savefig(). Do NOT import os, sys, or subprocess.
@@ -335,10 +341,11 @@ def execute_generated_code(code, market_data_json):
     # Prepare safe namespace — give models everything they commonly need
     import builtins
     safe_builtins = {k: getattr(builtins, k) for k in dir(builtins) if not k.startswith('_')}
-    # Remove dangerous ones
-    for dangerous in ['__import__', 'exec', 'eval', 'compile', 'open', 'input', 'breakpoint', 'exit', 'quit', 'globals', 'locals', 'vars', 'dir']:
+    # Remove dangerous ones. Keep locals/globals/vars/dir — harmless introspection
+    # that models use legitimately (e.g. `'x' in locals()`).
+    for dangerous in ['exec', 'eval', 'compile', 'open', 'input', 'breakpoint', 'exit', 'quit']:
         safe_builtins.pop(dangerous, None)
-    # But keep __import__ for safe module loading
+    # Keep __import__ for safe module loading
     safe_builtins['__import__'] = __import__
     
     safe_globals = {
@@ -380,6 +387,24 @@ def execute_generated_code(code, market_data_json):
     try:
         from statsmodels.tsa.arima.model import ARIMA as _ARIMA2
         safe_globals['ARIMA'] = _ARIMA2
+    except:
+        pass
+    # Common statsmodels helpers models call unqualified
+    try:
+        import statsmodels.api as _sm_api
+        safe_globals['add_constant'] = _sm_api.add_constant
+        safe_globals['OLS'] = _sm_api.OLS
+    except:
+        pass
+    try:
+        from scipy.optimize import curve_fit as _curve_fit, minimize as _minimize
+        safe_globals['curve_fit'] = _curve_fit
+        safe_globals['minimize'] = _minimize
+    except:
+        pass
+    try:
+        from sklearn.linear_model import LinearRegression as _LinReg
+        safe_globals['LinearRegression'] = _LinReg
     except:
         pass
     
@@ -453,7 +478,12 @@ def execute_generated_code(code, market_data_json):
             }
         except Exception as e:
             execution_time = time.time() - start_time
-            last_error = str(e)[:500]
+            # Include exception type + line number: "KeyError: 1 (line 23)" not just "1"
+            import traceback
+            tb = traceback.extract_tb(e.__traceback__)
+            line_no = next((f.lineno for f in reversed(tb) if f.filename == '<string>'), None)
+            loc = f' (line {line_no})' if line_no else ''
+            last_error = f'{type(e).__name__}: {str(e)[:400]}{loc}'
             # Clear stdout for next attempt
             stdout_capture = io.StringIO()
             continue

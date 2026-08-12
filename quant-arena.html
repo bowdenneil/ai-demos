@@ -249,6 +249,28 @@ async function apiGet(url) {
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
+// ─── PANEL HEADERS — reflect actual model selection ─────────────────────────
+const MODEL_META = {};  // key -> {name, type} filled from /api/quant/models
+
+function panelMeta(modelKey) {
+  return MODEL_META[modelKey] || { name: modelKey.split('/').pop(), type: modelKey.startsWith('anthropic/') ? 'Closed (Commercial)' : 'Open-Weight' };
+}
+
+function updatePanelHeader(label, modelKey) {
+  const meta = panelMeta(modelKey);
+  const l = label.toLowerCase();
+  document.getElementById('name-' + l).textContent = meta.name;
+  const tagEl = document.getElementById('tag-' + l);
+  const closed = /closed/i.test(meta.type);
+  tagEl.textContent = closed ? 'Closed' : 'Open-Weight';
+  tagEl.className = 'model-tag ' + (closed ? 'tag-closed' : 'tag-open');
+}
+
+function syncPanelHeaders() {
+  updatePanelHeader('A', document.getElementById('model-a').value);
+  updatePanelHeader('B', document.getElementById('model-b').value);
+}
+
 async function init() {
   try {
     const data = await apiGet('/api/quant/scenarios');
@@ -259,6 +281,15 @@ async function init() {
   } catch(e) {
     document.getElementById('scenario-bar').innerHTML = '<div style="color:var(--danger);">Failed to load scenarios: ' + e.message + '</div>';
   }
+  // Load model metadata so panel headers show real names/types
+  try {
+    const m = await apiGet('/api/quant/models');
+    (m.models || []).forEach(x => { MODEL_META[x.key] = { name: x.name, type: x.type }; });
+  } catch(e) { console.warn('models load failed', e); }
+  // Panel headers follow the dropdowns
+  document.getElementById('model-a').addEventListener('change', syncPanelHeaders);
+  document.getElementById('model-b').addEventListener('change', syncPanelHeaders);
+  syncPanelHeaders();
 }
 
 function renderScenarios() {
@@ -399,8 +430,9 @@ async function runModel(model, label) {
     let buffer = '';
     let fullText = '';
     let hasCode = false;
+    let finished = false;
     
-    while (true) {
+    while (!finished) {
       const { done, value } = await reader.read();
       if (done) break;
       buffer += decoder.decode(value, { stream: true });
@@ -409,12 +441,20 @@ async function runModel(model, label) {
       
       for (const line of lines) {
         const trimmed = line.trim();
-        if (!trimmed.startsWith('data: ') || trimmed === 'data: [DONE]') continue;
+        if (trimmed === 'data: [DONE]') { finished = true; break; }
+        if (!trimmed.startsWith('data: ')) continue;
         
         try {
           const evt = JSON.parse(trimmed.slice(6));
           
-          if (evt.type === 'reasoning') {
+          if (evt.type === 'start') {
+            // Server-side truth: show the model actually running
+            document.getElementById('name-' + label.toLowerCase()).textContent = evt.model_name;
+            const tagEl = document.getElementById('tag-' + label.toLowerCase());
+            const closed = /closed/i.test(evt.model_type || '');
+            tagEl.textContent = closed ? 'Closed' : 'Open-Weight';
+            tagEl.className = 'model-tag ' + (closed ? 'tag-closed' : 'tag-open');
+          } else if (evt.type === 'reasoning') {
             reasoningEl.textContent = evt.text;
           } else if (evt.type === 'stream') {
             fullText = evt.text;
@@ -423,6 +463,12 @@ async function runModel(model, label) {
             
             // Auto-scroll
             bodyEl.scrollTop = bodyEl.scrollHeight;
+          } else if (evt.type === 'repairing') {
+            const execSection = document.getElementById('exec-section-' + label);
+            const execEl = document.getElementById('exec-' + label);
+            execSection.style.display = 'block';
+            execEl.className = 'exec-result';
+            execEl.innerHTML = '<span class="spinner"></span> First attempt failed (' + (evt.error || '').slice(0, 120) + ') — model is repairing its own code...';
           } else if (evt.type === 'complete') {
             fullText = evt.full_text || fullText;
             streamEl.innerHTML = highlightCode(fullText);
@@ -444,7 +490,7 @@ async function runModel(model, label) {
             
             // Code execution results
             const codeResult = evt.code_result;
-            const codeStatus = codeResult?.success ? '✅ Ran' : '❌ Error';
+            const codeStatus = codeResult?.success ? (codeResult?.repaired ? '🔧 Repaired' : '✅ Ran') : '❌ Error';
             document.getElementById('code-status-' + label.toLowerCase()).textContent = codeStatus;
             
             if (codeResult) {
