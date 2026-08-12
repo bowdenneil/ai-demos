@@ -116,11 +116,11 @@ const ABCompare = {
       output.innerHTML = `
         <div class="ab-split">
           <div class="ab-panel" id="ab-panel-a-${demoId}">
-            <div class="ab-panel-header"><span class="ab-panel-label">${modelA.split('/').pop()}</span><span class="ab-panel-time" id="ab-time-a-${demoId}"></span></div>
+            <div class="ab-panel-header"><span class="ab-panel-label">${modelA.split('/').pop()}</span><span class="ab-panel-cost" id="ab-cost-a-${demoId}"></span><span class="ab-panel-time" id="ab-time-a-${demoId}"></span></div>
             <div class="ab-panel-content" id="ab-content-a-${demoId}"><span class="typing-cursor"></span> <span style="color:var(--text-dim)">Running...</span></div>
           </div>
           <div class="ab-panel" id="ab-panel-b-${demoId}">
-            <div class="ab-panel-header"><span class="ab-panel-label">${modelB.split('/').pop()}</span><span class="ab-panel-time" id="ab-time-b-${demoId}"></span></div>
+            <div class="ab-panel-header"><span class="ab-panel-label">${modelB.split('/').pop()}</span><span class="ab-panel-cost" id="ab-cost-b-${demoId}"></span><span class="ab-panel-time" id="ab-time-b-${demoId}"></span></div>
             <div class="ab-panel-content" id="ab-content-b-${demoId}"><span class="typing-cursor"></span> <span style="color:var(--text-dim)">Running...</span></div>
           </div>
         </div>
@@ -131,9 +131,11 @@ const ABCompare = {
     const contentB = document.getElementById('ab-content-b-' + demoId);
     const timeA = document.getElementById('ab-time-a-' + demoId);
     const timeB = document.getElementById('ab-time-b-' + demoId);
+    const costA = document.getElementById('ab-cost-a-' + demoId);
+    const costB = document.getElementById('ab-cost-b-' + demoId);
 
     // Run a model — temporarily override MODEL so callLLM uses the right model
-    const runModel = async (model, contentEl, timeEl) => {
+    const runModel = async (model, contentEl, timeEl, costEl) => {
       // Save and override MODEL
       const savedModel = MODEL;
       MODEL = model;
@@ -189,24 +191,27 @@ const ABCompare = {
       MODEL = savedModel;
       const elapsed = ((Date.now() - start) / 1000).toFixed(1);
       if (timeEl) timeEl.textContent = `${elapsed}s`;
+
+      // Cost calculation — displayed in header beside model name + footer under output
+      let cost = 0, inTok = 0, outTok = 0;
+      if (typeof LLM_PRICES !== 'undefined' && fullText) {
+        const p = LLM_PRICES[model] || { inp: 0.50, out: 1.50 };
+        inTok = Math.round(messages.reduce((n, m) => n + (m.content || '').length, 0) / 4);
+        outTok = Math.round(fullText.length / 4);
+        cost = (inTok * p.inp + outTok * p.out) / 1e6;
+      }
+      if (costEl) costEl.innerHTML = `<strong>€${cost.toFixed(4)}</strong> · ${(inTok + outTok).toLocaleString()} tok`;
+
       if (contentEl) {
-        // Per-model cost footer (token counts estimated at ~4 chars/token)
-        let footer = '';
-        if (typeof LLM_PRICES !== 'undefined' && fullText) {
-          const p = LLM_PRICES[model] || { inp: 0.50, out: 1.50 };
-          const inTok = Math.round(messages.reduce((n, m) => n + (m.content || '').length, 0) / 4);
-          const outTok = Math.round(fullText.length / 4);
-          const cost = (inTok * p.inp + outTok * p.out) / 1e6;
-          footer = `<div class="llm-cost-footer">💶 <strong>€${cost.toFixed(4)}</strong> (est.) · ${(inTok + outTok).toLocaleString()} tok · ${elapsed}s</div>`;
-        }
+        const footer = cost ? `<div class="llm-cost-footer">💶 <strong>€${cost.toFixed(4)}</strong> (est.) · ${(inTok + outTok).toLocaleString()} tok · ${elapsed}s</div>` : '';
         contentEl.innerHTML = formatMarkdown(fullText) + footer;
       }
       return fullText;
     };
 
     const [resultA, resultB] = await Promise.all([
-      runModel(modelA, contentA, timeA),
-      runModel(modelB, contentB, timeB),
+      runModel(modelA, contentA, timeA, costA),
+      runModel(modelB, contentB, timeB, costB),
     ]);
 
     return { a: resultA, b: resultB };
