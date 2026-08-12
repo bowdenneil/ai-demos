@@ -1,0 +1,289 @@
+{
+  "uid": "gmq-lighting",
+  "title": "GMQ Lighting — Operations Dashboard",
+  "tags": ["gmq"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total Building Power (kW)",
+      "type": "stat",
+      "datasource": {"uid": "aftyz8azsqdq8b"},
+      "gridPos": {"x": 0, "y": 0, "w": 4, "h": 4},
+      "targets": [{
+        "datasource": {"uid": "aftyz8azsqdq8b"},
+        "queryText": "SELECT timestamp as time, SUM(power_kw) as value FROM energy_readings WHERE timestamp > strftime('%Y-%m-%d %H:%M:%S', datetime('now','-24 hours')) GROUP BY timestamp ORDER BY timestamp",
+        "rawQuery": true,
+        "refId": "A"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kwatt",
+          "color": {"mode": "thresholds"},
+          "thresholds": {"steps": [
+            {"color": "green", "value": null},
+            {"color": "yellow", "value": 10},
+            {"color": "red", "value": 15}
+          ]}
+        }
+      },
+      "options": {
+        "reduceOptions": {"calcs": ["lastNotNull"]},
+        "orientation": "horizontal"
+      }
+    },
+    {
+      "id": 2,
+      "title": "Energy Consumption — 24h Trend",
+      "type": "timeseries",
+      "datasource": {"uid": "aftyz8azsqdq8b"},
+      "gridPos": {"x": 4, "y": 0, "w": 20, "h": 8},
+      "targets": [{
+        "datasource": {"uid": "aftyz8azsqdq8b"},
+        "queryText": "SELECT timestamp as time, SUM(power_kw) as value FROM energy_readings WHERE timestamp > strftime('%Y-%m-%d %H:%M:%S', datetime('now','-24 hours')) GROUP BY timestamp ORDER BY timestamp",
+        "rawQuery": true,
+        "refId": "A"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kwatt",
+          "custom": {
+            "lineInterpolation": "smooth",
+            "fillOpacity": 20,
+            "lineColor": {"mode": "fixed", "fixedColor": "#53d8fb"}
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Per-Zone Power",
+      "type": "barchart",
+      "datasource": {"uid": "aftyz8azsqdq8b"},
+      "gridPos": {"x": 0, "y": 8, "w": 8, "h": 8},
+      "targets": [{
+        "datasource": {"uid": "aftyz8azsqdq8b"},
+        "queryText": "SELECT room as metric, AVG(power_kw) as value FROM energy_readings WHERE timestamp > strftime('%Y-%m-%d %H:%M:%S', datetime('now','-1 hours')) GROUP BY room ORDER BY value DESC",
+        "rawQuery": true,
+        "refId": "A"
+      }],
+      "fieldConfig": {"defaults": {"unit": "kwatt"}}
+    },
+    {
+      "id": 4,
+      "title": "Fixture Status Distribution",
+      "type": "piechart",
+      "datasource": {"uid": "aftyz8azsqdq8b"},
+      "gridPos": {"x": 8, "y": 8, "w": 8, "h": 8},
+      "targets": [{
+        "datasource": {"uid": "aftyz8azsqdq8b"},
+        "queryText": "SELECT state as metric, COUNT(*) as value FROM fixture_status WHERE timestamp = (SELECT MAX(timestamp) FROM fixture_status) GROUP BY state",
+        "rawQuery": true,
+        "refId": "A"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "by"},
+          "mappings": [
+            {"type": "value", "options": {"on": {"color": "#fbbf24", "text": "ON"}}},
+            {"type": "value", "options": {"off": {"color": "#333355", "text": "OFF"}}},
+            {"type": "value", "options": {"daylit": {"color": "#53d8fb", "text": "Daylit"}}},
+            {"type": "value", "options": {"emergency": {"color": "#34d399", "text": "Emergency"}}},
+            {"type": "value", "options": {"fault": {"color": "#f87171", "text": "Fault"}}}
+          ]
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Daily Energy Savings (kWh)",
+      "type": "stat",
+      "datasource": {"uid": "aftyz8azsqdq8b"},
+      "gridPos": {"x": 16, "y": 8, "w": 4, "h": 4},
+      "targets": [{
+        "datasource": {"uid": "aftyz8azsqdq8b"},
+        "queryText": "SELECT date as time, savings_kwh as value FROM daily_summary ORDER BY date DESC LIMIT 1",
+        "rawQuery": true,
+        "refId": "A"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kWh",
+          "color": {"mode": "thresholds"},
+          "thresholds": {"steps": [
+            {"color": "red", "value": null},
+            {"color": "yellow", "value": 100},
+            {"color": "green", "value": 200}
+          ]}
+        }
+      },
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}}
+    },
+    {
+      "id": 6,
+      "title": "CO₂ Saved (kg/day)",
+      "type": "stat",
+      "datasource": {"uid": "aftyz8azsqdq8b"},
+      "gridPos": {"x": 20, "y": 8, "w": 4, "h": 4},
+      "targets": [{
+        "datasource": {"uid": "aftyz8azsqdq8b"},
+        "queryText": "SELECT date as time, co2_saved_kg as value FROM daily_summary ORDER BY date DESC LIMIT 1",
+        "rawQuery": true,
+        "refId": "A"
+      }],
+      "fieldConfig": {"defaults": {"unit": "kg", "color": {"fixedColor": "#34d399", "mode": "fixed"}}},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}}
+    },
+    {
+      "id": 7,
+      "title": "Cost Savings (€/day)",
+      "type": "stat",
+      "datasource": {"uid": "aftyz8azsqdq8b"},
+      "gridPos": {"x": 16, "y": 12, "w": 4, "h": 4},
+      "targets": [{
+        "datasource": {"uid": "aftyz8azsqdq8b"},
+        "queryText": "SELECT date as time, cost_saved_eur as value FROM daily_summary ORDER BY date DESC LIMIT 1",
+        "rawQuery": true,
+        "refId": "A"
+      }],
+      "fieldConfig": {"defaults": {"unit": "currencyEUR", "color": {"fixedColor": "#fbbf24", "mode": "fixed"}}},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}}
+    },
+    {
+      "id": 8,
+      "title": "Savings % vs Baseline",
+      "type": "gauge",
+      "datasource": {"uid": "aftyz8azsqdq8b"},
+      "gridPos": {"x": 20, "y": 12, "w": 4, "h": 4},
+      "targets": [{
+        "datasource": {"uid": "aftyz8azsqdq8b"},
+        "queryText": "SELECT date as time, savings_pct as value FROM daily_summary ORDER BY date DESC LIMIT 1",
+        "rawQuery": true,
+        "refId": "A"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0, "max": 100,
+          "thresholds": {"steps": [
+            {"color": "red", "value": null},
+            {"color": "yellow", "value": 20},
+            {"color": "green", "value": 35}
+          ]}
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Emergency Lighting — Test Results",
+      "type": "table",
+      "datasource": {"uid": "aftyz8azsqdq8b"},
+      "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8},
+      "targets": [{
+        "datasource": {"uid": "aftyz8azsqdq8b"},
+        "queryText": "SELECT timestamp, device_id, test_type, result, battery_pct as battery_pct, signal_strength as signal FROM emergency_tests ORDER BY timestamp DESC LIMIT 20",
+        "rawQuery": true,
+        "refId": "A",
+        "format": "table"
+      }],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "result"},
+            "properties": [{
+              "id": "mappings",
+              "value": [
+                {"type": "value", "options": {"PASS": {"text": "✅ PASS", "color": "#34d399"}}},
+                {"type": "value", "options": {"FAIL": {"text": "❌ FAIL", "color": "#f87171"}}}
+              ]
+            }]
+          }
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "title": "7-Day Energy Trend",
+      "type": "timeseries",
+      "datasource": {"uid": "aftyz8azsqdq8b"},
+      "gridPos": {"x": 12, "y": 16, "w": 12, "h": 8},
+      "targets": [{
+        "datasource": {"uid": "aftyz8azsqdq8b"},
+        "queryText": "SELECT timestamp as time, SUM(power_kw) as value FROM energy_readings WHERE timestamp > strftime('%Y-%m-%d %H:%M:%S', datetime('now','-7 days')) GROUP BY timestamp ORDER BY timestamp",
+        "rawQuery": true,
+        "refId": "A"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kwatt",
+          "custom": {
+            "lineInterpolation": "smooth",
+            "fillOpacity": 15,
+            "lineColor": {"mode": "fixed", "fixedColor": "#7c5cfc"}
+          }
+        }
+      }
+    },
+    {
+      "id": 11,
+      "title": "Active Fixtures & Faults (7 days)",
+      "type": "timeseries",
+      "datasource": {"uid": "aftyz8azsqdq8b"},
+      "gridPos": {"x": 0, "y": 24, "w": 12, "h": 8},
+      "targets": [{
+        "datasource": {"uid": "aftyz8azsqdq8b"},
+        "queryText": "SELECT timestamp as time, COUNT(DISTINCT dali_address) as value FROM fixture_status WHERE state='on' AND timestamp > strftime('%Y-%m-%d %H:%M:%S', datetime('now','-7 days')) GROUP BY timestamp ORDER BY timestamp",
+        "rawQuery": true,
+        "refId": "A",
+        "legendFormat": "Active"
+      },
+      {
+        "datasource": {"uid": "aftyz8azsqdq8b"},
+        "queryText": "SELECT timestamp as time, COUNT(*) as value FROM fixture_status WHERE fault=1 AND timestamp > strftime('%Y-%m-%d %H:%M:%S', datetime('now','-7 days')) GROUP BY timestamp ORDER BY timestamp",
+        "rawQuery": true,
+        "refId": "B",
+        "legendFormat": "Faults"
+      }],
+      "fieldConfig": {
+        "defaults": {"unit": "short"},
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Active"},
+            "properties": [{"id": "color", "value": {"fixedColor": "#34d399", "mode": "fixed"}}]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Faults"},
+            "properties": [{"id": "color", "value": {"fixedColor": "#f87171", "mode": "fixed"}}]
+          }
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "title": "Daily Savings Trend (kWh)",
+      "type": "barchart",
+      "datasource": {"uid": "aftyz8azsqdq8b"},
+      "gridPos": {"x": 12, "y": 24, "w": 12, "h": 8},
+      "targets": [{
+        "datasource": {"uid": "aftyz8azsqdq8b"},
+        "queryText": "SELECT date as time, savings_kwh as value FROM daily_summary ORDER BY date",
+        "rawQuery": true,
+        "refId": "A"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kWh",
+          "color": {"fixedColor": "#53d8fb", "mode": "fixed"}
+        }
+      }
+    }
+  ]
+}

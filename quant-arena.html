@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quant Arena — Model A/B Comparison</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root {
+--bg: #0a0a1a; --surface: #12122a; --surface2: #1a1a3a; --border: #2a2a5a;
+--accent: #53d8fb; --accent2: #7c5cfc; --accent3: #f953ba; --accent4: #34d399;
+--accent5: #fbbf24; --danger: #f87171; --success: #34d399; --warning: #fbbf24;
+--text: #e8e8f0; --text-dim: #8888aa; --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:var(--font); background:var(--bg); color:var(--text); min-height:100vh; }
+.header {
+background:linear-gradient(135deg,#0a0a2a 0%,#1a0a3a 50%,#0a1a2a 100%);
+border-bottom:1px solid var(--border); padding:1rem 2rem; display:flex;
+justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100;
+}
+.header h1 { font-size:1.4rem; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.header .back-link { color:var(--text-dim); text-decoration:none; font-size:0.85rem; }
+.header .back-link:hover { color:var(--accent); }
+.container { max-width:1600px; margin:0 auto; padding:1.5rem; }
+
+/* Scenario selector */
+.scenario-bar { display:flex; gap:0.75rem; margin-bottom:1.5rem; flex-wrap:wrap; }
+.scenario-card {
+flex:1; min-width:280px; background:var(--surface); border:1px solid var(--border);
+border-radius:10px; padding:1rem; cursor:pointer; transition:all 0.2s; position:relative;
+}
+.scenario-card:hover { border-color:var(--accent); background:var(--surface2); }
+.scenario-card.active { border-color:var(--accent); background:rgba(83,216,251,0.05); box-shadow:0 0 12px rgba(83,216,251,0.15); }
+.scenario-card .icon { font-size:1.5rem; margin-bottom:0.3rem; }
+.scenario-card .title { font-size:0.95rem; font-weight:600; color:var(--text); margin-bottom:0.2rem; }
+.scenario-card .subtitle { font-size:0.75rem; color:var(--text-dim); }
+.scenario-card .series-count { position:absolute; top:0.8rem; right:0.8rem; font-size:0.65rem; color:var(--text-dim); background:var(--surface2); padding:0.15rem 0.5rem; border-radius:10px; }
+
+/* Model selector */
+.model-bar { display:flex; gap:1rem; margin-bottom:1.5rem; align-items:center; }
+.model-select-group { display:flex; gap:0.5rem; align-items:center; }
+.model-select-group label { font-size:0.8rem; color:var(--text-dim); font-weight:600; }
+.model-select {
+background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.5rem 0.8rem;
+color:var(--text); font-size:0.85rem; font-family:var(--font); cursor:pointer; min-width:200px;
+}
+.model-select:focus { outline:none; border-color:var(--accent); }
+.run-btn {
+background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#0a0a1a; border:none;
+padding:0.7rem 1.8rem; border-radius:8px; font-size:0.95rem; font-weight:700; cursor:pointer;
+transition:all 0.2s; font-family:var(--font);
+}
+.run-btn:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(83,216,251,0.3); }
+.run-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+/* Arena — split screen */
+.arena { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+.model-panel { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+.model-panel.running { border-color:var(--accent); box-shadow:0 0 20px rgba(83,216,251,0.1); }
+.panel-header { display:flex; justify-content:space-between; align-items:center; padding:0.8rem 1rem; background:var(--surface2); border-bottom:1px solid var(--border); }
+.panel-header .model-name { font-size:0.95rem; font-weight:600; }
+.panel-header .model-tag { font-size:0.65rem; padding:0.15rem 0.5rem; border-radius:6px; font-weight:600; text-transform:uppercase; letter-spacing:0.03em; }
+.tag-open { background:rgba(52,211,153,0.15); color:var(--success); }
+.tag-closed { background:rgba(248,113,113,0.15); color:var(--danger); }
+.panel-body { padding:1rem; flex:1; overflow-y:auto; max-height:600px; }
+
+/* Section within panel */
+.panel-section { margin-bottom:1rem; }
+.section-label { font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-dim); margin-bottom:0.4rem; display:flex; align-items:center; gap:0.3rem; }
+.reasoning-text { font-size:0.8rem; color:var(--text-dim); line-height:1.5; font-style:italic; max-height:100px; overflow-y:auto; background:var(--surface2); padding:0.6rem; border-radius:6px; border-left:3px solid var(--accent2); }
+.stream-text { font-size:0.85rem; line-height:1.6; white-space:pre-wrap; word-break:break-word; }
+.code-block { background:#0d0d20; border:1px solid var(--border); border-radius:8px; padding:0.8rem; font-family:'Fira Code', 'Consolas', monospace; font-size:0.78rem; line-height:1.5; overflow-x:auto; white-space:pre; max-height:400px; }
+.code-block .keyword { color:#c792ea; }
+.code-block .string { color:#c3e88d; }
+.code-block .comment { color:#546e7a; font-style:italic; }
+.code-block .number { color:#f78c6c; }
+.exec-result { font-size:0.78rem; font-family:monospace; background:#0d0d20; border-radius:6px; padding:0.6rem; white-space:pre-wrap; max-height:200px; overflow-y:auto; }
+.exec-success { border-left:3px solid var(--success); }
+.exec-error { border-left:3px solid var(--danger); color:var(--danger); }
+.chart-container { background:var(--surface2); border-radius:8px; padding:0.5rem; height:220px; position:relative; }
+
+/* Stats bar */
+.stats-bar { display:flex; gap:1rem; padding:0.6rem 1rem; background:var(--surface2); border-top:1px solid var(--border); }
+.stat { display:flex; flex-direction:column; gap:0.1rem; }
+.stat-label { font-size:0.6rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; }
+.stat-value { font-size:0.9rem; font-weight:600; }
+.stat-value.cost { color:var(--accent4); }
+.stat-value.refusals { color:var(--danger); }
+
+/* Session summary */
+.session-summary { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-top:1.5rem; }
+.session-summary h3 { font-size:1rem; margin-bottom:0.8rem; }
+.session-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+.session-stat { text-align:center; padding:0.8rem; background:var(--surface2); border-radius:8px; }
+.session-stat .val { font-size:1.3rem; font-weight:700; }
+.session-stat .lbl { font-size:0.7rem; color:var(--text-dim); margin-top:0.2rem; }
+
+/* Loading */
+.typing-cursor { display:inline-block; width:2px; height:1em; background:var(--accent); animation:blink 1s infinite; margin-left:2px; vertical-align:text-bottom; }
+@keyframes blink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
+.spinner { display:inline-block; width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:0.3rem; }
+.status-dot.idle { background:var(--text-dim); }
+.status-dot.running { background:var(--accent); animation:pulse 1.5s infinite; }
+.status-dot.done { background:var(--success); }
+.status-dot.error { background:var(--danger); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* Data preview */
+.data-preview { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1rem; margin-bottom:1.5rem; }
+.data-preview h4 { font-size:0.85rem; margin-bottom:0.5rem; color:var(--text-dim); }
+.data-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:0.5rem; }
+.data-item { background:var(--surface2); padding:0.5rem 0.7rem; border-radius:6px; }
+.data-item .name { font-size:0.75rem; color:var(--text-dim); }
+.data-item .value { font-size:0.95rem; font-weight:600; }
+.data-item .change { font-size:0.7rem; }
+.change-up { color:var(--success); }
+.change-down { color:var(--danger); }
+</style>
+</head>
+<body>
+
+<div class="header">
+<div style="display:flex;align-items:center;gap:1rem;">
+<h1>⚖️ Quant Arena</h1>
+<span style="color:var(--text-dim);font-size:0.8rem;">Open vs Closed Model Comparison for Capital Markets</span>
+</div>
+<a class="back-link" href="/">← Back to Portal</a>
+</div>
+
+<div class="container">
+<!-- Scenario selection -->
+<div class="scenario-bar" id="scenario-bar"></div>
+
+<!-- Data preview -->
+<div class="data-preview" id="data-preview" style="display:none;">
+<h4>📊 Live Market Data — FRED</h4>
+<div class="data-grid" id="data-grid"></div>
+</div>
+
+<!-- Model selectors + run button -->
+<div class="model-bar">
+<div class="model-select-group">
+<label>Model A:</label>
+<select class="model-select" id="model-a">
+  <option value="deepseek/deepseek-v4-flash-0731">DeepSeek V4 Flash (671B MoE)</option>
+  <option value="z-ai/glm-5.2">GLM-5.2 (355B MoE)</option>
+  <option value="deepseek/deepseek-v3.2">DeepSeek V3.2 (671B MoE)</option>
+  <option value="z-ai/glm-4.6">GLM-4.6 (355B MoE)</option>
+  <option value="deepseek/deepseek-r1-0528">DeepSeek R1 (671B Reasoning)</option>
+  <option value="qwen/qwen3-235b-a22b-2507">Qwen3 235B</option>
+  <option value="anthropic/claude-sonnet-5">Claude Sonnet 5 (Closed)</option>
+  <option value="anthropic/claude-haiku-4-5-20251001">Claude Haiku 4.5 (Closed)</option>
+  <option value="anthropic/claude-opus-4-5-20251101">Claude Opus 4.5 (Closed)</option>
+</select>
+</div>
+<div class="model-select-group">
+<label>Model B:</label>
+<select class="model-select" id="model-b">
+  <option value="z-ai/glm-5.2">GLM-5.2 (355B MoE)</option>
+  <option value="deepseek/deepseek-v4-flash-0731">DeepSeek V4 Flash (671B MoE)</option>
+  <option value="deepseek/deepseek-v3.2">DeepSeek V3.2 (671B MoE)</option>
+  <option value="z-ai/glm-4.6">GLM-4.6 (355B MoE)</option>
+  <option value="deepseek/deepseek-r1-0528">DeepSeek R1 (671B Reasoning)</option>
+  <option value="qwen/qwen3-235b-a22b-2507">Qwen3 235B</option>
+  <option value="anthropic/claude-sonnet-5">Claude Sonnet 5 (Closed)</option>
+  <option value="anthropic/claude-haiku-4-5-20251001">Claude Haiku 4.5 (Closed)</option>
+  <option value="anthropic/claude-opus-4-5-20251101">Claude Opus 4.5 (Closed)</option>
+</select>
+</div>
+<button class="run-btn" id="run-btn" onclick="runComparison()">▶ Run A/B Comparison</button>
+</div>
+
+<!-- Arena -->
+<div class="arena">
+<div class="model-panel" id="panel-a">
+<div class="panel-header">
+<div style="display:flex;align-items:center;gap:0.5rem;">
+<span class="status-dot idle" id="status-a"></span>
+<span class="model-name" id="name-a">Model A</span>
+<span class="model-tag tag-open" id="tag-a">Open-Weight</span>
+</div>
+<span style="font-size:0.75rem;color:var(--text-dim);" id="timer-a"></span>
+</div>
+<div class="panel-body" id="body-a">
+<div style="text-align:center;color:var(--text-dim);padding:2rem;font-size:0.85rem;">Select a scenario and click Run</div>
+</div>
+<div class="stats-bar" id="stats-a" style="display:none;">
+<div class="stat"><span class="stat-label">Time</span><span class="stat-value" id="time-a">—</span></div>
+<div class="stat"><span class="stat-label">Tokens</span><span class="stat-value" id="tokens-a">—</span></div>
+<div class="stat"><span class="stat-label">Cost</span><span class="stat-value cost" id="cost-a">—</span></div>
+<div class="stat"><span class="stat-label">Code</span><span class="stat-value" id="code-status-a">—</span></div>
+<div class="stat"><span class="stat-label">Forecast</span><span class="stat-value" id="forecast-a">—</span></div>
+</div>
+</div>
+
+<div class="model-panel" id="panel-b">
+<div class="panel-header">
+<div style="display:flex;align-items:center;gap:0.5rem;">
+<span class="status-dot idle" id="status-b"></span>
+<span class="model-name" id="name-b">Model B</span>
+<span class="model-tag tag-open" id="tag-b">Open-Weight</span>
+</div>
+<span style="font-size:0.75rem;color:var(--text-dim);" id="timer-b"></span>
+</div>
+<div class="panel-body" id="body-b">
+<div style="text-align:center;color:var(--text-dim);padding:2rem;font-size:0.85rem;">Select a scenario and click Run</div>
+</div>
+<div class="stats-bar" id="stats-b" style="display:none;">
+<div class="stat"><span class="stat-label">Time</span><span class="stat-value" id="time-b">—</span></div>
+<div class="stat"><span class="stat-label">Tokens</span><span class="stat-value" id="tokens-b">—</span></div>
+<div class="stat"><span class="stat-label">Cost</span><span class="stat-value cost" id="cost-b">—</span></div>
+<div class="stat"><span class="stat-label">Code</span><span class="stat-value" id="code-status-b">—</span></div>
+<div class="stat"><span class="stat-label">Forecast</span><span class="stat-value" id="forecast-b">—</span></div>
+</div>
+</div>
+</div>
+
+<!-- Session summary -->
+<div class="session-summary" id="session-summary" style="display:none;">
+<h3>📋 Session Summary</h3>
+<div class="session-grid" id="session-grid"></div>
+</div>
+</div>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const STATE = {
+  scenario: null,
+  scenarios: [],
+  running: false,
+  marketData: null,
+  results: { A: null, B: null },
+  session: { runs: 0, totalCostA: 0, totalCostB: 0, totalTokensA: 0, totalTokensB: 0 },
+  charts: {},
+};
+
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+function getAuthToken() {
+  return localStorage.getItem('ai_demo_token') || '';
+}
+
+async function apiGet(url) {
+  const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + getAuthToken() } });
+  if (res.status === 401) { window.location.href = '/'; throw new Error('Auth required'); }
+  return res.json();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+async function init() {
+  try {
+    const data = await apiGet('/api/quant/scenarios');
+    STATE.scenarios = data.scenarios;
+    renderScenarios();
+    // Auto-select first scenario
+    if (STATE.scenarios.length > 0) selectScenario(STATE.scenarios[0].id);
+  } catch(e) {
+    document.getElementById('scenario-bar').innerHTML = '<div style="color:var(--danger);">Failed to load scenarios: ' + e.message + '</div>';
+  }
+}
+
+function renderScenarios() {
+  const bar = document.getElementById('scenario-bar');
+  bar.innerHTML = STATE.scenarios.map(s => `
+    <div class="scenario-card ${STATE.scenario === s.id ? 'active' : ''}" id="scenario-${s.id}" onclick="selectScenario('${s.id}')">
+      <div class="icon">${s.icon}</div>
+      <div class="title">${s.title}</div>
+      <div class="subtitle">${s.subtitle}</div>
+      <div class="series-count">${s.series.length} series</div>
+    </div>
+  `).join('');
+}
+
+async function selectScenario(id) {
+  STATE.scenario = id;
+  document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('active'));
+  const card = document.getElementById('scenario-' + id);
+  if (card) card.classList.add('active');
+  
+  // Load market data preview
+  try {
+    const data = await apiGet('/api/quant/data?scenario=' + id);
+    STATE.marketData = data;
+    renderDataPreview(data);
+  } catch(e) {
+    console.error('Failed to load data:', e);
+  }
+}
+
+function renderDataPreview(data) {
+  const preview = document.getElementById('data-preview');
+  const grid = document.getElementById('data-grid');
+  if (!data || !data.summary) { preview.style.display = 'none'; return; }
+  
+  preview.style.display = 'block';
+  const entries = Object.entries(data.summary).filter(([k]) => !k.startsWith('_'));
+  grid.innerHTML = entries.map(([sid, s]) => {
+    const changeClass = s.change_30d > 0 ? 'change-up' : 'change-down';
+    const changeSign = s.change_30d > 0 ? '+' : '';
+    return `<div class="data-item">
+      <div class="name">${s.name}</div>
+      <div class="value">${s.last_value}${s.unit ? ' ' + s.unit : ''}</div>
+      <div class="change ${changeClass}">${changeSign}${s.change_30d.toFixed(2)} 30d</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── RUN COMPARISON ──────────────────────────────────────────────────────────
+async function runComparison() {
+  if (STATE.running) return;
+  STATE.running = true;
+  STATE.results = { A: null, B: null };
+  
+  const modelA = document.getElementById('model-a').value;
+  const modelB = document.getElementById('model-b').value;
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Running...';
+  
+  // Reset panels
+  ['a', 'b'].forEach(l => {
+    const panel = document.getElementById('panel-' + l);
+    panel.classList.add('running');
+    document.getElementById('status-' + l).className = 'status-dot running';
+    document.getElementById('stats-' + l).style.display = 'none';
+    document.getElementById('body-' + l).innerHTML = '';
+    document.getElementById('timer-' + l).textContent = '';
+  });
+  
+  // Launch both model runs in parallel
+  const promises = [
+    runModel(modelA, 'A'),
+    runModel(modelB, 'B'),
+  ];
+  
+  await Promise.allSettled(promises);
+  
+  STATE.running = false;
+  btn.disabled = false;
+  btn.textContent = '▶ Run A/B Comparison';
+  
+  // Update session summary
+  STATE.session.runs++;
+  renderSessionSummary();
+}
+
+async function runModel(model, label) {
+  const bodyEl = document.getElementById('body-' + label.toLowerCase());
+  const timerEl = document.getElementById('timer-' + label.toLowerCase());
+  
+  let reasoningEl, streamEl, codeEl, execEl, chartEl;
+  let startTime = Date.now();
+  
+  // Add sections
+  bodyEl.innerHTML = `
+    <div class="panel-section" id="reasoning-section-${label}">
+      <div class="section-label"><span class="spinner"></span> Reasoning</div>
+      <div class="reasoning-text" id="reasoning-${label}"></div>
+    </div>
+    <div class="panel-section" id="stream-section-${label}">
+      <div class="section-label">📝 Analysis & Code</div>
+      <div class="stream-text" id="stream-${label}"></div>
+    </div>
+    <div class="panel-section" id="exec-section-${label}" style="display:none;">
+      <div class="section-label">⚡ Code Execution</div>
+      <div class="exec-result" id="exec-${label}"></div>
+    </div>
+    <div class="panel-section" id="chart-section-${label}" style="display:none;">
+      <div class="section-label">📊 Forecast Chart</div>
+      <div class="chart-container"><canvas id="chart-${label}"></canvas></div>
+    </div>
+  `;
+  
+  reasoningEl = document.getElementById('reasoning-' + label);
+  streamEl = document.getElementById('stream-' + label);
+  
+  // Timer
+  const timerInterval = setInterval(() => {
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+    timerEl.textContent = elapsed + 's';
+  }, 100);
+  
+  try {
+    const res = await fetch('/api/quant/run', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + getAuthToken(),
+      },
+      body: JSON.stringify({ scenario: STATE.scenario, model, label }),
+    });
+    
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let fullText = '';
+    let hasCode = false;
+    
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith('data: ') || trimmed === 'data: [DONE]') continue;
+        
+        try {
+          const evt = JSON.parse(trimmed.slice(6));
+          
+          if (evt.type === 'reasoning') {
+            reasoningEl.textContent = evt.text;
+          } else if (evt.type === 'stream') {
+            fullText = evt.text;
+            // Render with code highlighting
+            streamEl.innerHTML = highlightCode(fullText) + '<span class="typing-cursor"></span>';
+            
+            // Auto-scroll
+            bodyEl.scrollTop = bodyEl.scrollHeight;
+          } else if (evt.type === 'complete') {
+            fullText = evt.full_text || fullText;
+            streamEl.innerHTML = highlightCode(fullText);
+            
+            clearInterval(timerInterval);
+            const elapsed = evt.elapsed + 's';
+            timerEl.textContent = elapsed;
+            
+            // Update status
+            document.getElementById('status-' + label.toLowerCase()).className = 'status-dot done';
+            document.getElementById('panel-' + label.toLowerCase()).classList.remove('running');
+            
+            // Show stats
+            const statsEl = document.getElementById('stats-' + label.toLowerCase());
+            statsEl.style.display = 'flex';
+            document.getElementById('time-' + label.toLowerCase()).textContent = elapsed;
+            document.getElementById('tokens-' + label.toLowerCase()).textContent = evt.tokens;
+            document.getElementById('cost-' + label.toLowerCase()).textContent = '€' + (evt.cost || 0).toFixed(4);
+            
+            // Code execution results
+            const codeResult = evt.code_result;
+            const codeStatus = codeResult?.success ? '✅ Ran' : '❌ Error';
+            document.getElementById('code-status-' + label.toLowerCase()).textContent = codeStatus;
+            
+            if (codeResult) {
+              const execSection = document.getElementById('exec-section-' + label);
+              const execEl = document.getElementById('exec-' + label);
+              execSection.style.display = 'block';
+              execEl.className = 'exec-result ' + (codeResult.success ? 'exec-success' : 'exec-error');
+              execEl.textContent = codeResult.output || codeResult.error || 'No output';
+              
+              // Forecast status
+              let forecastStatus = '—';
+              if (codeResult.success && codeResult.output) {
+                if (codeResult.output.toLowerCase().includes('forecast')) forecastStatus = '✅ Generated';
+                else forecastStatus = '✅ Output';
+              } else {
+                forecastStatus = '❌ Failed';
+              }
+              document.getElementById('forecast-' + label.toLowerCase()).textContent = forecastStatus;
+              
+              // Render chart if chart_data exists
+              if (codeResult.chart_data) {
+                renderChart(label, codeResult.chart_data);
+              }
+            }
+            
+            // Store result
+            STATE.results[label] = {
+              model: evt.model,
+              model_name: evt.model_name,
+              tokens: evt.tokens,
+              elapsed: evt.elapsed,
+              cost: evt.cost,
+              code_success: codeResult?.success,
+              has_forecast: codeResult?.success && codeResult?.output?.toLowerCase().includes('forecast'),
+            };
+            
+            // Update session totals
+            if (label === 'A') {
+              STATE.session.totalCostA += (evt.cost || 0);
+              STATE.session.totalTokensA += evt.tokens;
+            } else {
+              STATE.session.totalCostB += (evt.cost || 0);
+              STATE.session.totalTokensB += evt.tokens;
+            }
+            
+          } else if (evt.type === 'error') {
+            clearInterval(timerInterval);
+            document.getElementById('status-' + label.toLowerCase()).className = 'status-dot error';
+            document.getElementById('panel-' + label.toLowerCase()).classList.remove('running');
+            streamEl.innerHTML = '<span style="color:var(--danger);">Error: ' + evt.error + '</span>';
+          }
+        } catch(e) { continue; }
+      }
+    }
+  } catch(e) {
+    clearInterval(timerInterval);
+    document.getElementById('status-' + label.toLowerCase()).className = 'status-dot error';
+    bodyEl.innerHTML = '<div style="color:var(--danger);padding:1rem;">Error: ' + e.message + '</div>';
+  }
+}
+
+// ─── CODE HIGHLIGHTING ────────────────────────────────────────────────────────
+function highlightCode(text) {
+  // Escape HTML
+  let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  
+  // Highlight code blocks
+  html = html.replace(/```python\n([\s\S]*?)```/g, (match, code) => {
+    return '<div class="code-block">' + highlightPython(code) + '</div>';
+  });
+  html = html.replace(/```\n([\s\S]*?)```/g, (match, code) => {
+    return '<div class="code-block">' + highlightPython(code) + '</div>';
+  });
+  
+  // Bold for key terms
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+  return html;
+}
+
+function highlightPython(code) {
+  let html = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  // Comments
+  html = html.replace(/(#[^\n]*)/g, '<span class="comment">$1</span>');
+  // Strings
+  html = html.replace(/('[^']*'|"[^"]*")/g, '<span class="string">$1</span>');
+  // Keywords
+  html = html.replace(/\b(import|from|def|return|if|else|elif|for|while|class|try|except|with|as|in|not|and|or|is|None|True|False|lambda|print)\b/g, '<span class="keyword">$1</span>');
+  // Numbers
+  html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="number">$1</span>');
+  return html;
+}
+
+// ─── CHART RENDERING ──────────────────────────────────────────────────────────
+function renderChart(label, chartData) {
+  const section = document.getElementById('chart-section-' + label);
+  section.style.display = 'block';
+  const canvas = document.getElementById('chart-' + label);
+  
+  // Destroy old chart
+  if (STATE.charts[label]) { STATE.charts[label].destroy(); }
+  
+  // chartData could be {labels: [], datasets: [{label, data, color}]}
+  // or {type: 'bar', labels: [], values: []}
+  let config;
+  
+  if (chartData.datasets) {
+    config = {
+      type: chartData.type || 'line',
+      data: {
+        labels: chartData.labels,
+        datasets: chartData.datasets.map((ds, i) => ({
+          label: ds.label || 'Series ' + (i+1),
+          data: ds.data,
+          borderColor: ds.color || ['#53d8fb', '#7c5cfc', '#fbbf24', '#34d399'][i % 4],
+          backgroundColor: (ds.color || '#53d8fb') + '20',
+          fill: chartData.type !== 'bar',
+          tension: 0.3,
+          pointRadius: chartData.type === 'bar' ? 0 : 2,
+          borderWidth: 2,
+        })),
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        plugins: { legend: { labels: { color: '#8888aa', font: { size: 10 } } } },
+        scales: {
+          x: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1a1a3a' } },
+          y: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1a1a3a' } },
+        },
+      },
+    };
+  } else if (chartData.labels && chartData.values) {
+    config = {
+      type: chartData.type || 'line',
+      data: {
+        labels: chartData.labels,
+        datasets: [{
+          label: chartData.title || 'Forecast',
+          data: chartData.values,
+          borderColor: '#53d8fb', backgroundColor: 'rgba(83,216,251,0.1)',
+          fill: true, tension: 0.3, pointRadius: 2, borderWidth: 2,
+        }],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        plugins: { legend: { labels: { color: '#8888aa', font: { size: 10 } } } },
+        scales: {
+          x: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1a1a3a' } },
+          y: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1a1a3a' } },
+        },
+      },
+    };
+  } else {
+    return; // unknown format
+  }
+  
+  STATE.charts[label] = new Chart(canvas, config);
+}
+
+// ─── SESSION SUMMARY ──────────────────────────────────────────────────────────
+function renderSessionSummary() {
+  const summary = document.getElementById('session-summary');
+  const grid = document.getElementById('session-grid');
+  summary.style.display = 'block';
+  
+  const s = STATE.session;
+  const totalCost = s.totalCostA + s.totalCostB;
+  const totalTokens = s.totalTokensA + s.totalTokensB;
+  
+  // Get model names from last run
+  const nameA = STATE.results.A?.model_name || 'Model A';
+  const nameB = STATE.results.B?.model_name || 'Model B';
+  
+  grid.innerHTML = `
+    <div class="session-stat"><div class="val">${s.runs}</div><div class="lbl">Comparisons Run</div></div>
+    <div class="session-stat"><div class="val">${totalTokens.toLocaleString()}</div><div class="lbl">Total Tokens</div></div>
+    <div class="session-stat"><div class="val">€${totalCost.toFixed(4)}</div><div class="lbl">Total Cost (Open-Weight)</div></div>
+    <div class="session-stat"><div class="val" style="color:var(--danger);">€${(totalTokens / 1000000 * 5).toFixed(2)}</div><div class="lbl">Equivalent on GPT-4o</div></div>
+  `;
+}
+
+// ─── START ────────────────────────────────────────────────────────────────────
+Chart.defaults.color = '#8888aa';
+Chart.defaults.borderColor = '#2a2a5a';
+init();
+</script>
+</body>
+</html>

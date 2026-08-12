@@ -1,0 +1,2456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GMQ Lighting Systems Upgrade — Interactive Proposal</title>
+  <style>
+    :root {
+      --bg: #0a0a1a;
+      --surface: #12122a;
+      --surface2: #1a1a3a;
+      --border: #2a2a5a;
+      --accent: #53d8fb;
+      --accent2: #7c5cfc;
+      --accent3: #f953ba;
+      --accent4: #34d399;
+      --accent5: #fbbf24;
+      --accent6: #f97316;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --text: #e8e8f0;
+      --text-dim: #8888aa;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* HEADER */
+    .header {
+      background: linear-gradient(135deg, #0a0a2a 0%, #1a0a3a 50%, #0a1a2a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle at 30% 50%, rgba(83,216,251,0.06) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 50%, rgba(124,92,252,0.06) 0%, transparent 50%);
+      animation: pulse 8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+    .header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent4));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+      z-index: 1;
+    }
+    .header .subtitle {
+      color: var(--text-dim);
+      margin-top: 0.5rem;
+      font-size: 1.05rem;
+      position: relative;
+      z-index: 1;
+    }
+    .header .meta {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+    .header .meta-item {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+    .header .meta-item strong {
+      color: var(--accent);
+    }
+
+    /* CONTAINER */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    .section {
+      margin-bottom: 2.5rem;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-title .icon {
+      font-size: 1.3rem;
+    }
+    .section-desc {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 0.6rem 1.2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      transition: all 0.2s;
+    }
+    .tab:hover { border-color: var(--accent); color: var(--text); }
+    .tab.active {
+      background: var(--surface2);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* METRICS BAR */
+    .metrics-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .metric-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .metric-card .label {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .metric-card .value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-top: 0.3rem;
+    }
+    .metric-card .unit {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+    .metric-card .delta {
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
+    }
+    .metric-card .delta.up { color: var(--success); }
+    .metric-card .delta.down { color: var(--success); }
+    .metric-card .delta.warn { color: var(--warning); }
+    .metric-card.energy .value { color: var(--accent); }
+    .metric-card.cost .value { color: var(--accent5); }
+    .metric-card.carbon .value { color: var(--accent4); }
+    .metric-card.investment .value { color: var(--accent3); }
+
+    /* BUILDING SIMULATOR */
+    .sim-container {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 1.5rem;
+    }
+    @media (max-width: 768px) {
+      .sim-container { grid-template-columns: 1fr; }
+    }
+    .building-view {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+    }
+    .building-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      padding: 1rem;
+      background: #080815;
+      border-radius: 8px;
+      min-height: 360px;
+    }
+    .room {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      min-height: 70px;
+    }
+    .room:hover { border-color: var(--accent); }
+    .room .room-name {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      text-align: center;
+    }
+    .room .room-light {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin-bottom: 0.3rem;
+      transition: all 0.4s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+    /* Room states */
+    .room.on .room-light {
+      background: radial-gradient(circle, rgba(251,191,36,0.9) 0%, rgba(251,191,36,0.2) 70%, transparent 100%);
+      box-shadow: 0 0 20px rgba(251,191,36,0.4);
+    }
+    .room.off .room-light {
+      background: rgba(40,40,60,0.5);
+    }
+    .room.daylit .room-light {
+      background: radial-gradient(circle, rgba(83,216,251,0.6) 0%, rgba(83,216,251,0.1) 70%, transparent 100%);
+      box-shadow: 0 0 15px rgba(83,216,251,0.3);
+    }
+    .room.emergency .room-light {
+      background: radial-gradient(circle, rgba(52,211,153,0.7) 0%, rgba(52,211,153,0.1) 70%, transparent 100%);
+      box-shadow: 0 0 12px rgba(52,211,153,0.3);
+    }
+    .room .room-power {
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      margin-top: 0.2rem;
+    }
+
+    /* CONTROL PANEL */
+    .control-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .control-group {
+      margin-bottom: 1.2rem;
+    }
+    .control-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-bottom: 0.4rem;
+    }
+    .control-group .value-display {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    /* Slider */
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--surface2);
+      border-radius: 3px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(83,216,251,0.4);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 8px rgba(83,216,251,0.4);
+    }
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+    }
+    .toggle-row label { margin: 0; }
+    .toggle {
+      position: relative;
+      width: 44px; height: 24px;
+      background: var(--surface2);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .toggle.on { background: var(--accent4); }
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 18px; height: 18px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+    .toggle.on::after { transform: translateX(20px); }
+
+    /* Button row */
+    .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.8rem;
+    }
+    .btn {
+      padding: 0.5rem 1rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    .btn:hover { border-color: var(--accent); }
+    .btn.primary { background: var(--accent2); border-color: var(--accent2); color: white; }
+    .btn.primary:hover { background: #6b4cf0; }
+
+    /* COMPARISON TABLE */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    .comparison-table th,
+    .comparison-table td {
+      padding: 0.8rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .comparison-table th {
+      color: var(--text-dim);
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .comparison-table td:first-child { color: var(--text-dim); }
+    .comparison-table .col-old { color: var(--danger); }
+    .comparison-table .col-new { color: var(--success); }
+    .comparison-table tr:hover { background: rgba(255,255,255,0.02); }
+
+    /* COST BREAKDOWN */
+    .cost-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 768px) {
+      .cost-grid { grid-template-columns: 1fr; }
+    }
+    .cost-bar-chart {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .bar-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.8rem;
+      gap: 0.8rem;
+    }
+    .bar-label {
+      width: 140px;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      text-align: right;
+    }
+    .bar-track {
+      flex: 1;
+      height: 28px;
+      background: var(--surface2);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 0.6rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: white;
+      transition: width 1s ease;
+      white-space: nowrap;
+    }
+    .bar-fill.gl { background: linear-gradient(90deg, var(--accent), #2db8d8); }
+    .bar-fill.lc { background: linear-gradient(90deg, var(--accent2), #5b3cd8); }
+    .bar-fill.el { background: linear-gradient(90deg, var(--accent4), #22b87a); }
+    .bar-fill.ei { background: linear-gradient(90deg, var(--accent5), #d99c1a); }
+    .bar-fill.prelim { background: linear-gradient(90deg, var(--accent6), #d96014); }
+    .bar-fill.total { background: linear-gradient(90deg, var(--accent3), #d83d96); }
+
+    /* LIFECYCLE CHART */
+    .lifecycle-chart {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .chart-area {
+      position: relative;
+      height: 300px;
+      margin-top: 1rem;
+    }
+    .chart-svg {
+      width: 100%;
+      height: 100%;
+    }
+    .chart-legend {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+    .legend-item .dot {
+      width: 12px; height: 12px;
+      border-radius: 3px;
+    }
+
+    /* CARBON VIZ */
+    .carbon-viz {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    @media (max-width: 768px) {
+      .carbon-viz { grid-template-columns: 1fr; }
+    }
+    .carbon-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .carbon-card .big-number {
+      font-size: 3rem;
+      font-weight: 800;
+    }
+    .carbon-card.annual .big-number { color: var(--accent4); }
+    .carbon-card.decade .big-number { color: var(--accent); }
+    .carbon-card .desc {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      margin-top: 0.3rem;
+    }
+    .carbon-trees {
+      margin-top: 0.8rem;
+      font-size: 1.5rem;
+    }
+
+    /* WORKSTREAM CARDS */
+    .workstream-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+    .workstream-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .workstream-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 100%;
+    }
+    .workstream-card.gl::before { background: var(--accent); }
+    .workstream-card.lc::before { background: var(--accent2); }
+    .workstream-card.el::before { background: var(--accent4); }
+    .workstream-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    .workstream-card .ws-cost {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin: 0.5rem 0;
+    }
+    .workstream-card.gl .ws-cost { color: var(--accent); }
+    .workstream-card.lc .ws-cost { color: var(--accent2); }
+    .workstream-card.el .ws-cost { color: var(--accent4); }
+    .workstream-card ul {
+      list-style: none;
+      padding: 0;
+    }
+    .workstream-card li {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      padding: 0.2rem 0;
+      padding-left: 1.2rem;
+      position: relative;
+    }
+    .workstream-card li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    /* SCENARIO SELECTOR */
+    .scenario-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .scenario-btn {
+      padding: 0.5rem 1rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      transition: all 0.2s;
+    }
+    .scenario-btn:hover { border-color: var(--accent); }
+    .scenario-btn.active {
+      background: var(--accent2);
+      border-color: var(--accent2);
+      color: white;
+    }
+
+    /* LIVE READOUT */
+    .live-readout {
+      background: #080815;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+    }
+    .readout-line {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.2rem 0;
+      border-bottom: 1px solid rgba(42,42,90,0.5);
+    }
+    .readout-line:last-child { border-bottom: none; }
+    .readout-line .key { color: var(--text-dim); }
+    .readout-line .val { color: var(--accent); font-weight: 600; }
+    .readout-line .val.green { color: var(--success); }
+    .readout-line .val.yellow { color: var(--warning); }
+    .readout-line .val.red { color: var(--danger); }
+
+    /* BACK LINK */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      transition: all 0.2s;
+    }
+    .back-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* COMPLIANCE BADGE */
+    .compliance-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.3rem 0.8rem;
+      background: rgba(52,211,153,0.1);
+      border: 1px solid rgba(52,211,153,0.3);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--success);
+    }
+    .compliance-badge.warn {
+      background: rgba(251,191,36,0.1);
+      border-color: rgba(251,191,36,0.3);
+      color: var(--warning);
+    }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+
+    /* ENERGY FLOW ANIMATION */
+    .energy-flow {
+      height: 4px;
+      background: var(--surface2);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+      margin: 0.5rem 0;
+    }
+    .energy-flow .flow-particle {
+      position: absolute;
+      height: 100%;
+      width: 30%;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      animation: flow 2s linear infinite;
+    }
+    @keyframes flow {
+      0% { left: -30%; }
+      100% { left: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>Google GMQ — Lighting Infrastructure Upgrade</h1>
+  <p class="subtitle">Interactive Proposal Visualisation · Waveguide for CBRE</p>
+  <div class="meta">
+    <span class="meta-item">📍 <strong>Grand Mill Quay, Barrow Street, Dublin 4</strong></span>
+    <span class="meta-item">📄 <strong>Revision P01</strong></span>
+    <span class="meta-item">💰 <strong>€914,115 Total Investment</strong></span>
+    <span class="meta-item">🌱 <strong>40% Energy Reduction</strong></span>
+  </div>
+</div>
+
+<div class="container">
+
+  <a href="/" class="back-link">← Back to Demo Portal</a>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('simulator')">💡 Lighting Simulator</div>
+    <div class="tab" onclick="switchTab('energy')">⚡ Energy & Carbon</div>
+    <div class="tab" onclick="switchTab('cost')">💰 Cost Breakdown</div>
+    <div class="tab" onclick="switchTab('lifecycle')">📅 Lifecycle TCO</div>
+    <div class="tab" onclick="switchTab('overview')">📋 Proposal Overview</div>
+    <div class="tab" onclick="switchTab('management')">🖥️ Management Portal</div>
+    <div class="tab" onclick="switchTab('grafana')">📊 Grafana Dashboard</div>
+  </div>
+
+  <!-- ═══ TAB: SIMULATOR ═══ -->
+  <div id="tab-simulator" class="tab-content active">
+    <div class="section">
+      <h2 class="section-title"><span class="icon">💡</span> Interactive Lighting Simulator</h2>
+      <p class="section-desc">Toggle rooms, adjust dimming, and see how DALI controls + daylight harvesting + occupancy sensing reduce energy in real time. Compare with the existing fixed-output system.</p>
+
+      <!-- SCENARIO SELECTOR -->
+      <div class="scenario-bar">
+        <div class="scenario-btn active" onclick="setScenario('proposed')">🏠 Proposed System (DALI + Controls)</div>
+        <div class="scenario-btn" onclick="setScenario('existing')">🏚️ Existing System (Fixed Output)</div>
+      </div>
+
+      <!-- METRICS BAR -->
+      <div class="metrics-bar">
+        <div class="metric-card energy">
+          <div class="label">Current Load</div>
+          <div class="value" id="sim-power">0</div>
+          <div class="unit">kW</div>
+        </div>
+        <div class="metric-card cost">
+          <div class="label">Annual Energy</div>
+          <div class="value" id="sim-annual-energy">0</div>
+          <div class="unit">MWh/yr</div>
+        </div>
+        <div class="metric-card cost">
+          <div class="label">Annual Cost</div>
+          <div class="value" id="sim-annual-cost">€0</div>
+          <div class="unit">(@ €0.28/kWh)</div>
+        </div>
+        <div class="metric-card carbon">
+          <div class="label">Annual CO₂</div>
+          <div class="value" id="sim-annual-carbon">0</div>
+          <div class="unit">tonnes/yr</div>
+        </div>
+      </div>
+
+      <div class="sim-container">
+        <!-- BUILDING VIEW -->
+        <div class="building-view">
+          <h3 style="margin-bottom: 0.8rem; font-size: 1rem; color: var(--text-dim);">Google GMQ — Floor Plan (Interactive)</h3>
+          <div class="building-grid" id="building-grid">
+            <!-- Rooms generated by JS -->
+          </div>
+
+          <div class="energy-flow">
+            <div class="flow-particle" id="flow-particle"></div>
+          </div>
+
+          <div class="live-readout">
+            <div class="readout-line">
+              <span class="key">[System]</span>
+              <span class="val" id="readout-system">DALI Controlled LED</span>
+            </div>
+            <div class="readout-line">
+              <span class="key">[Rooms Active]</span>
+              <span class="val yellow" id="readout-rooms">0 / 12</span>
+            </div>
+            <div class="readout-line">
+              <span class="key">[Avg Dim Level]</span>
+              <span class="val" id="readout-dim">100%</span>
+            </div>
+            <div class="readout-line">
+              <span class="key">[Daylight Harvesting]</span>
+              <span class="val green" id="readout-daylight">Active</span>
+            </div>
+            <div class="readout-line">
+              <span class="key">[Occupancy Sensing]</span>
+              <span class="val green" id="readout-occupancy">Active</span>
+            </div>
+            <div class="readout-line">
+              <span class="key">[Emergency Lighting]</span>
+              <span class="val green" id="readout-emergency">HIVE Monitored ✓</span>
+            </div>
+            <div class="readout-line">
+              <span class="key">[Compliance Testing]</span>
+              <span class="val green" id="readout-compliance">Automated ✓</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTROL PANEL -->
+        <div class="control-panel">
+          <h3 style="margin-bottom: 1rem; font-size: 1rem;">Controls</h3>
+
+          <div class="control-group">
+            <label>Global Dim Level: <span class="value-display" id="dim-value">100%</span></label>
+            <input type="range" id="dim-slider" min="0" max="100" value="100" oninput="updateDim(this.value)">
+          </div>
+
+          <div class="control-group">
+            <label>Daylight Availability: <span class="value-display" id="daylight-value">60%</span></label>
+            <input type="range" id="daylight-slider" min="0" max="100" value="60" oninput="updateDaylight(this.value)">
+          </div>
+
+          <div class="control-group">
+            <label>Time of Day: <span class="value-display" id="time-value">14:00</span></label>
+            <input type="range" id="time-slider" min="0" max="23" value="14" oninput="updateTime(this.value)">
+          </div>
+
+          <div class="toggle-row">
+            <label>Occupancy Sensing</label>
+            <div class="toggle on" id="toggle-occupancy" onclick="toggleControl('occupancy', this)"></div>
+          </div>
+
+          <div class="toggle-row">
+            <label>Daylight Harvesting</label>
+            <div class="toggle on" id="toggle-daylight" onclick="toggleControl('daylight', this)"></div>
+          </div>
+
+          <div class="toggle-row">
+            <label>Time Scheduling</label>
+            <div class="toggle on" id="toggle-scheduling" onclick="toggleControl('scheduling', this)"></div>
+          </div>
+
+          <div class="toggle-row">
+            <label>Show Emergency Lighting</label>
+            <div class="toggle" id="toggle-emergency" onclick="toggleControl('emergency', this)"></div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn primary" onclick="allRoomsOn()">All On</button>
+            <button class="btn" onclick="allRoomsOff()">All Off</button>
+            <button class="btn" onclick="autoPopulate()">Workday Mode</button>
+            <button class="btn" onclick="afterHoursMode()">After Hours</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: ENERGY & CARBON ═══ -->
+  <div id="tab-energy" class="tab-content">
+    <div class="section">
+      <h2 class="section-title"><span class="icon">⚡</span> Energy & Carbon Impact</h2>
+      <p class="section-desc">The proposed DALI lighting control strategy is projected to reduce annual lighting energy consumption by approximately 40%, from 211 MWh to 126.6 MWh.</p>
+
+      <div class="metrics-bar">
+        <div class="metric-card energy">
+          <div class="label">Existing Consumption</div>
+          <div class="value">211</div>
+          <div class="unit">MWh/year</div>
+        </div>
+        <div class="metric-card energy">
+          <div class="label">Proposed Consumption</div>
+          <div class="value">126.6</div>
+          <div class="unit">MWh/year</div>
+        </div>
+        <div class="metric-card cost">
+          <div class="label">Annual Saving</div>
+          <div class="value">84.4</div>
+          <div class="unit">MWh/year</div>
+          <div class="delta down">↓ 40% reduction</div>
+        </div>
+        <div class="metric-card cost">
+          <div class="label">10-Year Saving</div>
+          <div class="value">844</div>
+          <div class="unit">MWh</div>
+        </div>
+      </div>
+
+      <!-- Energy comparison bar chart -->
+      <div class="cost-bar-chart" style="margin-top: 1.5rem;">
+        <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Projected Annual Lighting Energy</h3>
+        <div class="bar-row">
+          <div class="bar-label">Existing System</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: 100%; background: linear-gradient(90deg, var(--danger), #c0392b);">211 MWh</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Proposed System</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: 60%; background: linear-gradient(90deg, var(--success), #22b87a);">126.6 MWh</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Annual Saving</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: 40%; background: linear-gradient(90deg, var(--accent), #2db8d8);">84.4 MWh</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cost sensitivity -->
+      <div class="cost-bar-chart" style="margin-top: 1.5rem;">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">Electricity Price Sensitivity</h3>
+        <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 1rem;">Every 1 cent/kWh increase in electricity cost increases the annual financial value of the projected energy saving by approximately €844.</p>
+        <div id="price-sensitivity-chart"></div>
+      </div>
+
+      <!-- Carbon -->
+      <h3 style="margin-top: 2rem; margin-bottom: 1rem;">🌱 Projected Carbon Reduction</h3>
+      <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1rem;">Based on SEAI electricity consumption emission factor: 197.8 gCO₂/kWh</p>
+
+      <div class="carbon-viz">
+        <div class="carbon-card annual">
+          <div class="big-number">16.7</div>
+          <div class="desc">tonnes CO₂ reduced <strong>per year</strong></div>
+          <div class="carbon-trees">🌳 ~760 trees equivalent</div>
+        </div>
+        <div class="carbon-card decade">
+          <div class="big-number">166.9</div>
+          <div class="desc">tonnes CO₂ reduced over <strong>10 years</strong></div>
+          <div class="carbon-trees">🌳 ~7,600 trees equivalent</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: COST ═══ -->
+  <div id="tab-cost" class="tab-content">
+    <div class="section">
+      <h2 class="section-title"><span class="icon">💰</span> Project Cost Breakdown</h2>
+      <p class="section-desc">High-level budget estimate based on the surveyed installation. Costs assume works undertaken during normal working hours.</p>
+
+      <div class="metrics-bar">
+        <div class="metric-card investment">
+          <div class="label">Total Investment</div>
+          <div class="value">€914K</div>
+        </div>
+        <div class="metric-card cost">
+          <div class="label">General Lighting</div>
+          <div class="value">€339K</div>
+          <div class="unit">37% of total</div>
+        </div>
+        <div class="metric-card cost">
+          <div class="label">Lighting Controls</div>
+          <div class="value">€206K</div>
+          <div class="unit">22% of total</div>
+        </div>
+        <div class="metric-card cost">
+          <div class="label">Emergency Lighting</div>
+          <div class="value">€166K</div>
+          <div class="unit">18% of total</div>
+        </div>
+      </div>
+
+      <div class="cost-bar-chart" style="margin-top: 1.5rem;">
+        <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Budget Cost by Workstream</h3>
+        <div class="bar-row">
+          <div class="bar-label">General Lighting</div>
+          <div class="bar-track">
+            <div class="bar-fill gl" style="width: 37.1%;">€339,140</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Lighting Controls</div>
+          <div class="bar-track">
+            <div class="bar-fill lc" style="width: 22.5%;">€205,640</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Emergency Lighting</div>
+          <div class="bar-track">
+            <div class="bar-fill el" style="width: 18.2%;">€166,153</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Electrical Infrastructure</div>
+          <div class="bar-track">
+            <div class="bar-fill ei" style="width: 15.3%;">€139,440</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Preliminaries</div>
+          <div class="bar-track">
+            <div class="bar-fill prelim" style="width: 5.4%;">€49,548</div>
+          </div>
+        </div>
+        <div class="bar-row" style="margin-top: 0.5rem; padding-top: 0.8rem; border-top: 1px solid var(--border);">
+          <div class="bar-label" style="color: var(--text); font-weight: 600;">Total Project</div>
+          <div class="bar-track">
+            <div class="bar-fill total" style="width: 100%;">€914,115</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: LIFECYCLE ═══ -->
+  <div id="tab-lifecycle" class="tab-content">
+    <div class="section">
+      <h2 class="section-title"><span class="icon">📅</span> Emergency Lighting — 12-Year Lifecycle TCO</h2>
+      <p class="section-desc">The Clevertronics HIVE system has a higher initial capital cost but lower operating expenditure, with a financial crossover at approximately Year 5. Over 12 years, it saves €103,230 (35.6% lifecycle cost reduction) and up to 89% whole-life carbon reduction.</p>
+
+      <div class="metrics-bar">
+        <div class="metric-card investment">
+          <div class="label">Lifecycle Cost Reduction</div>
+          <div class="value">35.6%</div>
+        </div>
+        <div class="metric-card cost">
+          <div class="label">12-Year Saving</div>
+          <div class="value">€103K</div>
+        </div>
+        <div class="metric-card carbon">
+          <div class="label">Carbon Reduction</div>
+          <div class="value">89%</div>
+          <div class="unit">whole-life</div>
+        </div>
+        <div class="metric-card energy">
+          <div class="label">Financial Crossover</div>
+          <div class="value">Year 5</div>
+        </div>
+      </div>
+
+      <!-- Lifecycle chart -->
+      <div class="lifecycle-chart" style="margin-top: 1.5rem;">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">Cumulative Lifecycle Cost Comparison (12 Years)</h3>
+        <div class="chart-area" id="lifecycle-chart-area">
+          <svg class="chart-svg" id="lifecycle-svg" viewBox="0 0 600 300" preserveAspectRatio="none">
+            <!-- Grid lines -->
+            <line x1="40" y1="0" x2="40" y2="260" stroke="var(--border)" stroke-width="1"/>
+            <line x1="40" y1="260" x2="600" y2="260" stroke="var(--border)" stroke-width="1"/>
+            <!-- Y-axis labels -->
+            <text x="35" y="10" text-anchor="end" fill="var(--text-dim)" font-size="10">€300K</text>
+            <text x="35" y="75" text-anchor="end" fill="var(--text-dim)" font-size="10">€225K</text>
+            <text x="35" y="140" text-anchor="end" fill="var(--text-dim)" font-size="10">€150K</text>
+            <text x="35" y="205" text-anchor="end" fill="var(--text-dim)" font-size="10">€75K</text>
+            <text x="35" y="260" text-anchor="end" fill="var(--text-dim)" font-size="10">€0</text>
+            <!-- X-axis labels -->
+            <text x="40" y="278" fill="var(--text-dim)" font-size="10">Y0</text>
+            <text x="130" y="278" fill="var(--text-dim)" font-size="10">Y2</text>
+            <text x="220" y="278" fill="var(--text-dim)" font-size="10">Y4</text>
+            <text x="310" y="278" fill="var(--text-dim)" font-size="10">Y6</text>
+            <text x="400" y="278" fill="var(--text-dim)" font-size="10">Y8</text>
+            <text x="490" y="278" fill="var(--text-dim)" font-size="10">Y10</text>
+            <text x="575" y="278" fill="var(--text-dim)" font-size="10">Y12</text>
+            <!-- Crossover marker -->
+            <line x1="265" y1="0" x2="265" y2="260" stroke="var(--warning)" stroke-width="1" stroke-dasharray="4,4"/>
+            <text x="270" y="15" fill="var(--warning)" font-size="9">Crossover ≈ Year 5</text>
+
+            <!-- Conventional line (higher cumulative) -->
+            <polyline id="conv-line" fill="none" stroke="var(--danger)" stroke-width="2"
+              points="40,130 85,118 130,106 175,94 220,82 265,72 310,62 355,52 400,42 445,32 490,22 535,14 575,8"/>
+            <!-- HIVE line (starts higher, crosses lower) -->
+            <polyline id="hive-line" fill="none" stroke="var(--success)" stroke-width="2"
+              points="40,150 85,145 130,140 175,135 220,130 265,125 310,115 355,105 400,95 445,85 490,75 535,65 575,55"/>
+
+            <!-- Area between lines -->
+            <polygon id="saving-area" fill="rgba(52,211,153,0.08)" stroke="none"
+              points="265,72 310,62 355,52 400,42 445,32 490,22 535,14 575,8 575,55 535,65 490,75 445,85 400,95 355,105 310,115 265,125"/>
+          </svg>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="dot" style="background: var(--danger);"></div>Conventional DALI Emergency Lighting</div>
+          <div class="legend-item"><div class="dot" style="background: var(--success);"></div>Clevertronics HIVE System</div>
+          <div class="legend-item"><div class="dot" style="background: var(--warning);"></div>Financial Crossover (≈Year 5)</div>
+        </div>
+      </div>
+
+      <!-- Comparison Table -->
+      <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Conventional vs Clevertronics HIVE</h3>
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th class="col-old">Conventional</th>
+              <th class="col-new">Clevertronics HIVE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Battery Design Life</td>
+              <td class="col-old">~4 years</td>
+              <td class="col-new">12 years</td>
+            </tr>
+            <tr>
+              <td>Manufacturer's Warranty</td>
+              <td class="col-old">~3 years</td>
+              <td class="col-new">10 years</td>
+            </tr>
+            <tr>
+              <td>Battery Charging</td>
+              <td class="col-old">Continuous trickle</td>
+              <td class="col-new">Intelligent (on-demand)</td>
+            </tr>
+            <tr>
+              <td>Function & Duration Testing</td>
+              <td class="col-old">Manual</td>
+              <td class="col-new">Automated scheduled</td>
+            </tr>
+            <tr>
+              <td>Compliance Records</td>
+              <td class="col-old">Manual logbooks</td>
+              <td class="col-new">Digital reporting</td>
+            </tr>
+            <tr>
+              <td>Luminaire Monitoring</td>
+              <td class="col-old">Periodic inspections</td>
+              <td class="col-new">Continuous monitoring</td>
+            </tr>
+            <tr>
+              <td>Network</td>
+              <td class="col-old">CTU or wired</td>
+              <td class="col-new">Wireless RF mesh</td>
+            </tr>
+            <tr>
+              <td>Lifecycle Maintenance</td>
+              <td class="col-old">Higher</td>
+              <td class="col-new">Reduced</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: OVERVIEW ═══ -->
+  <div id="tab-overview" class="tab-content">
+    <div class="section">
+      <h2 class="section-title"><span class="icon">📋</span> Proposal Overview</h2>
+      <p class="section-desc">Waveguide has undertaken a survey of the existing lighting and emergency lighting installations within Google GMQ, Grand Mill Quay, Dublin 4, to assess the feasibility of modernising the building's lighting infrastructure.</p>
+
+      <!-- Workstream cards -->
+      <div class="workstream-grid">
+        <div class="workstream-card gl">
+          <h3>💡 General Lighting</h3>
+          <div class="ws-cost">€339,140</div>
+          <ul>
+            <li>Like-for-like replacement with DALI-compatible LED luminaires</li>
+            <li>Continuous dimming (0–100%)</li>
+            <li>Individual luminaire addressability</li>
+            <li>Daylight-responsive dimming</li>
+            <li>Software configurable</li>
+            <li>Platform for intelligent building controls</li>
+          </ul>
+        </div>
+        <div class="workstream-card lc">
+          <h3>🎛️ Lighting Controls</h3>
+          <div class="ws-cost">€205,640</div>
+          <ul>
+            <li>New Delmatic DALI lighting control system</li>
+            <li>Lighting Control Modules (LCMs) + DALI bus wiring</li>
+            <li>DALI relays for decorative lighting</li>
+            <li>Occupancy-based control + time scheduling</li>
+            <li>Centralised monitoring & BMS integration</li>
+            <li>Aligns with wider Google campus platform</li>
+          </ul>
+        </div>
+        <div class="workstream-card el">
+          <h3>🚨 Emergency Lighting</h3>
+          <div class="ws-cost">€166,153</div>
+          <ul>
+            <li>Clevertronics HIVE monitored system</li>
+            <li>Wireless RF mesh — no monitoring cabling</li>
+            <li>Automated function & duration testing</li>
+            <li>12-year battery design life</li>
+            <li>10-year manufacturer's warranty</li>
+            <li>Independent of DALI control network</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Existing vs Proposed comparison -->
+      <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Conventional LED vs DALI-Controlled LED</h3>
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th class="col-old">Conventional Fixed-Output LED</th>
+              <th class="col-new">DALI-Controlled LED</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Light Output</td>
+              <td class="col-old">Fixed</td>
+              <td class="col-new">Continuous dimming (0–100%)</td>
+            </tr>
+            <tr>
+              <td>Energy Demand</td>
+              <td class="col-old">Constant while energised</td>
+              <td class="col-new">Matched to operational demand</td>
+            </tr>
+            <tr>
+              <td>Task Tuning</td>
+              <td class="col-old">No</td>
+              <td class="col-new">Individual luminaire/area adjustment</td>
+            </tr>
+            <tr>
+              <td>Daylight Harvesting</td>
+              <td class="col-old">No</td>
+              <td class="col-new">Automatic daylight-responsive dimming</td>
+            </tr>
+            <tr>
+              <td>Time-Based Control</td>
+              <td class="col-old">Limited</td>
+              <td class="col-new">Time scheduling</td>
+            </tr>
+            <tr>
+              <td>Configuration</td>
+              <td class="col-old">Static installation</td>
+              <td class="col-new">Software configurable</td>
+            </tr>
+            <tr>
+              <td>Intelligence</td>
+              <td class="col-old">Standalone</td>
+              <td class="col-new">Platform for intelligent building controls</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Key outcomes -->
+      <h3 style="margin-top: 2rem; margin-bottom: 1rem;">🎯 Key Outcomes</h3>
+      <div class="metrics-bar">
+        <div class="metric-card energy">
+          <div class="label">Energy Reduction</div>
+          <div class="value">40%</div>
+          <div class="unit">annual lighting</div>
+        </div>
+        <div class="metric-card carbon">
+          <div class="label">CO₂ Reduction</div>
+          <div class="value">16.7t</div>
+          <div class="unit">per year</div>
+        </div>
+        <div class="metric-card investment">
+          <div class="label">Lifecycle Saving</div>
+          <div class="value">€103K</div>
+          <div class="unit">over 12 years</div>
+        </div>
+        <div class="metric-card cost">
+          <div class="label">Carbon (Whole-Life)</div>
+          <div class="value">89%</div>
+          <div class="unit">reduction</div>
+        </div>
+      </div>
+
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem;">
+        <p style="color: var(--text-dim); font-size: 0.9rem;">
+          <strong style="color: var(--accent);">Prepared by:</strong> Waveguide — Unit 6, Kinsealy Business Park, Kinsealy, Co Dublin, K36 VH95<br>
+          <strong style="color: var(--accent);">Prepared for:</strong> CBRE (Google GMQ)<br>
+          <strong style="color: var(--accent);">Site:</strong> Grand Mill Quay, Barrow Street, Dublin 4<br>
+          <strong style="color: var(--accent);">Revision:</strong> P01 · <strong style="color: var(--accent);">Date:</strong> 09/07/26
+        </p>
+      </div>
+    </div>
+  </div>
+
+
+<!-- ═══ TAB: MANAGEMENT PORTAL ═══ -->
+<div id="tab-management" class="tab-content">
+  <div class="section">
+    <h2 class="section-title"><span class="icon">🖥️</span> Delmatic Lightscape Management Portal</h2>
+    <p class="section-desc">Simulated interactive management and monitoring dashboard — demonstrating how the proposed Delmatic DALI control system and Clevertronics HIVE emergency monitoring would operate in production.</p>
+
+    <!-- Management sidebar + content -->
+    <div class="mgmt-layout">
+      <div class="mgmt-sidebar">
+        <div class="mgmt-nav-item active" data-view="floorplan" onclick="mgmtSwitchView('floorplan')">🏠<span>Floor Plan</span></div>
+        <div class="mgmt-nav-item" data-view="topology" onclick="mgmtSwitchView('topology')">🌐<span>Network</span></div>
+        <div class="mgmt-nav-item" data-view="emergency" onclick="mgmtSwitchView('emergency')">🚨<span>Emergency</span></div>
+        <div class="mgmt-nav-item" data-view="energy" onclick="mgmtSwitchView('energy')">⚡<span>Energy</span></div>
+        <div class="mgmt-nav-item" data-view="scenes" onclick="mgmtSwitchView('scenes')">🎬<span>Scenes</span></div>
+        <div class="mgmt-nav-item" data-view="devices" onclick="mgmtSwitchView('devices')">📋<span>Devices</span></div>
+        <div class="mgmt-status">
+          <div class="mgmt-status-dot online"></div>
+          <span>Lightscape Online</span>
+        </div>
+      </div>
+
+      <div class="mgmt-content">
+        <!-- FLOOR PLAN VIEW -->
+        <div id="mgmt-view-floorplan" class="mgmt-view active">
+          <div class="mgmt-toolbar">
+            <button class="mgmt-btn primary" onclick="mgmtAllOn()">All On</button>
+            <button class="mgmt-btn" onclick="mgmtAllOff()">All Off</button>
+            <button class="mgmt-btn" onclick="mgmtApplyScene('workday')">Workday</button>
+            <button class="mgmt-btn" onclick="mgmtApplyScene('afterhours')">After Hours</button>
+            <button class="mgmt-btn warn" onclick="mgmtRunEmergencyTest()">Emergency Test</button>
+            <label class="mgmt-toggle-label"><input type="checkbox" id="mgmt-heatmap" onchange="mgmtToggleHeatmap()"> Heat Map</label>
+          </div>
+          <div class="mgmt-floorplan-wrap">
+            <svg id="mgmt-floorplan-svg" viewBox="0 0 800 500" class="mgmt-svg-floorplan"></svg>
+            <div id="mgmt-fixture-detail" class="mgmt-detail-panel">
+              <p class="mgmt-detail-hint">Click a luminaire to view details</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- NETWORK TOPOLOGY VIEW -->
+        <div id="mgmt-view-topology" class="mgmt-view">
+          <h3 class="mgmt-view-title">DALI Network Topology</h3>
+          <svg id="mgmt-topology-svg" viewBox="0 0 900 520" class="mgmt-svg-topology"></svg>
+          <div id="mgmt-topo-detail" class="mgmt-detail-panel" style="margin-top:1rem;"></div>
+        </div>
+
+        <!-- EMERGENCY MONITORING VIEW -->
+        <div id="mgmt-view-emergency" class="mgmt-view">
+          <div class="mgmt-emergency-header">
+            <h3 class="mgmt-view-title">Clevertronics HIVE — Emergency Monitoring</h3>
+            <div>
+              <button class="mgmt-btn primary" onclick="mgmtRunFunctionTest()">▶ Run Function Test</button>
+              <button class="mgmt-btn" onclick="mgmtRunDurationTest()">⏱ Run Duration Test</button>
+            </div>
+          </div>
+          <div id="mgmt-emergency-summary" class="mgmt-emergency-summary"></div>
+          <div id="mgmt-emergency-list"></div>
+          <div id="mgmt-emergency-log"></div>
+        </div>
+
+        <!-- ENERGY DASHBOARD VIEW -->
+        <div id="mgmt-view-energy" class="mgmt-view">
+          <h3 class="mgmt-view-title">Energy Dashboard</h3>
+          <div class="mgmt-energy-grid">
+            <div class="mgmt-gauge-card">
+              <svg id="mgmt-gauge-svg" viewBox="0 0 200 120"></svg>
+              <p id="mgmt-gauge-label" class="mgmt-gauge-label">0.0 kW</p>
+            </div>
+            <div class="mgmt-chart-card">
+              <h4>24-Hour Energy Trend</h4>
+              <svg id="mgmt-energy-chart" viewBox="0 0 400 150"></svg>
+            </div>
+          </div>
+          <div class="mgmt-zone-energy" id="mgmt-zone-energy"></div>
+          <div class="mgmt-savings-bar" id="mgmt-savings-bar"></div>
+        </div>
+
+        <!-- SCENE MANAGEMENT VIEW -->
+        <div id="mgmt-view-scenes" class="mgmt-view">
+          <h3 class="mgmt-view-title">Scene Management</h3>
+          <div id="mgmt-scenes-list" class="mgmt-scenes-list"></div>
+          <h4 class="mgmt-sched-title">Weekly Schedule <button class="mgmt-btn primary" onclick="mgmtActivateSchedule()">Activate Schedule</button></h4>
+          <div id="mgmt-schedule-grid"></div>
+        </div>
+
+        <!-- DEVICE REGISTRY VIEW -->
+        <div id="mgmt-view-devices" class="mgmt-view">
+          <h3 class="mgmt-view-title">DALI Device Registry</h3>
+          <div class="mgmt-device-filters">
+            <input type="text" id="mgmt-device-search" placeholder="Search..." oninput="mgmtFilterDevices()" class="mgmt-search">
+            <select id="mgmt-filter-type" onchange="mgmtFilterDevices()" class="mgmt-select">
+              <option value="">All Types</option>
+              <option value="LED Driver">LED Driver</option>
+              <option value="PIR Sensor">PIR Sensor</option>
+              <option value="Wall Switch">Wall Switch</option>
+              <option value="Emergency">Emergency</option>
+              <option value="DALI Relay">DALI Relay</option>
+            </select>
+            <select id="mgmt-filter-status" onchange="mgmtFilterDevices()" class="mgmt-select">
+              <option value="">All Status</option>
+              <option value="Online">Online</option>
+              <option value="Fault">Fault</option>
+              <option value="Offline">Offline</option>
+            </select>
+          </div>
+          <div class="mgmt-device-table-wrap">
+            <table class="mgmt-device-table" id="mgmt-device-table"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ─── Management Portal ─── */
+.mgmt-layout { display: grid; grid-template-columns: 60px 1fr; gap: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; min-height: 580px; }
+.mgmt-sidebar { background: var(--bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 0.3rem; }
+.mgmt-nav-item { width: 44px; height: 44px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; color: var(--text-dim); transition: all 0.2s; position: relative; }
+.mgmt-nav-item span { font-size: 0.55rem; margin-top: 2px; }
+.mgmt-nav-item:hover { background: var(--surface2); color: var(--text); }
+.mgmt-nav-item.active { background: var(--surface2); color: var(--accent); }
+.mgmt-nav-item.active::before { content: ''; position: absolute; left: -1px; top: 8px; bottom: 8px; width: 3px; background: var(--accent); border-radius: 2px; }
+.mgmt-status { margin-top: auto; padding: 0.5rem 0; text-align: center; font-size: 0.55rem; color: var(--text-dim); }
+.mgmt-status-dot { width: 8px; height: 8px; border-radius: 50%; margin: 0 auto 4px; }
+.mgmt-status-dot.online { background: var(--success); box-shadow: 0 0 6px var(--success); animation: mgmtPulse 2s infinite; }
+@keyframes mgmtPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.mgmt-content { padding: 1.5rem; overflow-y: auto; max-height: 650px; }
+.mgmt-view { display: none; }
+.mgmt-view.active { display: block; }
+.mgmt-view-title { font-size: 1.1rem; margin-bottom: 1rem; }
+.mgmt-toolbar { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+.mgmt-btn { padding: 0.4rem 0.9rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 0.82rem; color: var(--text); transition: all 0.2s; }
+.mgmt-btn:hover { border-color: var(--accent); }
+.mgmt-btn.primary { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+.mgmt-btn.primary:hover { background: #6b4cf0; }
+.mgmt-btn.warn { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.3); color: var(--danger); }
+.mgmt-toggle-label { display: flex; align-items: center; gap: 0.3rem; font-size: 0.82rem; color: var(--text-dim); cursor: pointer; margin-left: auto; }
+.mgmt-toggle-label input { cursor: pointer; }
+.mgmt-floorplan-wrap { display: grid; grid-template-columns: 1fr 220px; gap: 1rem; }
+.mgmt-svg-floorplan { background: #060612; border-radius: 8px; width: 100%; height: auto; }
+.mgmt-detail-panel { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; font-size: 0.82rem; }
+.mgmt-detail-hint { color: var(--text-dim); text-align: center; margin-top: 2rem; }
+.mgmt-detail-panel h4 { font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--accent); }
+.mgmt-detail-panel .detail-row { display: flex; justify-content: space-between; padding: 0.25rem 0; border-bottom: 1px solid rgba(42,42,90,0.4); }
+.mgmt-detail-panel .detail-row:last-child { border-bottom: none; }
+.mgmt-detail-panel .detail-key { color: var(--text-dim); }
+.mgmt-detail-panel .detail-val { color: var(--text); font-weight: 600; }
+.mgmt-svg-topology { background: #060612; border-radius: 8px; width: 100%; height: auto; }
+.mgmt-emergency-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+.mgmt-emergency-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.8rem; margin-bottom: 1rem; }
+.mgmt-emergency-stat { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; text-align: center; }
+.mgmt-emergency-stat .stat-val { font-size: 1.6rem; font-weight: 800; }
+.mgmt-emergency-stat .stat-label { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.2rem; }
+.mgmt-emergency-stat.ok .stat-val { color: var(--success); }
+.mgmt-emergency-stat.warn .stat-val { color: var(--warning); }
+.mgmt-emergency-stat.fault .stat-val { color: var(--danger); }
+.mgmt-emergency-device { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem 1rem; margin-bottom: 0.5rem; display: grid; grid-template-columns: auto 1fr auto; gap: 0.8rem; align-items: center; font-size: 0.82rem; }
+.mgmt-emergency-device .edot { width: 10px; height: 10px; border-radius: 50%; }
+.mgmt-emergency-device .edot.ok { background: var(--success); box-shadow: 0 0 4px var(--success); }
+.mgmt-emergency-device .edot.warn { background: var(--warning); }
+.mgmt-emergency-device .edot.fault { background: var(--danger); animation: mgmtBlink 1s infinite; }
+@keyframes mgmtBlink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+.mgmt-emergency-device .edetail { display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem 1rem; }
+.mgmt-emergency-device .edetail span { color: var(--text-dim); font-size: 0.75rem; }
+.mgmt-emergency-device .edetail strong { color: var(--text); font-size: 0.78rem; }
+.mgmt-signal { display: flex; gap: 2px; align-items: flex-end; }
+.mgmt-signal .bar { width: 4px; background: var(--surface); border-radius: 1px; }
+.mgmt-signal .bar.active { background: var(--success); }
+.mgmt-emergency-log { margin-top: 1rem; }
+.mgmt-emergency-log h4 { font-size: 0.9rem; margin-bottom: 0.5rem; }
+.mgmt-log-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+.mgmt-log-table th, .mgmt-log-table td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid var(--border); }
+.mgmt-log-table th { color: var(--text-dim); text-transform: uppercase; font-size: 0.7rem; }
+.mgmt-energy-grid { display: grid; grid-template-columns: 220px 1fr; gap: 1rem; margin-bottom: 1rem; }
+.mgmt-gauge-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; text-align: center; }
+.mgmt-gauge-label { font-size: 1.4rem; font-weight: 800; color: var(--accent); margin-top: 0.3rem; }
+.mgmt-chart-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+.mgmt-chart-card h4 { font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--text-dim); }
+.mgmt-zone-energy { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.mgmt-zone-bar { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+.mgmt-zone-bar .zlabel { width: 100px; font-size: 0.75rem; color: var(--text-dim); text-align: right; }
+.mgmt-zone-bar .ztrack { flex: 1; height: 16px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+.mgmt-zone-bar .zfill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+.mgmt-savings-bar { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.mgmt-savings-item { text-align: center; }
+.mgmt-savings-item .sval { font-size: 1.3rem; font-weight: 800; }
+.mgmt-savings-item .slabel { font-size: 0.72rem; color: var(--text-dim); }
+.mgmt-scenes-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.8rem; margin-bottom: 1.5rem; }
+.mgmt-scene-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem; cursor: pointer; transition: all 0.2s; }
+.mgmt-scene-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.mgmt-scene-card.active { border-color: var(--accent2); background: rgba(124,92,252,0.1); }
+.mgmt-scene-card h4 { font-size: 0.82rem; margin-bottom: 0.5rem; }
+.mgmt-scene-preview { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; height: 24px; border-radius: 4px; overflow: hidden; }
+.mgmt-scene-preview .sp { border-radius: 1px; }
+.mgmt-sched-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
+.mgmt-schedule-grid { overflow-x: auto; }
+.mgmt-sched-table { border-collapse: collapse; font-size: 0.7rem; }
+.mgmt-sched-table th, .mgmt-sched-table td { border: 1px solid var(--border); padding: 0; }
+.mgmt-sched-table th { background: var(--surface2); padding: 0.3rem; color: var(--text-dim); min-width: 50px; }
+.mgmt-sched-table td { min-width: 50px; height: 22px; cursor: pointer; transition: background 0.1s; }
+.mgmt-sched-table td:hover { opacity: 0.7; }
+.mgmt-device-filters { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.mgmt-search { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.8rem; color: var(--text); font-size: 0.82rem; flex: 1; min-width: 150px; }
+.mgmt-select { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem; color: var(--text); font-size: 0.82rem; }
+.mgmt-device-table-wrap { overflow-x: auto; }
+.mgmt-device-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+.mgmt-device-table th, .mgmt-device-table td { padding: 0.5rem 0.7rem; text-align: left; border-bottom: 1px solid var(--border); }
+.mgmt-device-table th { color: var(--text-dim); text-transform: uppercase; font-size: 0.7rem; cursor: pointer; }
+.mgmt-device-table tr { cursor: pointer; }
+.mgmt-device-table tr:hover { background: rgba(255,255,255,0.02); }
+.mgmt-device-table .dstatus { display: inline-flex; align-items: center; gap: 0.3rem; }
+.mgmt-device-table .ddot { width: 8px; height: 8px; border-radius: 50%; }
+.mgmt-device-table .ddot.online { background: var(--success); }
+.mgmt-device-table .ddot.fault { background: var(--danger); }
+.mgmt-device-table .ddot.offline { background: var(--text-dim); }
+.mgmt-test-progress { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+.mgmt-test-bar { height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; margin-top: 0.5rem; }
+.mgmt-test-bar-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.3s; }
+@media (max-width: 768px) {
+  .mgmt-layout { grid-template-columns: 50px 1fr; }
+  .mgmt-floorplan-wrap, .mgmt-energy-grid, .mgmt-zone-energy, .mgmt-savings-bar { grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+// ═══════════════════════════════════════════
+// MANAGEMENT PORTAL — Delmatic Lightscape Sim
+// ═══════════════════════════════════════════
+
+const mgmtRooms = [
+  { name: 'Open Office A', x: 20, y: 20, w: 180, h: 130, fixtures: 6 },
+  { name: 'Open Office B', x: 210, y: 20, w: 180, h: 130, fixtures: 6 },
+  { name: 'Meeting Rm 1', x: 400, y: 20, w: 120, h: 60, fixtures: 2 },
+  { name: 'Meeting Rm 2', x: 400, y: 90, w: 120, h: 60, fixtures: 2 },
+  { name: 'Collab Space', x: 530, y: 20, w: 130, h: 130, fixtures: 4 },
+  { name: 'Phone Booth 1', x: 670, y: 20, w: 60, h: 60, fixtures: 1 },
+  { name: 'Phone Booth 2', x: 670, y: 90, w: 60, h: 60, fixtures: 1 },
+  { name: 'Kitchen', x: 670, y: 160, w: 120, h: 100, fixtures: 3 },
+  { name: 'Corridor N', x: 20, y: 160, w: 370, h: 50, fixtures: 3 },
+  { name: 'Corridor S', x: 20, y: 400, w: 770, h: 40, fixtures: 5 },
+  { name: 'Quiet Room', x: 400, y: 160, w: 130, h: 80, fixtures: 2 },
+  { name: 'Reception', x: 530, y: 250, w: 260, h: 100, fixtures: 3 },
+];
+
+const mgmtFixtureTypes = ['LED Driver', 'LED Driver', 'LED Driver', 'LED Driver', 'Emergency', 'PIR Sensor'];
+let mgmtFixtures = [];
+let mgmtActiveScene = 'workday';
+let mgmtHeatmapOn = false;
+let mgmtEnergyData = [];
+let mgmtSchedule = {};
+
+// ─── Init fixtures ───
+function mgmtInitFixtures() {
+  mgmtFixtures = [];
+  let addr = 0;
+  mgmtRooms.forEach((room, ri) => {
+    for (let i = 0; i < room.fixtures; i++) {
+      const fx = i / room.fixtures;
+      const x = room.x + 20 + fx * (room.w - 40);
+      const y = room.y + 15 + (i % 2) * (room.h - 40);
+      const isEmergency = (addr % 7 === 6);
+      mgmtFixtures.push({
+        id: addr,
+        addr: addr,
+        room: room.name,
+        roomIdx: ri,
+        x: x,
+        y: y,
+        type: isEmergency ? 'Emergency' : 'LED Driver',
+        power: isEmergency ? 0.08 : 0.35,
+        state: 'on',
+        dim: 100,
+        group: ri % 16,
+        scene: 0,
+        firmware: 'DALI-2 v2.1',
+      });
+      addr++;
+    }
+  });
+}
+
+// ─── Floor Plan ───
+function mgmtRenderFloorPlan() {
+  const svg = document.getElementById('mgmt-floorplan-svg');
+  if (!svg) return;
+  let html = '';
+  // Rooms
+  mgmtRooms.forEach(room => {
+    html += `<rect x="${room.x}" y="${room.y}" width="${room.w}" height="${room.h}" rx="4" fill="#101028" stroke="#2a2a5a" stroke-width="1"/>`;
+    html += `<text x="${room.x + 6}" y="${room.y + 14}" fill="#555577" font-size="9">${room.name}</text>`;
+    if (mgmtHeatmapOn) {
+      const heat = Math.random();
+      const color = heat > 0.7 ? 'rgba(251,191,36,0.15)' : heat > 0.4 ? 'rgba(83,216,251,0.1)' : 'transparent';
+      html += `<rect x="${room.x}" y="${room.y}" width="${room.w}" height="${room.h}" rx="4" fill="${color}" stroke="none"/>`;
+    }
+  });
+  // Fixtures
+  mgmtFixtures.forEach(f => {
+    let color = '#333355', glow = '';
+    if (f.state === 'on') { color = '#fbbf24'; glow = `<circle cx="${f.x}" cy="${f.y}" r="10" fill="rgba(251,191,36,0.15)"/>`; }
+    else if (f.state === 'off') { color = '#222244'; }
+    else if (f.state === 'fault') { color = '#f87171'; glow = `<circle cx="${f.x}" cy="${f.y}" r="10" fill="rgba(248,113,113,0.2)"><animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/></circle>`; }
+    else if (f.state === 'daylit') { color = '#53d8fb'; glow = `<circle cx="${f.x}" cy="${f.y}" r="8" fill="rgba(83,216,251,0.12)"/>`; }
+    else if (f.state === 'emergency') { color = '#34d399'; glow = `<circle cx="${f.x}" cy="${f.y}" r="8" fill="rgba(52,211,153,0.12)"/>`; }
+    html += glow;
+    const r = f.type === 'Emergency' ? 5 : 4;
+    html += `<circle cx="${f.x}" cy="${f.y}" r="${r}" fill="${color}" stroke="#2a2a5a" stroke-width="1" style="cursor:pointer" onclick="mgmtFixtureClick(${f.id})" data-fid="${f.id}"/>`;
+    if (f.type === 'Emergency') {
+      html += `<text x="${f.x - 2}" y="${f.y + 2}" fill="#060612" font-size="6" style="pointer-events:none">E</text>`;
+    }
+  });
+  svg.innerHTML = html;
+}
+
+function mgmtFixtureClick(fid) {
+  const f = mgmtFixtures[fid];
+  const panel = document.getElementById('mgmt-fixture-detail');
+  panel.innerHTML = `
+    <h4>🔧 Luminaire #${f.addr}</h4>
+    <div class="detail-row"><span class="detail-key">DALI Address</span><span class="detail-val">${f.addr}</span></div>
+    <div class="detail-row"><span class="detail-key">Type</span><span class="detail-val">${f.type}</span></div>
+    <div class="detail-row"><span class="detail-key">Location</span><span class="detail-val">${f.room}</span></div>
+    <div class="detail-row"><span class="detail-key">Group</span><span class="detail-val">${f.group}</span></div>
+    <div class="detail-row"><span class="detail-key">Power</span><span class="detail-val">${f.power} kW</span></div>
+    <div class="detail-row"><span class="detail-key">Status</span><span class="detail-val" style="color:${f.state==='fault'?'var(--danger)':'var(--success)'}">${f.state.toUpperCase()}</span></div>
+    <div class="detail-row"><span class="detail-key">Dim Level</span><span class="detail-val">${f.dim}%</span></div>
+    <div class="detail-row"><span class="detail-key">Firmware</span><span class="detail-val">${f.firmware}</span></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.4rem;">
+      <button class="mgmt-btn primary" onclick="mgmtFixtureToggle(${fid})">Toggle</button>
+      <button class="mgmt-btn" onclick="mgmtFixtureDim(${fid}, -10)">Dim −</button>
+      <button class="mgmt-btn" onclick="mgmtFixtureDim(${fid}, 10)">Dim +</button>
+    </div>
+  `;
+}
+
+function mgmtFixtureToggle(fid) {
+  const f = mgmtFixtures[fid];
+  f.state = f.state === 'off' ? 'on' : 'off';
+  f.dim = f.state === 'on' ? 100 : 0;
+  mgmtRenderFloorPlan();
+  mgmtFixtureClick(fid);
+  mgmtUpdateEnergy();
+}
+
+function mgmtFixtureDim(fid, delta) {
+  const f = mgmtFixtures[fid];
+  f.dim = Math.max(0, Math.min(100, f.dim + delta));
+  if (f.dim === 0) f.state = 'off';
+  else if (f.state === 'off') f.state = 'on';
+  mgmtRenderFloorPlan();
+  mgmtFixtureClick(fid);
+  mgmtUpdateEnergy();
+}
+
+// ─── Controls ───
+function mgmtAllOn() {
+  mgmtFixtures.forEach(f => { f.state = 'on'; f.dim = 100; });
+  mgmtRenderFloorPlan();
+  mgmtUpdateEnergy();
+}
+
+function mgmtAllOff() {
+  mgmtFixtures.forEach(f => { if (f.type !== 'Emergency') { f.state = 'off'; f.dim = 0; } });
+  mgmtRenderFloorPlan();
+  mgmtUpdateEnergy();
+}
+
+function mgmtApplyScene(scene) {
+  mgmtActiveScene = scene;
+  const scenes = {
+    workday: { on: 80, daylit: true, off: false },
+    afterhours: { on: 30, daylit: false, off: true },
+    night: { on: 0, daylit: false, off: true },
+    meeting: { on: 90, daylit: true, off: false },
+  };
+  const s = scenes[scene] || scenes.workday;
+  mgmtFixtures.forEach(f => {
+    if (f.type === 'Emergency') return;
+    const hour = new Date().getHours();
+    const isWindowRoom = f.roomIdx % 4 === 0;
+    if (s.daylit && isWindowRoom && hour >= 8 && hour <= 17) {
+      f.state = 'daylit'; f.dim = s.on * 0.6;
+    } else if (s.off && Math.random() > s.on / 100) {
+      f.state = 'off'; f.dim = 0;
+    } else {
+      f.state = 'on'; f.dim = s.on;
+    }
+  });
+  mgmtRenderFloorPlan();
+  mgmtUpdateEnergy();
+}
+
+function mgmtRunEmergencyTest() {
+  mgmtFixtures.forEach(f => {
+    if (f.type === 'Emergency') { f.state = 'emergency'; }
+  });
+  mgmtRenderFloorPlan();
+  setTimeout(() => {
+    mgmtFixtures.forEach(f => {
+      if (f.type === 'Emergency') {
+        f.state = Math.random() > 0.1 ? 'on' : 'fault';
+      }
+    });
+    mgmtRenderFloorPlan();
+    mgmtUpdateEnergy();
+  }, 3000);
+}
+
+function mgmtToggleHeatmap() {
+  mgmtHeatmapOn = document.getElementById('mgmt-heatmap').checked;
+  mgmtRenderFloorPlan();
+}
+
+// ─── Network Topology ───
+function mgmtRenderTopology() {
+  const svg = document.getElementById('mgmt-topology-svg');
+  if (!svg) return;
+  let html = '';
+  const nodes = [
+    { id: 'server', label: 'Lightscape Server', x: 450, y: 30, type: 'server', status: 'online', detail: 'Dell PowerEdge · 16GB RAM · Lightscape v4.2' },
+    { id: 'r1', label: 'IP Router — Floor 1', x: 250, y: 120, type: 'router', status: 'online', detail: 'Cisco IE-3300 · BACnet/IP · MQTT' },
+    { id: 'r2', label: 'IP Router — Floor 2', x: 650, y: 120, type: 'router', status: 'online', detail: 'Cisco IE-3300 · BACnet/IP · MQTT' },
+    { id: 'lcm1', label: 'LCM-1', x: 100, y: 230, type: 'lcm', status: 'online', detail: 'IPDBW6 · 6ch DALI-2 Buswire · 42 fixtures' },
+    { id: 'lcm2', label: 'LCM-2', x: 250, y: 230, type: 'lcm', status: 'online', detail: 'IPDBW6 · 6ch DALI-2 Buswire · 38 fixtures' },
+    { id: 'lcm3', label: 'LCM-3', x: 400, y: 230, type: 'lcm', status: 'online', detail: 'IPDBW6 · 6ch DALI-2 Buswire · 35 fixtures' },
+    { id: 'lcm4', label: 'LCM-4', x: 550, y: 230, type: 'lcm', status: 'online', detail: 'IPDBW6 · 6ch DALI-2 Buswire · 40 fixtures' },
+    { id: 'lcm5', label: 'LCM-5', x: 700, y: 230, type: 'lcm', status: 'online', detail: 'IPDBW6 · 6ch DALI-2 Buswire · 29 fixtures' },
+    { id: 'hive', label: 'HIVE Gateway', x: 830, y: 120, type: 'gateway', status: 'online', detail: 'Clevertronics HIVE · RF Mesh · Wireless' },
+  ];
+  const links = [
+    ['server','r1'], ['server','r2'], ['server','hive'],
+    ['r1','lcm1'], ['r1','lcm2'], ['r2','lcm3'], ['r2','lcm4'], ['r2','lcm5'],
+  ];
+  // Draw links
+  links.forEach(([a,b]) => {
+    const na = nodes.find(n=>n.id===a), nb = nodes.find(n=>n.id===b);
+    html += `<line x1="${na.x}" y1="${na.y}" x2="${nb.x}" y2="${nb.y}" stroke="#2a2a5a" stroke-width="1.5"/>`;
+    // Animated data flow dot
+    html += `<circle r="3" fill="#53d8fb" opacity="0.6"><animateMotion dur="${2+Math.random()}s" repeatCount="indefinite" path="M${na.x},${na.y} L${nb.x},${nb.y}"/></circle>`;
+  });
+  // Draw bus lines under LCMs
+  [180, 330, 480, 630, 780].forEach((bx, i) => {
+    html += `<line x1="${bx-50}" y1="340" x2="${bx+50}" y2="340" stroke="#34d399" stroke-width="1" stroke-dasharray="3,3"/>`;
+    html += `<text x="${bx-45}" y="355" fill="#555577" font-size="8">DALI Bus ${i+1}</text>`;
+    for (let j = 0; j < 4; j++) {
+      const fx = bx - 40 + j * 25;
+      html += `<rect x="${fx-3}" y="365" width="6" height="8" rx="1" fill="#34d399" opacity="0.6" onclick="mgmtTopoClick('bus${i+1}_${j}')"/>`;
+    }
+  });
+  // Draw nodes
+  nodes.forEach(n => {
+    const colors = { server: '#7c5cfc', router: '#53d8fb', lcm: '#34d399', gateway: '#fbbf24' };
+    const c = colors[n.type] || '#8888aa';
+    html += `<g style="cursor:pointer" onclick="mgmtTopoClick('${n.id}')">`;
+    html += `<rect x="${n.x-50}" y="${n.y-15}" width="100" height="30" rx="6" fill="${c}22" stroke="${c}" stroke-width="1.5"/>`;
+    html += `<circle cx="${n.x-38}" cy="${n.y}" r="4" fill="${n.status==='online'?'#34d399':'#f87171'}">${n.status==='online'?'<animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>':''}</circle>`;
+    html += `<text x="${n.x+5}" y="${n.y+3}" fill="${c}" font-size="9" text-anchor="middle">${n.label}</text>`;
+    html += `</g>`;
+  });
+  svg.innerHTML = html;
+  mgmtTopologyNodes = nodes;
+}
+
+let mgmtTopologyNodes = [];
+function mgmtTopoClick(id) {
+  const node = mgmtTopologyNodes.find(n => n.id === id);
+  const panel = document.getElementById('mgmt-topo-detail');
+  if (node) {
+    panel.innerHTML = `
+      <div class="mgmt-detail-panel">
+        <h4>📡 ${node.label}</h4>
+        <div class="detail-row"><span class="detail-key">Type</span><span class="detail-val">${node.type.toUpperCase()}</span></div>
+        <div class="detail-row"><span class="detail-key">Status</span><span class="detail-val" style="color:var(--success)">${node.status.toUpperCase()}</span></div>
+        <div class="detail-row"><span class="detail-key">Details</span><span class="detail-val">${node.detail}</span></div>
+      </div>`;
+  } else {
+    panel.innerHTML = `<div class="mgmt-detail-panel"><p style="color:var(--text-dim)">DALI bus fixture — individual device. See Device Registry for full details.</p></div>`;
+  }
+}
+
+// ─── Emergency Monitoring ───
+const mgmtEmergencyDevices = [];
+function mgmtInitEmergency() {
+  const locations = ['Open Office A', 'Open Office B', 'Corridor N', 'Corridor S', 'Kitchen', 'Meeting Rm 1', 'Reception', 'Collab Space'];
+  locations.forEach((loc, i) => {
+    mgmtEmergencyDevices.push({
+      id: i,
+      name: `EMG-${String(i+1).padStart(2,'0')}`,
+      location: loc,
+      battery: Math.random() > 0.85 ? 'Degraded' : 'Good',
+      lastFuncTest: `2026-07-${25+Math.floor(Math.random()*7)} 0${Math.floor(Math.random()*7)}:00`,
+      lastDurTest: `2026-07-${20+Math.floor(Math.random()*5)} 0${Math.floor(Math.random()*7)}:00`,
+      nextTest: `2026-08-0${2+Math.floor(Math.random()*5)} 0${Math.floor(Math.random()*7)}:00`,
+      signal: 2 + Math.floor(Math.random() * 3),
+      status: 'ok',
+    });
+  });
+}
+
+function mgmtRenderEmergency() {
+  const summary = document.getElementById('mgmt-emergency-summary');
+  const ok = mgmtEmergencyDevices.filter(d => d.status === 'ok').length;
+  const warn = mgmtEmergencyDevices.filter(d => d.status === 'warn').length;
+  const fault = mgmtEmergencyDevices.filter(d => d.status === 'fault').length;
+  summary.innerHTML = `
+    <div class="mgmt-emergency-stat ok"><div class="stat-val">${ok}</div><div class="stat-label">Operational</div></div>
+    <div class="mgmt-emergency-stat warn"><div class="stat-val">${warn}</div><div class="stat-label">Warnings</div></div>
+    <div class="mgmt-emergency-stat fault"><div class="stat-val">${fault}</div><div class="stat-label">Faults</div></div>
+    <div class="mgmt-emergency-stat ok"><div class="stat-val">100%</div><div class="stat-label">Compliance</div></div>
+  `;
+  let html = '';
+  mgmtEmergencyDevices.forEach(d => {
+    const statusClass = d.status;
+    const batteryColor = d.battery === 'Good' ? 'var(--success)' : 'var(--warning)';
+    let bars = '';
+    for (let i = 0; i < 4; i++) {
+      bars += `<div class="bar ${i < d.signal ? 'active' : ''}" style="height:${4+i*3}px"></div>`;
+    }
+    html += `
+      <div class="mgmt-emergency-device">
+        <div class="edot ${statusClass}"></div>
+        <div>
+          <strong>${d.name}</strong> — ${d.location}
+          <div class="edetail">
+            <span>Battery:</span><strong style="color:${batteryColor}">${d.battery}</strong>
+            <span>Last Func Test:</span><strong>${d.lastFuncTest}</strong>
+            <span>Last Dur Test:</span><strong>${d.lastDurTest}</strong>
+            <span>Next Test:</span><strong>${d.nextTest}</strong>
+          </div>
+        </div>
+        <div class="mgmt-signal">${bars}</div>
+      </div>`;
+  });
+  document.getElementById('mgmt-emergency-list').innerHTML = html;
+  // Test log
+  let logHtml = '<h4>Recent Test Log</h4><table class="mgmt-log-table"><thead><tr><th>Device</th><th>Test Type</th><th>Result</th><th>Timestamp</th></tr></thead><tbody>';
+  const testTypes = ['Function', 'Duration', 'Function', 'Function', 'Duration'];
+  const results = ['PASS', 'PASS', 'PASS', 'PASS', 'FAIL'];
+  mgmtEmergencyDevices.slice(0, 5).forEach((d, i) => {
+    logHtml += `<tr><td>${d.name}</td><td>${testTypes[i]}</td><td style="color:${results[i]==='PASS'?'var(--success)':'var(--danger)'}">${results[i]}</td><td>${d.lastFuncTest}</td></tr>`;
+  });
+  logHtml += '</tbody></table>';
+  document.getElementById('mgmt-emergency-log').innerHTML = logHtml;
+}
+
+function mgmtRunFunctionTest() {
+  const summaryEl = document.getElementById('mgmt-emergency-summary');
+  const orig = summaryEl.innerHTML;
+  summaryEl.innerHTML = `<div class="mgmt-test-progress"><p>🔴 Running Function Test...</p><div class="mgmt-test-bar"><div class="mgmt-test-bar-fill" id="mgmt-test-fb" style="width:0%"></div></div></div>`;
+  let prog = 0;
+  const interval = setInterval(() => {
+    prog += 10;
+    const bar = document.getElementById('mgmt-test-fb');
+    if (bar) bar.style.width = prog + '%';
+    if (prog >= 100) {
+      clearInterval(interval);
+      mgmtEmergencyDevices.forEach(d => {
+        if (Math.random() > 0.9) d.status = 'fault';
+        else d.status = 'ok';
+      });
+      mgmtRenderEmergency();
+    }
+  }, 200);
+}
+
+function mgmtRunDurationTest() {
+  const summaryEl = document.getElementById('mgmt-emergency-summary');
+  summaryEl.innerHTML = `<div class="mgmt-test-progress"><p>⏱ Running Duration Test (3hr rated)...</p><div class="mgmt-test-bar"><div class="mgmt-test-bar-fill" id="mgmt-test-fb" style="width:0%"></div></div></div>`;
+  let prog = 0;
+  const interval = setInterval(() => {
+    prog += 5;
+    const bar = document.getElementById('mgmt-test-fb');
+    if (bar) bar.style.width = prog + '%';
+    if (prog >= 100) {
+      clearInterval(interval);
+      mgmtRenderEmergency();
+    }
+  }, 150);
+}
+
+// ─── Energy Dashboard ───
+function mgmtRenderEnergy() {
+  // Gauge
+  const totalPower = mgmtFixtures.reduce((sum, f) => sum + (f.state === 'off' ? 0 : f.power * f.dim / 100), 0);
+  const maxPower = mgmtFixtures.reduce((sum, f) => sum + f.power, 0);
+  const pct = Math.min(1, totalPower / maxPower);
+  const svg = document.getElementById('mgmt-gauge-svg');
+  if (!svg) return;
+  const angle = -90 + pct * 180;
+  const r = 70, cx = 100, cy = 90;
+  const arc = (a1, a2) => {
+    const x1 = cx + r * Math.cos(a1 * Math.PI / 180);
+    const y1 = cy + r * Math.sin(a1 * Math.PI / 180);
+    const x2 = cx + r * Math.cos(a2 * Math.PI / 180);
+    const y2 = cy + r * Math.sin(a2 * Math.PI / 180);
+    const large = a2 - a1 > 180 ? 1 : 0;
+    return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`;
+  };
+  svg.innerHTML = `
+    <path d="${arc(-90, 90)}" fill="none" stroke="#1a1a3a" stroke-width="10" stroke-linecap="round"/>
+    <path d="${arc(-90, -90 + pct * 180)}" fill="none" stroke="${pct > 0.8 ? '#f87171' : pct > 0.5 ? '#fbbf24' : '#53d8fb'}" stroke-width="10" stroke-linecap="round"/>
+    <text x="100" y="95" text-anchor="middle" fill="#e8e8f0" font-size="16" font-weight="bold">${totalPower.toFixed(1)} kW</text>
+    <text x="100" y="110" text-anchor="middle" fill="#8888aa" font-size="9">of ${maxPower.toFixed(1)} kW max</text>
+  `;
+  document.getElementById('mgmt-gauge-label').textContent = totalPower.toFixed(1) + ' kW';
+
+  // 24h chart
+  if (mgmtEnergyData.length === 0) {
+    for (let h = 0; h < 24; h++) {
+      const base = h >= 7 && h <= 19 ? 0.6 + Math.random() * 0.3 : 0.1 + Math.random() * 0.1;
+      mgmtEnergyData.push(base * maxPower);
+    }
+  }
+  const chart = document.getElementById('mgmt-energy-chart');
+  if (!chart) return;
+  const w = 400, h = 150, pad = 20;
+  const maxVal = Math.max(...mgmtEnergyData);
+  let path = `M ${pad} ${h - pad}`;
+  mgmtEnergyData.forEach((v, i) => {
+    const x = pad + (i / 23) * (w - pad * 2);
+    const y = h - pad - (v / maxVal) * (h - pad * 2);
+    path += ` L ${x} ${y}`;
+  });
+  chart.innerHTML = `
+    <line x1="${pad}" y1="${h-pad}" x2="${w-pad}" y2="${h-pad}" stroke="#2a2a5a"/>
+    <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${h-pad}" stroke="#2a2a5a"/>
+    <path d="${path}" fill="none" stroke="#53d8fb" stroke-width="2"/>
+    <path d="${path} L ${w-pad} ${h-pad} L ${pad} ${h-pad} Z" fill="rgba(83,216,251,0.1)"/>
+    <text x="${pad}" y="${h-5}" fill="#555577" font-size="8">00:00</text>
+    <text x="${w/2}" y="${h-5}" fill="#555577" font-size="8" text-anchor="middle">12:00</text>
+    <text x="${w-pad-15}" y="${h-5}" fill="#555577" font-size="8">23:00</text>
+  `;
+
+  // Zone energy
+  const zoneEl = document.getElementById('mgmt-zone-energy');
+  if (!zoneEl) return;
+  let zoneHtml = '<div style="grid-column:1/-1;"><h4 style="font-size:0.85rem;color:var(--text-dim);margin-bottom:0.5rem;">Per-Zone Energy (Today)</h4></div>';
+  mgmtRooms.slice(0, 6).forEach(room => {
+    const roomFixtures = mgmtFixtures.filter(f => f.room === room.name);
+    const power = roomFixtures.reduce((s, f) => s + (f.state === 'off' ? 0 : f.power * f.dim / 100), 0);
+    const max = roomFixtures.reduce((s, f) => s + f.power, 0);
+    const pct2 = max > 0 ? (power / max) * 100 : 0;
+    zoneHtml += `
+      <div class="mgmt-zone-bar">
+        <div class="zlabel">${room.name}</div>
+        <div class="ztrack"><div class="zfill" style="width:${pct2}%;background:linear-gradient(90deg,var(--accent),#2db8d8)"></div></div>
+        <span style="font-size:0.7rem;color:var(--text-dim);width:50px;">${power.toFixed(1)}kW</span>
+      </div>`;
+  });
+  zoneEl.innerHTML = zoneHtml;
+
+  // Savings
+  const baseline = maxPower * 0.85;
+  const savings = ((baseline - totalPower) / baseline * 100).toFixed(0);
+  const daylitSavings = mgmtFixtures.filter(f => f.state === 'daylit').reduce((s, f) => s + f.power * 0.3, 0);
+  const occSavings = mgmtFixtures.filter(f => f.state === 'off').reduce((s, f) => s + f.power, 0);
+  document.getElementById('mgmt-savings-bar').innerHTML = `
+    <div class="mgmt-savings-item"><div class="sval" style="color:var(--success)">${savings}%</div><div class="slabel">vs Baseline</div></div>
+    <div class="mgmt-savings-item"><div class="sval" style="color:var(--accent)">${daylitSavings.toFixed(1)}kW</div><div class="slabel">Daylight Savings</div></div>
+    <div class="mgmt-savings-item"><div class="sval" style="color:var(--accent2)">${occSavings.toFixed(1)}kW</div><div class="slabel">Occupancy Savings</div></div>
+  `;
+}
+
+function mgmtUpdateEnergy() {
+  // Only re-render if visible
+  const view = document.getElementById('mgmt-view-energy');
+  if (view && view.classList.contains('active')) mgmtRenderEnergy();
+}
+
+// ─── Scenes ───
+const mgmtScenes = [
+  { name: 'Morning', desc: 'Warm gradual ramp-up', levels: [30, 40, 20, 50, 30, 0, 10, 40] },
+  { name: 'Workday', desc: 'Full brightness with daylight harvesting', levels: [90, 90, 80, 80, 85, 70, 70, 90] },
+  { name: 'Meeting', desc: 'Focused meeting room lighting', levels: [70, 70, 100, 100, 60, 50, 50, 70] },
+  { name: 'Lunch', desc: 'Reduced brightness, social areas bright', levels: [50, 50, 60, 60, 80, 40, 40, 80] },
+  { name: 'After Hours', desc: 'Low-level circulation only', levels: [10, 10, 20, 20, 30, 0, 0, 40] },
+  { name: 'Night', desc: 'Emergency lighting only', levels: [0, 0, 0, 0, 0, 0, 0, 10] },
+  { name: 'Emergency', desc: 'Full emergency evacuation', levels: [100, 100, 100, 100, 100, 100, 100, 100] },
+  { name: 'Maintenance', desc: '50% all zones for servicing', levels: [50, 50, 50, 50, 50, 50, 50, 50] },
+];
+
+function mgmtRenderScenes() {
+  const list = document.getElementById('mgmt-scenes-list');
+  if (!list) return;
+  let html = '';
+  mgmtScenes.forEach((s, i) => {
+    let preview = '';
+    s.levels.forEach(l => {
+      const alpha = l / 100;
+      preview += `<div class="sp" style="background:rgba(251,191,36,${alpha})"></div>`;
+    });
+    html += `
+      <div class="mgmt-scene-card ${s.name.toLowerCase() === mgmtActiveScene ? 'active' : ''}" onclick="mgmtSelectScene('${s.name.toLowerCase()}')">
+        <h4>${s.name}</h4>
+        <div class="mgmt-scene-preview">${preview}</div>
+        <p style="font-size:0.7rem;color:var(--text-dim);margin-top:0.3rem;">${s.desc}</p>
+      </div>`;
+  });
+  list.innerHTML = html;
+}
+
+function mgmtSelectScene(name) {
+  mgmtActiveScene = name;
+  const scene = mgmtScenes.find(s => s.name.toLowerCase() === name);
+  if (!scene) return;
+  mgmtRooms.forEach((room, ri) => {
+    const level = scene.levels[ri % scene.levels.length];
+    mgmtFixtures.forEach(f => {
+      if (f.room === room.name && f.type !== 'Emergency') {
+        f.dim = level;
+        f.state = level === 0 ? 'off' : 'on';
+      }
+    });
+  });
+  mgmtRenderScenes();
+  mgmtRenderFloorPlan();
+  mgmtUpdateEnergy();
+}
+
+function mgmtRenderSchedule() {
+  const grid = document.getElementById('mgmt-schedule-grid');
+  if (!grid) return;
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const colors = { 'workday': '#53d8fb', 'afterhours': '#fbbf24', 'night': '#1a1a3a', 'morning': '#f97316', 'meeting': '#7c5cfc', 'lunch': '#34d399', '': '#101028' };
+  let html = '<table class="mgmt-sched-table"><thead><tr><th>Hour</th>';
+  days.forEach(d => html += `<th>${d}</th>`);
+  html += '</tr></thead><tbody>';
+  for (let h = 0; h < 24; h++) {
+    html += `<tr><td style="color:var(--text-dim);text-align:center">${String(h).padStart(2,'0')}:00</td>`;
+    days.forEach((d, di) => {
+      const key = `${di}_${h}`;
+      let scene = mgmtSchedule[key] || '';
+      if (!scene) {
+        if (h >= 7 && h <= 8) scene = 'morning';
+        else if (h >= 9 && h <= 17) scene = 'workday';
+        else if (h >= 12 && h <= 13) scene = 'lunch';
+        else if (h >= 18 && h <= 20) scene = 'afterhours';
+        else scene = 'night';
+        if (di >= 5 && h >= 9 && h <= 17) scene = 'afterhours';
+      }
+      const c = colors[scene] || '#101028';
+      html += `<td style="background:${c}" title="${scene}" onclick="mgmtCycleSchedule(${di}, ${h})"></td>`;
+    });
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  grid.innerHTML = html;
+}
+
+function mgmtCycleSchedule(day, hour) {
+  const key = `${day}_${hour}`;
+  const cycle = ['', 'morning', 'workday', 'meeting', 'lunch', 'afterhours', 'night'];
+  const current = mgmtSchedule[key] || 'workday';
+  const idx = cycle.indexOf(current);
+  mgmtSchedule[key] = cycle[(idx + 1) % cycle.length];
+  mgmtRenderSchedule();
+}
+
+function mgmtActivateSchedule() {
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = '✓ Activated';
+  btn.style.background = 'var(--success)';
+  setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 2000);
+}
+
+// ─── Device Registry ───
+const mgmtAllDevices = [];
+function mgmtInitDevices() {
+  const types = ['LED Driver', 'PIR Sensor', 'Wall Switch', 'Emergency', 'DALI Relay'];
+  const lcms = ['LCM-1', 'LCM-2', 'LCM-3', 'LCM-4', 'LCM-5'];
+  const fw = ['DALI-2 v2.1', 'DALI-2 v2.0', 'DALI-2 v2.1', 'DALI-2 v1.9'];
+  let addr = 0;
+  mgmtRooms.forEach(room => {
+    const count = 2 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < count; i++) {
+      const type = types[addr % types.length];
+      mgmtAllDevices.push({
+        addr: addr,
+        name: `${type.split(' ')[0]}-${String(addr).padStart(2,'0')}`,
+        type: type,
+        location: room.name,
+        lcm: lcms[addr % 5],
+        status: Math.random() > 0.9 ? 'Fault' : 'Online',
+        firmware: fw[addr % fw.length],
+        group: addr % 16,
+      });
+      addr++;
+    }
+  });
+}
+
+function mgmtRenderDevices() {
+  const table = document.getElementById('mgmt-device-table');
+  if (!table) return;
+  const search = (document.getElementById('mgmt-device-search')?.value || '').toLowerCase();
+  const filterType = document.getElementById('mgmt-filter-type')?.value || '';
+  const filterStatus = document.getElementById('mgmt-filter-status')?.value || '';
+  const filtered = mgmtAllDevices.filter(d => {
+    if (search && !d.name.toLowerCase().includes(search) && !d.location.toLowerCase().includes(search) && !String(d.addr).includes(search)) return false;
+    if (filterType && d.type !== filterType) return false;
+    if (filterStatus && d.status !== filterStatus) return false;
+    return true;
+  });
+  let html = '<thead><tr><th>Addr</th><th>Name</th><th>Type</th><th>Location</th><th>LCM</th><th>Group</th><th>Status</th><th>Firmware</th></tr></thead><tbody>';
+  filtered.forEach(d => {
+    const dotClass = d.status === 'Online' ? 'online' : d.status === 'Fault' ? 'fault' : 'offline';
+    html += `<tr onclick="mgmtDeviceRow(${d.addr})">
+      <td>${d.addr}</td>
+      <td>${d.name}</td>
+      <td>${d.type}</td>
+      <td>${d.location}</td>
+      <td>${d.lcm}</td>
+      <td>${d.group}</td>
+      <td><span class="dstatus"><span class="ddot ${dotClass}"></span>${d.status}</span></td>
+      <td>${d.firmware}</td>
+    </tr>`;
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+function mgmtFilterDevices() { mgmtRenderDevices(); }
+
+function mgmtDeviceRow(addr) {
+  const d = mgmtAllDevices.find(x => x.addr === addr);
+  if (!d) return;
+  alert(`${d.name}\n\nDALI Address: ${d.addr}\nType: ${d.type}\nLocation: ${d.location}\nLCM: ${d.lcm}\nGroup: ${d.group}\nStatus: ${d.status}\nFirmware: ${d.firmware}`);
+}
+
+// ─── View Switching ───
+function mgmtSwitchView(view) {
+  document.querySelectorAll('.mgmt-nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.mgmt-view').forEach(v => v.classList.remove('active'));
+  document.querySelector(`.mgmt-nav-item[data-view="${view}"]`)?.classList.add('active');
+  document.getElementById(`mgmt-view-${view}`)?.classList.add('active');
+  if (view === 'topology') mgmtRenderTopology();
+  if (view === 'energy') mgmtRenderEnergy();
+  if (view === 'scenes') { mgmtRenderScenes(); mgmtRenderSchedule(); }
+  if (view === 'devices') mgmtRenderDevices();
+  if (view === 'emergency') mgmtRenderEmergency();
+  if (view === 'floorplan') mgmtRenderFloorPlan();
+}
+
+// ─── Real-time simulation ───
+function mgmtSimulate() {
+  // Randomly toggle a fixture
+  if (Math.random() > 0.7) {
+    const f = mgmtFixtures[Math.floor(Math.random() * mgmtFixtures.length)];
+    if (f.type !== 'Emergency') {
+      if (f.state === 'on' && Math.random() > 0.7) { f.state = 'off'; f.dim = 0; }
+      else if (f.state === 'off' && Math.random() > 0.5) { f.state = 'on'; f.dim = 60 + Math.random() * 40; }
+    }
+    // Random fault
+    if (Math.random() > 0.97) { f.state = 'fault'; }
+  }
+  // Random emergency device fault
+  if (Math.random() > 0.95) {
+    const d = mgmtEmergencyDevices[Math.floor(Math.random() * mgmtEmergencyDevices.length)];
+    d.status = d.status === 'ok' ? 'warn' : 'ok';
+  }
+  // Re-render visible view
+  const floorView = document.getElementById('mgmt-view-floorplan');
+  if (floorView && floorView.classList.contains('active')) mgmtRenderFloorPlan();
+  const emgView = document.getElementById('mgmt-view-emergency');
+  if (emgView && emgView.classList.contains('active')) mgmtRenderEmergency();
+  mgmtUpdateEnergy();
+}
+
+// ─── Init ───
+mgmtInitFixtures();
+mgmtInitEmergency();
+mgmtInitDevices();
+mgmtRenderFloorPlan();
+setInterval(mgmtSimulate, 4000);
+</script>
+
+
+<!-- ═══ TAB: GRAFANA DASHBOARD ═══ -->
+<div id="tab-grafana" class="tab-content">
+  <div class="section">
+    <h2 class="section-title"><span class="icon">📊</span> Grafana Operations Dashboard</h2>
+    <p class="section-desc">Live telemetry dashboard powered by Grafana — displaying real-time energy consumption, fixture status, emergency test results, and daily savings metrics from the GMQ lighting system.</p>
+    <iframe src="/grafana/d/gmq-lighting/gmq-lighting-operations-dashboard?orgId=1&kiosk" style="width:100%; height:750px; border:1px solid var(--border); border-radius:12px; background:var(--bg);" loading="lazy"></iframe>
+  </div>
+</div>
+
+<div class="footer">
+  Interactive proposal visualisation · Waveguide for CBRE / Google GMQ · Revision P01<br>
+  This is a private demo — not visible to guest accounts
+</div>
+
+<script>
+// ═══ SIMULATOR STATE ═══
+const rooms = [
+  { name: 'Open Office A', power: 2.5, col: 0, row: 0 },
+  { name: 'Open Office B', power: 2.5, col: 1, row: 0 },
+  { name: 'Meeting Room 1', power: 0.8, col: 2, row: 0 },
+  { name: 'Meeting Room 2', power: 0.8, col: 3, row: 0 },
+  { name: 'Collaboration', power: 1.5, col: 0, row: 1 },
+  { name: 'Phone Booth 1', power: 0.3, col: 1, row: 1 },
+  { name: 'Phone Booth 2', power: 0.3, col: 2, row: 1 },
+  { name: 'Kitchen', power: 1.2, col: 3, row: 1 },
+  { name: 'Corridor North', power: 0.6, col: 0, row: 2 },
+  { name: 'Corridor South', power: 0.6, col: 1, row: 2 },
+  { name: 'Quiet Room', power: 0.5, col: 2, row: 2 },
+  { name: 'Reception', power: 1.0, col: 3, row: 2 },
+];
+
+let state = {
+  scenario: 'proposed',
+  roomsOn: new Set(rooms.map((_, i) => i)),
+  dimLevel: 100,
+  daylight: 60,
+  timeOfDay: 14,
+  controls: {
+    occupancy: true,
+    daylight: true,
+    scheduling: true,
+    emergency: false,
+  }
+};
+
+// ═══ BUILDING GRID ═══
+function renderBuilding() {
+  const grid = document.getElementById('building-grid');
+  grid.innerHTML = '';
+  rooms.forEach((room, i) => {
+    const div = document.createElement('div');
+    div.className = 'room';
+    div.dataset.idx = i;
+    div.onclick = () => toggleRoom(i);
+    div.innerHTML = `
+      <div class="room-light" id="room-light-${i}">💡</div>
+      <div class="room-name">${room.name}</div>
+      <div class="room-power" id="room-power-${i}">${room.power}kW</div>
+    `;
+    grid.appendChild(div);
+  });
+  updateRoomStates();
+}
+
+function toggleRoom(idx) {
+  if (state.roomsOn.has(idx)) state.roomsOn.delete(idx);
+  else state.roomsOn.add(idx);
+  updateRoomStates();
+  updateMetrics();
+}
+
+function updateRoomStates() {
+  rooms.forEach((room, i) => {
+    const el = document.querySelector(`[data-idx="${i}"]`);
+    if (!el) return;
+    el.className = 'room';
+
+    const isOn = state.roomsOn.has(i);
+    const hour = state.timeOfDay;
+
+    // Scheduling: off outside 7am-7pm
+    let effectiveOn = isOn;
+    if (state.controls.scheduling && (hour < 7 || hour >= 19)) {
+      effectiveOn = false;
+    }
+
+    // Occupancy: simulate unoccupied rooms (every 3rd room unoccupied if sensing on)
+    if (effectiveOn && state.controls.occupancy) {
+      const occupied = (i + Math.floor(hour / 2)) % 3 !== 0;
+      if (!occupied) effectiveOn = false;
+    }
+
+    if (effectiveOn) {
+      // Check daylight
+      const isDaylitWindow = (room.col === 0 || room.col === 3); // window rooms
+      if (state.controls.daylight && isDaylitWindow && hour >= 8 && hour <= 17) {
+        const daylightFactor = state.daylight / 100;
+        if (daylightFactor > 0.5) {
+          el.classList.add('daylit');
+          el.querySelector('.room-light').textContent = '🌤️';
+        } else {
+          el.classList.add('on');
+          el.querySelector('.room-light').textContent = '💡';
+        }
+      } else {
+        el.classList.add('on');
+        el.querySelector('.room-light').textContent = '💡';
+      }
+    } else {
+      if (state.controls.emergency) {
+        el.classList.add('emergency');
+        el.querySelector('.room-light').textContent = '🚨';
+      } else {
+        el.classList.add('off');
+        el.querySelector('.room-light').textContent = '⚫';
+      }
+    }
+
+    // Update power display
+    let power = effectiveOn ? room.power : 0;
+    if (effectiveOn && state.controls.daylight) {
+      const isWindowRoom = (room.col === 0 || room.col === 3);
+      if (isWindowRoom && hour >= 8 && hour <= 17) {
+        power *= (1 - (state.daylight / 100) * 0.4);
+      }
+    }
+    power *= (state.dimLevel / 100);
+    document.getElementById(`room-power-${i}`).textContent = power > 0 ? power.toFixed(1) + 'kW' : '0kW';
+  });
+}
+
+function updateMetrics() {
+  let totalPower = 0;
+  let activeRooms = 0;
+
+  rooms.forEach((room, i) => {
+    if (!state.roomsOn.has(i)) return;
+    const hour = state.timeOfDay;
+    let effectiveOn = true;
+
+    if (state.controls.scheduling && (hour < 7 || hour >= 19)) effectiveOn = false;
+    if (effectiveOn && state.controls.occupancy) {
+      const occupied = (i + Math.floor(hour / 2)) % 3 !== 0;
+      if (!occupied) effectiveOn = false;
+    }
+
+    if (effectiveOn) {
+      let power = room.power;
+      if (state.controls.daylight) {
+        const isWindowRoom = (room.col === 0 || room.col === 3);
+        if (isWindowRoom && hour >= 8 && hour <= 17) {
+          power *= (1 - (state.daylight / 100) * 0.4);
+        }
+      }
+      power *= (state.dimLevel / 100);
+      totalPower += power;
+      activeRooms++;
+    }
+  });
+
+  // Existing system: all lights full power, no controls
+  if (state.scenario === 'existing') {
+    totalPower = rooms.reduce((sum, r) => sum + r.power, 0);
+    activeRooms = rooms.length;
+  }
+
+  const annualEnergy = totalPower * 8760 / 1000; // kW * hours / 1000 = MWh
+  const annualCost = annualEnergy * 280; // €0.28/kWh = €280/MWh
+  const annualCarbon = annualEnergy * 197.8 / 1000; // tonnes
+
+  document.getElementById('sim-power').textContent = totalPower.toFixed(1);
+  document.getElementById('sim-annual-energy').textContent = annualEnergy.toFixed(1);
+  document.getElementById('sim-annual-cost').textContent = '€' + annualCost.toLocaleString('en-IE', { maximumFractionDigits: 0 });
+  document.getElementById('sim-annual-carbon').textContent = annualCarbon.toFixed(1);
+
+  // Readout
+  document.getElementById('readout-system').textContent = state.scenario === 'proposed' ? 'DALI Controlled LED' : 'Fixed-Output LED';
+  document.getElementById('readout-rooms').textContent = `${activeRooms} / ${rooms.length}`;
+  document.getElementById('readout-dim').textContent = state.scenario === 'proposed' ? state.dimLevel + '%' : '100% (fixed)';
+
+  const occEl = document.getElementById('readout-occupancy');
+  const dayEl = document.getElementById('readout-daylight');
+  const schedEl = document.getElementById('readout-compliance');
+
+  if (state.scenario === 'existing') {
+    occEl.textContent = 'None';
+    occEl.className = 'val red';
+    dayEl.textContent = 'None';
+    dayEl.className = 'val red';
+    schedEl.textContent = 'Manual';
+    schedEl.className = 'val red';
+  } else {
+    occEl.textContent = state.controls.occupancy ? 'Active' : 'Off';
+    occEl.className = state.controls.occupancy ? 'val green' : 'val yellow';
+    dayEl.textContent = state.controls.daylight ? 'Active' : 'Off';
+    dayEl.className = state.controls.daylight ? 'val green' : 'val yellow';
+    schedEl.textContent = state.controls.scheduling ? 'Scheduled' : 'Manual';
+    schedEl.className = state.controls.scheduling ? 'val green' : 'val yellow';
+  }
+
+  document.getElementById('readout-emergency').textContent = state.controls.emergency ? 'HIVE Test Mode' : 'HIVE Monitored ✓';
+}
+
+// ═══ CONTROLS ═══
+function updateDim(val) {
+  state.dimLevel = parseInt(val);
+  document.getElementById('dim-value').textContent = val + '%';
+  updateRoomStates();
+  updateMetrics();
+}
+
+function updateDaylight(val) {
+  state.daylight = parseInt(val);
+  document.getElementById('daylight-value').textContent = val + '%';
+  updateRoomStates();
+  updateMetrics();
+}
+
+function updateTime(val) {
+  state.timeOfDay = parseInt(val);
+  const h = String(val).padStart(2, '0');
+  document.getElementById('time-value').textContent = `${h}:00`;
+  updateRoomStates();
+  updateMetrics();
+}
+
+function toggleControl(name, el) {
+  state.controls[name] = !state.controls[name];
+  el.classList.toggle('on');
+  updateRoomStates();
+  updateMetrics();
+}
+
+function setScenario(s) {
+  state.scenario = s;
+  document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  if (s === 'existing') {
+    state.roomsOn = new Set(rooms.map((_, i) => i));
+    state.dimLevel = 100;
+    document.getElementById('dim-slider').value = 100;
+    document.getElementById('dim-value').textContent = '100%';
+    // Disable controls visually
+    document.querySelectorAll('.control-panel .toggle').forEach(t => t.style.opacity = '0.4');
+    document.querySelectorAll('.control-panel input[type="range"]').forEach(t => t.style.opacity = '0.4');
+  } else {
+    document.querySelectorAll('.control-panel .toggle').forEach(t => t.style.opacity = '1');
+    document.querySelectorAll('.control-panel input[type="range"]').forEach(t => t.style.opacity = '1');
+  }
+  updateRoomStates();
+  updateMetrics();
+}
+
+function allRoomsOn() {
+  state.roomsOn = new Set(rooms.map((_, i) => i));
+  updateRoomStates();
+  updateMetrics();
+}
+
+function allRoomsOff() {
+  state.roomsOn.clear();
+  updateRoomStates();
+  updateMetrics();
+}
+
+function autoPopulate() {
+  state.roomsOn = new Set([0, 1, 2, 3, 4, 5, 6, 7, 10, 11]); // skip corridors
+  state.timeOfDay = 10;
+  state.daylight = 70;
+  document.getElementById('time-slider').value = 10;
+  document.getElementById('time-value').textContent = '10:00';
+  document.getElementById('daylight-slider').value = 70;
+  document.getElementById('daylight-value').textContent = '70%';
+  updateRoomStates();
+  updateMetrics();
+}
+
+function afterHoursMode() {
+  state.roomsOn = new Set([8, 9, 11]); // corridors + reception only
+  state.timeOfDay = 20;
+  state.daylight = 0;
+  document.getElementById('time-slider').value = 20;
+  document.getElementById('time-value').textContent = '20:00';
+  document.getElementById('daylight-slider').value = 0;
+  document.getElementById('daylight-value').textContent = '0%';
+  updateRoomStates();
+  updateMetrics();
+}
+
+// ═══ TABS ═══
+function switchTab(tabName) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(`tab-${tabName}`).classList.add('active');
+}
+
+// ═══ PRICE SENSITIVITY CHART ═══
+function renderPriceSensitivity() {
+  const container = document.getElementById('price-sensitivity-chart');
+  if (!container) return;
+  const prices = [0.20, 0.25, 0.28, 0.30, 0.35, 0.40];
+  const savings = prices.map(p => Math.round(84.4 * 1000 * p));
+  const maxSavings = Math.max(...savings);
+
+  let html = '';
+  prices.forEach((p, i) => {
+    const pct = (savings[i] / maxSavings) * 100;
+    const isCurrent = p === 0.28;
+    html += `
+      <div class="bar-row">
+        <div class="bar-label">€${p.toFixed(2)}/kWh ${isCurrent ? '←' : ''}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: ${pct}%; ${isCurrent ? 'background: linear-gradient(90deg, var(--accent), #2db8d8);' : 'background: linear-gradient(90deg, var(--accent2), #5b3cd8);'}">€${savings[i].toLocaleString()}</div>
+        </div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+// ═══ INIT ═══
+renderBuilding();
+updateMetrics();
+renderPriceSensitivity();
+</script>
+
+</body>
+</html>

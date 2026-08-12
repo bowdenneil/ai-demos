@@ -74,6 +74,21 @@
       position: relative;
       z-index: 1;
     }
+    .header-manual-link {
+      display: inline-block;
+      margin-top: 0.75rem;
+      padding: 0.4rem 1rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.85rem;
+      position: relative;
+      z-index: 1;
+      transition: all 0.2s;
+    }
+    .header-manual-link:hover { border-color: var(--accent); background: rgba(83,216,251,0.05); transform: translateY(-1px); }
     .api-bar {
       margin-top: 1rem;
       display: flex;
@@ -173,6 +188,8 @@
     .card-icon.onprem { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.15)); }
     .card-icon.tco { background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.15)); }
     .card-icon.network { background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(14,165,233,0.15)); }
+    .card-header-img.gmq { background: linear-gradient(135deg, rgba(251,191,36,0.12) 0%, rgba(52,211,153,0.08) 100%); }
+    .card-icon.gmq { background: rgba(251,191,36,0.15); }
     .card-icon.hidden { display: none; }
     .card-body {
       padding: 1.5rem;
@@ -1195,229 +1212,8 @@
     .btn-swarm { background: linear-gradient(135deg, #53d8fb, #7c5cfc); color: #fff; }
     .btn-swarm:hover:not(:disabled) { background: linear-gradient(135deg, #22d3ee, #a78bfa); }
 
-    /* ─── VODAFONE ROI DEMO ─── */
-    .card-header-img.vodafone { background: linear-gradient(135deg, rgba(230,0,0,0.15) 0%, rgba(230,0,0,0.04) 100%); }
-    .tag.vodafone { background: linear-gradient(135deg, rgba(230,0,0,0.15), rgba(230,0,0,0.08)); color: #ff3333; }
-    .btn-vodafone { background: linear-gradient(135deg, #e60000, #990000); color: #fff; }
-    .btn-vodafone:hover:not(:disabled) { background: linear-gradient(135deg, #ff1a1a, #b30000); }
+    /* ─── SWARM DEMO ─── */
 
-    .vf-layout {
-      display: grid;
-      grid-template-columns: 320px 1fr;
-      gap: 1.5rem;
-      align-items: start;
-    }
-    @media (max-width: 900px) { .vf-layout { grid-template-columns: 1fr; } }
-
-    .vf-sidebar {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.25rem;
-      position: sticky;
-      top: 1rem;
-    }
-    .vf-sidebar h3 {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #ff3333;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .vf-slider-group { margin-bottom: 1rem; }
-    .vf-slider-label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.35rem;
-    }
-    .vf-slider-label span:first-child {
-      font-size: 0.8rem;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .vf-slider-label .vf-amount {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #ff3333;
-      font-variant-numeric: tabular-nums;
-    }
-    .vf-slider {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 100%;
-      height: 6px;
-      border-radius: 3px;
-      background: linear-gradient(to right, #e60000 0%, #e60000 var(--pct,0%), var(--surface2) var(--pct,0%));
-      outline: none;
-      cursor: pointer;
-    }
-    .vf-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 18px; height: 18px;
-      border-radius: 50%;
-      background: #fff;
-      border: 2px solid #e60000;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(230,0,0,0.3);
-    }
-    .vf-slider::-moz-range-thumb {
-      width: 18px; height: 18px;
-      border-radius: 50%;
-      background: #fff;
-      border: 2px solid #e60000;
-      cursor: pointer;
-    }
-    .vf-slider-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.65rem;
-      color: var(--text-dim);
-      margin-top: 0.2rem;
-    }
-
-    .vf-metric-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-    }
-    @media (max-width: 700px) { .vf-metric-grid { grid-template-columns: repeat(2, 1fr); } }
-
-    .vf-metric {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 0.85rem;
-      text-align: center;
-      transition: border-color 0.3s;
-    }
-    .vf-metric:hover { border-color: #e60000; }
-    .vf-metric .vf-metric-icon { font-size: 1.2rem; }
-    .vf-metric .vf-metric-value {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: #ff3333;
-      margin: 0.2rem 0;
-      font-variant-numeric: tabular-nums;
-    }
-    .vf-metric .vf-metric-label {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--text-dim);
-    }
-    .vf-metric .vf-metric-sub {
-      font-size: 0.6rem;
-      color: var(--success);
-      margin-top: 0.15rem;
-    }
-
-    .vf-chart-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0.75rem;
-      margin-bottom: 0.75rem;
-    }
-    @media (max-width: 1100px) { .vf-chart-grid { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 600px) { .vf-chart-grid { grid-template-columns: 1fr; } }
-
-    .vf-chart-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 0.6rem 0.75rem;
-    }
-    .vf-chart-card h4 {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--text-dim);
-      margin-bottom: 0.35rem;
-    }
-    .vf-chart-card canvas { max-height: 140px; }
-
-    .vf-preset-row {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-    }
-    .vf-preset-btn {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text-dim);
-      padding: 0.35rem 0.75rem;
-      border-radius: 6px;
-      font-size: 0.72rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .vf-preset-btn:hover { border-color: #e60000; color: #ff3333; }
-
-    .vf-domain-row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.4rem 0;
-      border-bottom: 1px solid rgba(42,42,90,0.4);
-      font-size: 0.8rem;
-    }
-    .vf-domain-row:last-child { border-bottom: none; }
-    .vf-domain-icon { font-size: 1rem; width: 24px; text-align: center; }
-    .vf-domain-name { flex: 1; }
-    .vf-domain-roi {
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      min-width: 80px;
-      text-align: right;
-    }
-    .vf-domain-roi.positive { color: var(--success); }
-    .vf-domain-roi.negative { color: var(--danger); }
-
-    .vf-invest-display {
-      background: linear-gradient(135deg, rgba(230,0,0,0.08), rgba(230,0,0,0.02));
-      border: 1px solid rgba(230,0,0,0.2);
-      border-radius: 10px;
-      padding: 0.85rem;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    .vf-invest-display .vf-total-invest {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: #ff3333;
-    }
-    .vf-invest-display .vf-invest-label {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-dim);
-    }
-
-    .vf-break-even-marker {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: var(--success);
-      z-index: 1;
-    }
-    .vf-break-even-label {
-      position: absolute;
-      top: -16px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.6rem;
-      color: var(--success);
-      white-space: nowrap;
-    }
 
     .swarm-grid {
       display: grid;
@@ -1616,8 +1412,554 @@
       background: var(--surface); padding: 0.15rem 0.5rem; border-radius: 10px;
       border: 1px solid var(--border); letter-spacing: 0;
     }
+
+    /* ─── CYBER SECURITY DEMOS ─── */
+    .card-header-img.cyber { background: linear-gradient(135deg, rgba(248,113,113,0.12) 0%, rgba(124,92,252,0.08) 100%); }
+    .card-icon.cyber { background: linear-gradient(135deg, rgba(248,113,113,0.15), rgba(124,92,252,0.15)); }
+    .tag.cyber { background: linear-gradient(135deg, rgba(248,113,113,0.15), rgba(124,92,252,0.15)); color: var(--danger); }
+    .btn-cyber { background: linear-gradient(135deg, #f87171, #7c5cfc); color: #fff; }
+    .btn-cyber:hover:not(:disabled) { background: linear-gradient(135deg, #fb923c, #9678ff); }
+
+    /* Timeline Demo */
+    .cyber-timeline-layout { display: flex; flex-direction: column; gap: 1rem; height: 100%; }
+    .cyber-phase-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.5rem 0; }
+    .cyber-phase-btn {
+      display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem;
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text-dim); cursor: pointer; font-size: 0.8rem; font-family: var(--font);
+      transition: all 0.2s;
+    }
+    .cyber-phase-btn:hover { border-color: var(--text-dim); color: var(--text); }
+    .cyber-phase-btn.active { background: rgba(248,113,113,0.1); border-color: var(--danger); color: var(--text); }
+    .cyber-phase-btn .cyber-phase-icon { font-size: 1rem; }
+    .cyber-phase-detail { flex: 1; overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+    .cyber-empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-dim); }
+    .cyber-phase-header { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .cyber-phase-title-row { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 0.75rem; }
+    .cyber-phase-icon-lg { font-size: 2rem; line-height: 1; }
+    .cyber-phase-title-row h3 { font-size: 1.4rem; margin: 0; }
+    .cyber-phase-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.25rem; }
+    .cyber-timestamp, .cyber-mitre { font-size: 0.75rem; color: var(--text-dim); background: var(--surface2); padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid var(--border); }
+    .cyber-phase-summary { color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; }
+    .cyber-section { margin-bottom: 1.5rem; }
+    .cyber-section-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); margin-bottom: 0.75rem; }
+    .cyber-log-table { font-size: 0.8rem; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .cyber-log-header { display: grid; grid-template-columns: 70px 1fr 150px; gap: 0.5rem; padding: 0.5rem 0.75rem; background: var(--surface2); font-weight: 600; color: var(--text-dim); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    .cyber-log-row { display: grid; grid-template-columns: 70px 1fr 150px; gap: 0.5rem; padding: 0.5rem 0.75rem; border-top: 1px solid var(--border); align-items: start; }
+    .cyber-log-time { color: var(--text-dim); font-family: monospace; font-size: 0.75rem; }
+    .cyber-log-event { color: var(--text); line-height: 1.4; }
+    .cyber-log-source { color: var(--text-dim); font-size: 0.75rem; }
+    .cyber-sev-critical .cyber-log-event { color: #f87171; }
+    .cyber-sev-critical { background: rgba(248,113,113,0.04); }
+    .cyber-sev-high .cyber-log-event { color: #fbbf24; }
+    .cyber-sev-warning .cyber-log-event { color: #fbbf24; }
+    .cyber-sev-info .cyber-log-event { color: var(--text-dim); }
+    .cyber-ai-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+    .cyber-ai-header .cyber-section-title { margin-bottom: 0; }
+    .cyber-ai-output {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 1rem; min-height: 150px; max-height: 500px; overflow-y: auto; font-size: 0.85rem; line-height: 1.7;
+    }
+    .cyber-ai-output .output-content { font-size: 0.85rem; }
+    .cyber-ai-placeholder { color: var(--text-dim); font-style: italic; text-align: center; padding: 2rem 1rem; }
+
+    /* Attack Simulation Demo */
+    .cyber-sim-layout { display: flex; flex-direction: column; gap: 1rem; }
+    .cyber-sim-scenarios { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .cyber-sim-scenario-btn {
+      display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.9rem;
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text-dim); cursor: pointer; font-size: 0.8rem; font-family: var(--font); transition: all 0.2s;
+    }
+    .cyber-sim-scenario-btn:hover { border-color: var(--text-dim); color: var(--text); }
+    .cyber-sim-scenario-btn.active { background: rgba(248,113,113,0.1); border-color: var(--danger); color: var(--text); }
+    .cyber-sim-controls { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; padding: 0.5rem 0; }
+    .cyber-sim-speed { display: flex; align-items: center; gap: 0.4rem; }
+    .cyber-sim-speed select { padding: 0.35rem 0.5rem; font-size: 0.8rem; background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-family: var(--font); }
+    .cyber-sim-status { font-size: 0.8rem; color: var(--text-dim); padding: 0.3rem 0.7rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; }
+    .cyber-sim-status.running { color: #f87171; border-color: rgba(248,113,113,0.3); }
+    .cyber-sim-status.done { color: var(--success); border-color: rgba(52,211,153,0.3); }
+    .cyber-sim-split { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 768px) { .cyber-sim-split { grid-template-columns: 1fr; } }
+    .cyber-sim-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; min-height: 400px; }
+    .cyber-sim-attack { border-color: rgba(248,113,113,0.2); }
+    .cyber-sim-defense { border-color: rgba(52,211,153,0.2); }
+    .cyber-sim-panel-header { display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+    .cyber-sim-panel-header h3 { font-size: 1rem; margin: 0; flex: 1; }
+    .cyber-sim-badge { font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 6px; background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
+    .cyber-sim-badge.active { color: #f87171; border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.08); }
+    .cyber-sim-badge.monitoring { color: #fbbf24; border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.08); }
+    .cyber-sim-badge.contained { color: var(--text-dim); }
+    .cyber-sim-badge.done { color: var(--success); border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.08); }
+    .cyber-sim-steps { display: flex; flex-direction: column; gap: 0.2rem; }
+    .cyber-sim-step { display: flex; align-items: flex-start; gap: 0.4rem; padding: 0.35rem 0.5rem; border-radius: 6px; opacity: 0.35; transition: all 0.3s; }
+    .cyber-sim-step.active { opacity: 1; }
+    .cyber-sim-step.current { background: var(--surface2); }
+    .cyber-sim-step-icon { font-size: 0.9rem; line-height: 1.5; }
+    .cyber-sim-step-info { display: flex; flex-direction: column; gap: 0.1rem; }
+    .cyber-sim-step-label { font-size: 0.8rem; color: var(--text); }
+    .cyber-sim-step-detail { font-size: 0.7rem; color: var(--text-dim); line-height: 1.3; }
+    .cyber-sim-log { flex: 1; overflow-y: auto; font-size: 0.75rem; display: flex; flex-direction: column; gap: 0.3rem; max-height: 250px; }
+    .cyber-sim-log-empty { color: var(--text-dim); font-style: italic; text-align: center; padding: 1rem; }
+    .cyber-sim-log-entry { display: flex; align-items: flex-start; gap: 0.4rem; padding: 0.35rem 0.5rem; background: var(--surface2); border-radius: 6px; animation: cyber-fadein 0.3s ease; }
+    @keyframes cyber-fadein { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+    .cyber-sim-log-time { color: var(--text-dim); font-family: monospace; font-size: 0.7rem; white-space: nowrap; }
+    .cyber-sim-log-icon { font-size: 0.8rem; }
+    .cyber-sim-log-content { display: flex; flex-direction: column; gap: 0.1rem; }
+    .cyber-sim-log-label { font-weight: 600; color: var(--text); }
+    .cyber-sim-log-detail { color: var(--text-dim); font-size: 0.7rem; line-height: 1.3; }
+    .cyber-sim-summary { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+    .cyber-sim-summary-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .cyber-sim-summary h3 { margin: 0; }
+
+    /* Forensic Analyzer Demo */
+    .cyber-forensic-layout { display: flex; flex-direction: column; gap: 1rem; }
+    .cyber-forensic-mode-toggle { display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+    .cyber-mode-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); font-weight: 600; }
+    .cyber-mode-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    @media (max-width: 640px) { .cyber-mode-buttons { grid-template-columns: 1fr; } }
+    .cyber-mode-btn {
+      display: flex; flex-direction: column; gap: 0.15rem; padding: 0.75rem 1rem;
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text-dim); cursor: pointer; font-family: var(--font); font-size: 0.85rem; font-weight: 600;
+      text-align: left; transition: all 0.2s;
+    }
+    .cyber-mode-btn:hover { border-color: var(--text-dim); color: var(--text); }
+    .cyber-mode-btn.active { border-color: var(--accent); color: var(--text); background: rgba(83,216,251,0.05); }
+    .cyber-mode-sub { font-size: 0.7rem; font-weight: 400; color: var(--text-dim); }
+    .cyber-forensic-log-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; }
+    .cyber-forensic-log-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+    .cyber-forensic-log-header h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); margin: 0; }
+    .cyber-forensic-log-preview { max-height: 200px; overflow-y: auto; font-size: 0.75rem; border: 1px solid var(--border); border-radius: 8px; }
+    .cyber-log-more { padding: 0.5rem 0.75rem; text-align: center; color: var(--text-dim); font-style: italic; font-size: 0.75rem; border-top: 1px solid var(--border); }
+    .cyber-forensic-output { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; min-height: 200px; max-height: 600px; overflow-y: auto; }
+    .cyber-forensic-output .output-content { font-size: 0.85rem; line-height: 1.7; }
+    .cyber-guardrail-block { font-size: 0.85rem; }
+    .cyber-guardrail-step { display: flex; align-items: flex-start; gap: 0.5rem; padding: 0.4rem 0.75rem; border-radius: 6px; margin-bottom: 0.3rem; background: var(--surface2); animation: cyber-fadein 0.3s ease; }
+    .cyber-guardrail-time { color: var(--text-dim); font-family: monospace; font-size: 0.75rem; min-width: 35px; }
+    .cyber-guardrail-icon { font-size: 0.9rem; }
+    .cyber-guardrail-msg { color: var(--text); font-size: 0.8rem; }
+    .cyber-guardrail-explanation { margin-top: 1rem; padding: 1rem; background: var(--surface2); border: 1px solid rgba(248,113,113,0.2); border-radius: 10px; }
+    .cyber-guardrail-explanation h3 { color: #f87171; margin-bottom: 0.5rem; font-size: 1.1rem; }
+    .cyber-guardrail-explanation p { margin-bottom: 0.5rem; font-size: 0.85rem; line-height: 1.6; }
+    .cyber-asymmetry-box { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    @media (max-width: 640px) { .cyber-asymmetry-box { grid-template-columns: 1fr; } }
+    .cyber-asymmetry-side { padding: 0.75rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+    .cyber-asymmetry-side h4 { font-size: 0.9rem; margin-bottom: 0.5rem; }
+    .cyber-asymmetry-side ul { list-style: none; padding: 0; }
+    .cyber-asymmetry-side li { font-size: 0.8rem; color: var(--text-dim); padding: 0.2rem 0; padding-left: 1rem; position: relative; }
+    .cyber-asymmetry-side li::before { content: '▸'; position: absolute; left: 0; color: var(--text-dim); }
+    .cyber-lesson { padding: 0.75rem; background: rgba(83,216,251,0.05); border: 1px solid rgba(83,216,251,0.2); border-radius: 8px; font-size: 0.85rem; line-height: 1.6; }
+    .error-card { padding: 1rem; background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.2); border-radius: 8px; }
+    .error-card .dim { color: var(--text-dim); font-size: 0.8rem; }
+
+    /* ── ONBOARDING DEMO ──────────────────────────────────────────── */
+    .ob-chat-area {
+      flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem;
+      min-height: 350px; max-height: 500px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
+    }
+    .ob-message { display: flex; gap: 0.6rem; align-items: flex-start; max-width: 85%; animation: ob-fade-in 0.3s ease; }
+    .ob-message.ob-user { margin-left: auto; flex-direction: row-reverse; }
+    .ob-msg-avatar { font-size: 1.3rem; line-height: 1; flex-shrink: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--surface2); border-radius: 50%; border: 1px solid var(--border); }
+    .ob-msg-bubble { padding: 0.6rem 0.9rem; border-radius: 12px; font-size: 0.9rem; line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
+    .ob-agent .ob-msg-bubble { background: var(--surface2); border: 1px solid var(--border); border-top-left-radius: 4px; color: var(--text); }
+    .ob-user .ob-msg-bubble { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #0a0a1a; border-top-right-radius: 4px; font-weight: 500; }
+    @keyframes ob-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .ob-typing-indicator .ob-msg-bubble { display: flex; gap: 4px; align-items: center; padding: 0.7rem 1rem; }
+    .ob-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-dim); animation: ob-bounce 1.4s infinite ease-in-out; }
+    .ob-dot:nth-child(2) { animation-delay: 0.2s; }
+    .ob-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes ob-bounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
+    .ob-input-area { display: flex; gap: 0.5rem; padding: 0.75rem 0 0; }
+    .ob-input-area input {
+      flex: 1; padding: 0.75rem 1rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); font-size: 0.9rem; outline: none; transition: border-color 0.2s;
+    }
+    .ob-input-area input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(83,216,251,0.1); }
+    .btn-ob-send { padding: 0.75rem 1.2rem; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #0a0a1a; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.85rem; transition: transform 0.1s; }
+    .btn-ob-send:hover { transform: translateY(-1px); }
+    .btn-ob-mic { padding: 0.75rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--text-dim); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .btn-ob-mic:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-ob-mic.listening { background: rgba(249,83,186,0.15); border-color: var(--accent3); color: var(--accent3); animation: ob-mic-pulse 1.5s infinite; }
+    @keyframes ob-mic-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(249,83,186,0.3); } 50% { box-shadow: 0 0 0 6px rgba(249,83,186,0); } }
+    .ob-tts-toggle { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--text-dim); cursor: pointer; user-select: none; }
+    .ob-tts-toggle input { width: 14px; height: 14px; accent-color: var(--accent); }
+    .btn-ob-launch { padding: 0.9rem 1.8rem; background: linear-gradient(135deg, var(--accent4), var(--accent)); color: #0a0a1a; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
+    .btn-ob-launch:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(83,216,251,0.3); }
+    .btn-ob-restart { margin-top: 1rem; padding: 0.7rem 1.4rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-weight: 500; cursor: pointer; font-size: 0.85rem; transition: border-color 0.2s; }
+    .btn-ob-restart:hover { border-color: var(--accent); }
+
+    /* Agent panels grid */
+    .ob-agents-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem; }
+    @media (max-width: 900px) { .ob-agents-grid { grid-template-columns: 1fr; } }
+    .ob-agent-panel {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .ob-agent-panel.ob-panel-active { border-color: var(--agent-color); box-shadow: 0 0 20px -5px var(--agent-color); }
+    .ob-agent-panel.ob-panel-done { border-color: rgba(52,211,153,0.4); }
+    .ob-agent-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .ob-agent-icon { font-size: 1.3rem; }
+    .ob-agent-name { font-weight: 600; font-size: 0.9rem; flex: 1; color: var(--text); }
+    .ob-agent-status { font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+    .ob-status-pending { background: var(--surface2); color: var(--text-dim); }
+    .ob-status-running { background: rgba(83,216,251,0.15); color: var(--accent); }
+    .ob-status-done { background: rgba(52,211,153,0.15); color: var(--accent4); }
+    .ob-agent-tasks { display: flex; flex-direction: column; gap: 0.35rem; }
+    .ob-task { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; padding: 0.3rem 0; transition: color 0.3s; }
+    .ob-task-pending { color: var(--text-dim); }
+    .ob-task-running { color: var(--text); }
+    .ob-task-running .ob-task-icon { color: var(--accent); animation: ob-pulse 1s infinite; }
+    .ob-task-done { color: var(--text-dim); }
+    .ob-task-done .ob-task-label { text-decoration: line-through; }
+    .ob-task-icon { font-size: 0.7rem; width: 16px; text-align: center; flex-shrink: 0; }
+    @keyframes ob-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    /* Agent reasoning log */
+    .ob-agent-log { max-height: 220px; overflow-y: auto; font-size: 0.72rem; font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace; display: flex; flex-direction: column; gap: 0.2rem; }
+    .ob-log-entry { display: flex; gap: 0.3rem; align-items: flex-start; padding: 0.15rem 0; border-bottom: 1px solid rgba(42,42,90,0.3); line-height: 1.4; }
+    .ob-log-time { color: var(--text-dim); font-size: 0.62rem; flex-shrink: 0; opacity: 0.6; margin-top: 0.1rem; }
+    .ob-log-icon { flex-shrink: 0; font-size: 0.65rem; margin-top: 0.1rem; }
+    .ob-log-text { color: var(--text); word-break: break-word; flex: 1; }
+    .ob-log-thinking .ob-log-text { color: var(--accent); }
+    .ob-log-tool .ob-log-text { color: var(--accent2); }
+    .ob-log-result .ob-log-text { color: var(--text-dim); }
+    .ob-log-success .ob-log-text { color: var(--accent4); font-weight: 600; }
+    .ob-log-warning .ob-log-text { color: var(--accent5); }
+    .ob-log-error .ob-log-text { color: #f87171; }
+    .ob-log-entry:last-child { border-bottom: none; }
+
+    /* Failure injection controls */
+    .ob-failure-controls { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 1rem; }
+    .ob-failure-title { font-size: 0.78rem; font-weight: 700; color: var(--accent5); margin-bottom: 0.5rem; }
+    .ob-failure-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .btn-ob-fail { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 0.35rem 0.7rem; border-radius: 6px; font-size: 0.72rem; cursor: pointer; transition: all 0.2s; font-family: var(--font); }
+    .btn-ob-fail:hover { border-color: var(--accent5); background: rgba(251,191,36,0.08); color: var(--accent5); }
+    .btn-ob-fail:active { transform: scale(0.97); }
+
+    /* Agent status states */
+    .ob-panel-waiting { opacity: 0.5; }
+    .ob-panel-waiting .ob-agent-status { color: var(--accent5); }
+    .ob-panel-affected { animation: ob-flash 0.5s ease 3; }
+    @keyframes ob-flash { 0%, 100% { border-color: var(--border); } 50% { border-color: var(--accent5); box-shadow: 0 0 15px -3px var(--accent5); } }
+
+    .ob-agent-progress { height: 3px; background: var(--surface2); border-radius: 2px; margin-top: 0.75rem; overflow: hidden; }
+    .ob-agent-progress-fill { height: 100%; width: 0%; background: var(--agent-color); border-radius: 2px; transition: width 0.5s ease; }
+
+    /* A/B Comparison Engine */
+    .ab-toggle-bar { display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+    .ab-mode-toggle { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .ab-mode-btn { background: var(--surface); border: none; padding: 0.4rem 0.9rem; font-size: 0.78rem; color: var(--text-dim); cursor: pointer; transition: all 0.2s; font-family: var(--font); }
+    .ab-mode-btn.active { background: var(--accent); color: #0a0a1a; font-weight: 600; }
+    .ab-mode-btn:not(.active):hover { background: var(--surface2); color: var(--text); }
+    .ab-model-selectors { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .ab-model-group { display: flex; gap: 0.4rem; align-items: center; }
+    .ab-model-group label { font-size: 0.75rem; color: var(--text-dim); font-weight: 600; white-space: nowrap; }
+    .ab-model-select { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 0.3rem 0.5rem; color: var(--text); font-size: 0.75rem; font-family: var(--font); cursor: pointer; }
+    .ab-model-select:focus { outline: none; border-color: var(--accent); }
+    .ab-model-select option { background: var(--surface2); }
+
+    .ab-compare-active { padding: 0 !important; }
+    .ab-split { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    @media (max-width: 768px) { .ab-split { grid-template-columns: 1fr; } }
+    .ab-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+    .ab-panel-header { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); background: var(--surface2); }
+    .ab-panel-label { font-size: 0.72rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; }
+    .ab-panel-time { font-size: 0.68rem; color: var(--text-dim); }
+    .ab-panel-content { padding: 0.75rem; font-size: 0.85rem; line-height: 1.6; overflow-y: auto; max-height: 600px; min-height: 200px; }
+    .ab-panel-content .md-h1 { font-size: 1.1rem; font-weight: 700; margin: 0.75rem 0 0.4rem; color: var(--accent); }
+    .ab-panel-content .md-h2 { font-size: 1rem; font-weight: 700; margin: 0.6rem 0 0.3rem; color: var(--text); }
+    .ab-panel-content .md-h3 { font-size: 0.9rem; font-weight: 600; margin: 0.5rem 0 0.25rem; color: var(--accent2); }
+    .ab-panel-content ul, .ab-panel-content ol { margin: 0.4rem 0 0.4rem 1.2rem; }
+    .ab-panel-content li { margin: 0.2rem 0; }
+    .ab-panel-content p { margin: 0.4rem 0; }
+    .ab-panel-content strong { color: var(--text); }
+    .ab-panel-content table { border-collapse: collapse; width: 100%; margin: 0.5rem 0; }
+    .ab-panel-content td, .ab-panel-content th { border: 1px solid var(--border); padding: 0.3rem 0.5rem; font-size: 0.78rem; }
+    .ab-panel-content th { background: var(--surface2); font-weight: 600; }
+    .ab-panel-content .md-blockquote { border-left: 3px solid var(--accent); padding-left: 0.75rem; margin: 0.5rem 0; color: var(--text-dim); }
+
+    /* Welcome packet */
+    .ob-complete-area { margin-top: 1.5rem; }
+    .ob-welcome-packet { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+    .ob-welcome-packet h3 { margin-bottom: 1rem; font-size: 1.2rem; }
+    .ob-packet-content { font-size: 0.9rem; line-height: 1.7; }
+    .ob-packet-content .md-h1 { font-size: 1.3rem; font-weight: 700; margin: 1rem 0 0.5rem; color: var(--accent); }
+    .ob-packet-content .md-h2 { font-size: 1.1rem; font-weight: 700; margin: 1rem 0 0.5rem; color: var(--text); }
+    .ob-packet-content .md-h3 { font-size: 1rem; font-weight: 600; margin: 0.75rem 0 0.4rem; color: var(--accent2); }
+    .ob-packet-content .md-h4 { font-size: 0.9rem; font-weight: 600; margin: 0.5rem 0 0.3rem; color: var(--text-dim); }
+    .ob-packet-content ul, .ob-packet-content ol { margin: 0.5rem 0 0.5rem 1.5rem; }
+    .ob-packet-content li { margin: 0.25rem 0; }
+    .ob-packet-content p { margin: 0.5rem 0; }
+    .ob-packet-content strong { color: var(--text); }
+    .ob-packet-content .md-blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; margin: 0.75rem 0; color: var(--text-dim); font-style: italic; }
+    .ob-complete-loading { display: flex; align-items: center; gap: 0.75rem; padding: 2rem; color: var(--text-dim); }
+    .ob-spinner { width: 24px; height: 24px; border: 3px solid var(--surface2); border-top-color: var(--accent); border-radius: 50%; animation: ob-spin 0.8s linear infinite; }
+    @keyframes ob-spin { to { transform: rotate(360deg); } }
+
+    /* ═══════════════════════════════════════════════════════════════════ */
+    /* LINEGUARD AI — INDUSTRIAL CONTROL-ROOM THEME                         */
+    /* ═══════════════════════════════════════════════════════════════════ */
+    .card-header-img.lineguard { background: linear-gradient(135deg, rgba(251,191,36,0.12) 0%, rgba(249,115,22,0.08) 100%); }
+    .card-icon.lineguard { background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(249,115,22,0.15)); }
+
+    .lg-navbar {
+      display: flex; gap: 0; margin-bottom: 1rem; border-bottom: 1px solid var(--border);
+    }
+    .lg-nav-item {
+      padding: 0.6rem 1.2rem; cursor: pointer; font-size: 0.9rem; color: var(--text-dim);
+      border-bottom: 2px solid transparent; transition: all 0.2s; font-weight: 500;
+    }
+    .lg-nav-item:hover { color: var(--text); }
+    .lg-nav-item.active { color: var(--accent5); border-bottom-color: var(--accent5); }
+
+    .lg-screen { width: 100%; gap: 1rem; }
+
+    /* ── OVERVIEW ── */
+    .lg-overview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .lg-overview-header h3 { font-size: 1.3rem; color: var(--text); }
+    .lg-asset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+    .lg-asset-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      cursor: pointer; transition: all 0.2s; overflow: hidden;
+    }
+    .lg-asset-card:hover { border-color: var(--accent5); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(251,191,36,0.1); }
+    .lg-card-header { padding: 0.8rem; display: flex; justify-content: space-between; align-items: center; }
+    .lg-card-icon { font-size: 2rem; }
+    .lg-card-status-badge { font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; font-weight: 700; letter-spacing: 0.05em; }
+    .lg-status-normal .lg-card-status-badge, .lg-card-status-badge { background: rgba(52,211,153,0.2); color: var(--success); }
+    .lg-status-warning .lg-card-status-badge { background: rgba(251,191,36,0.2); color: var(--warning); }
+    .lg-status-critical .lg-card-status-badge { background: rgba(248,113,113,0.2); color: var(--danger); }
+    .lg-status-normal { background: rgba(52,211,153,0.05); }
+    .lg-status-warning { background: rgba(251,191,36,0.05); }
+    .lg-status-critical { background: rgba(248,113,113,0.05); }
+    .lg-card-body { padding: 0.8rem; }
+    .lg-card-body h3 { font-size: 0.95rem; margin-bottom: 0.3rem; color: var(--text); }
+    .lg-card-meta { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.6rem; }
+    .lg-card-metrics { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; }
+    .lg-metric { display: flex; flex-direction: column; gap: 0.1rem; padding: 0.25rem 0.5rem; background: var(--surface2); border-radius: 4px; }
+    .lg-metric-label { font-size: 0.65rem; color: var(--text-dim); }
+    .lg-metric-value { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+    .lg-metric-warn .lg-metric-value { color: var(--warning); }
+    .lg-metric-crit .lg-metric-value { color: var(--danger); }
+    .lg-card-risk { display: flex; align-items: center; gap: 0.5rem; }
+    .lg-risk-label { font-size: 0.7rem; color: var(--text-dim); }
+    .lg-risk-bar { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+    .lg-risk-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+    .lg-risk-fill-low { background: var(--success); }
+    .lg-risk-fill-medium { background: var(--warning); }
+    .lg-risk-fill-high { background: var(--danger); }
+    .lg-risk-value { font-size: 0.7rem; font-weight: 600; min-width: 3rem; text-align: right; }
+    .lg-risk-low { color: var(--success); } .lg-risk-medium { color: var(--warning); } .lg-risk-high { color: var(--danger); }
+
+    /* ── ASSET HEALTH ── */
+    .lg-asset-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 1rem; }
+    .lg-asset-header h3 { font-size: 1.2rem; color: var(--text); }
+    .lg-asset-meta { font-size: 0.8rem; color: var(--text-dim); }
+    .lg-asset-body { display: grid; grid-template-columns: 1fr 320px; gap: 1rem; }
+    .lg-asset-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-content: start; }
+    .lg-chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem; }
+    .lg-chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+    .lg-chart-title { font-size: 0.85rem; color: var(--text-dim); font-weight: 600; }
+    .lg-chart-current { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+    .lg-metric-text-normal { color: var(--success); }
+    .lg-metric-text-warning { color: var(--warning); }
+    .lg-metric-text-critical { color: var(--danger); }
+    .lg-chart-baseline { font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; }
+    .lg-asset-sidebar { display: flex; flex-direction: column; gap: 1rem; }
+    .lg-sidebar-section { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem; }
+    .lg-sidebar-section h4 { font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--text); }
+    .lg-maintenance-item { padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+    .lg-maintenance-item:last-child { border-bottom: none; }
+    .lg-maint-header { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.2rem; }
+    .lg-maint-id { font-size: 0.7rem; font-weight: 700; color: var(--accent7); }
+    .lg-maint-date { font-size: 0.7rem; color: var(--text-dim); }
+    .lg-maint-type { font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 3px; text-transform: uppercase; }
+    .lg-maint-corrective { background: rgba(248,113,113,0.15); color: var(--danger); }
+    .lg-maint-preventive { background: rgba(52,211,153,0.15); color: var(--success); }
+    .lg-maint-desc { font-size: 0.75rem; color: var(--text); margin-bottom: 0.2rem; }
+    .lg-maint-outcome { font-size: 0.7rem; color: var(--text-dim); font-style: italic; }
+    .lg-observation-item { padding: 0.4rem 0; border-bottom: 1px solid var(--border); }
+    .lg-observation-item:last-child { border-bottom: none; }
+    .lg-obs-header { display: flex; justify-content: space-between; margin-bottom: 0.2rem; }
+    .lg-obs-operator { font-size: 0.7rem; font-weight: 600; color: var(--accent4); }
+    .lg-obs-time { font-size: 0.65rem; color: var(--text-dim); }
+    .lg-obs-text { font-size: 0.75rem; color: var(--text); }
+
+    /* ── INVESTIGATION ── */
+    .lg-invest-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 1rem; }
+    .lg-invest-header h3 { font-size: 1.2rem; color: var(--text); }
+    .lg-invest-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .lg-invest-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 1rem; height: 600px; }
+    .lg-invest-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; }
+    .lg-panel-title { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--border); font-size: 0.85rem; font-weight: 600; color: var(--text); background: var(--surface2); }
+    .lg-panel-status { font-size: 0.7rem; color: var(--text-dim); font-weight: 400; }
+    .lg-panel-content { flex: 1; overflow-y: auto; padding: 0.6rem; }
+    .lg-panel-loading { color: var(--text-dim); font-size: 0.85rem; padding: 1rem; text-align: center; }
+
+    .lg-signal-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .lg-signal-item { padding: 0.4rem; border-radius: 4px; background: var(--surface2); border-left: 3px solid transparent; }
+    .lg-signal-normal { border-left-color: var(--success); }
+    .lg-signal-warning { border-left-color: var(--warning); }
+    .lg-signal-critical { border-left-color: var(--danger); }
+    .lg-signal-header { display: flex; justify-content: space-between; align-items: center; }
+    .lg-signal-metric { font-size: 0.8rem; color: var(--text-dim); }
+    .lg-signal-value { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+    .lg-signal-detail { font-size: 0.7rem; color: var(--text-dim); margin-top: 0.2rem; }
+    .lg-signal-bar { height: 3px; background: var(--bg); border-radius: 2px; margin-top: 0.3rem; overflow: hidden; }
+    .lg-signal-bar-fill { height: 100%; border-radius: 2px; }
+    .lg-signal-bar-normal { background: var(--success); }
+    .lg-signal-bar-warning { background: var(--warning); }
+    .lg-signal-bar-critical { background: var(--danger); }
+    .lg-anomaly-summary { margin-top: 0.6rem; padding-top: 0.6rem; border-top: 1px solid var(--border); }
+    .lg-anomaly-count { font-size: 0.8rem; font-weight: 600; color: var(--warning); margin-bottom: 0.3rem; }
+    .lg-anomaly-row { font-size: 0.7rem; padding: 0.2rem 0; color: var(--text-dim); }
+
+    .lg-hypothesis-card { background: var(--surface2); border: 1px solid var(--accent5); border-radius: 6px; padding: 0.6rem; margin-bottom: 0.5rem; }
+    .lg-hypothesis-leading { border-color: var(--warning); background: rgba(251,191,36,0.05); }
+    .lg-hyp-header { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+    .lg-hyp-icon { font-size: 1rem; }
+    .lg-hyp-name { font-size: 0.9rem; font-weight: 700; color: var(--text); flex: 1; }
+    .lg-hyp-confidence { font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 3px; background: rgba(251,191,36,0.15); color: var(--warning); font-weight: 600; }
+    .lg-hyp-summary { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.3rem; }
+    .lg-hyp-severity { font-size: 0.7rem; margin-top: 0.3rem; }
+    .lg-severity-low { color: var(--success); } .lg-severity-medium { color: var(--accent7); }
+    .lg-severity-high { color: var(--warning); } .lg-severity-critical { color: var(--danger); }
+    .lg-evidence-list { margin-top: 0.5rem; }
+    .lg-evidence-title { font-size: 0.75rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.3rem; }
+    .lg-evidence-item { display: flex; gap: 0.4rem; padding: 0.25rem 0; font-size: 0.75rem; }
+    .lg-evidence-num { width: 18px; height: 18px; border-radius: 50%; background: var(--success); color: var(--bg); font-size: 0.65rem; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+    .lg-contradictions { margin-top: 0.4rem; }
+    .lg-contradiction .lg-evidence-num { background: var(--danger); }
+    .lg-evidence-text { color: var(--text); }
+    .lg-validation { font-size: 0.75rem; padding: 0.4rem; background: rgba(6,182,212,0.05); border-radius: 4px; margin-top: 0.4rem; color: var(--accent7); }
+
+    .lg-recommendation-card { background: var(--surface2); border: 1px solid var(--accent4); border-radius: 6px; padding: 0.6rem; margin-bottom: 0.5rem; }
+    .lg-rec-header { display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.3rem; }
+    .lg-rec-title { font-size: 0.85rem; font-weight: 600; color: var(--accent4); }
+    .lg-rec-window, .lg-rec-tech, .lg-rec-parts { font-size: 0.75rem; color: var(--text); margin: 0.15rem 0; }
+    .lg-rec-loto { font-size: 0.7rem; color: var(--warning); margin-top: 0.3rem; font-weight: 600; }
+    .lg-plan-steps { margin: 0.5rem 0; }
+    .lg-steps-title { font-size: 0.75rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.3rem; }
+    .lg-step-item { display: flex; gap: 0.4rem; padding: 0.2rem 0; font-size: 0.72rem; }
+    .lg-step-num { width: 16px; height: 16px; border-radius: 3px; background: var(--accent4); color: var(--bg); font-size: 0.6rem; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+    .lg-step-text { color: var(--text); }
+    .lg-impact-card { background: rgba(52,211,153,0.05); border: 1px solid var(--accent4); border-radius: 6px; padding: 0.6rem; margin: 0.5rem 0; }
+    .lg-impact-header { font-size: 0.8rem; font-weight: 600; color: var(--accent4); margin-bottom: 0.3rem; }
+    .lg-impact-row { display: flex; justify-content: space-between; font-size: 0.72rem; padding: 0.15rem 0; color: var(--text-dim); }
+    .lg-impact-cost { color: var(--danger); font-weight: 600; }
+    .lg-impact-saved { color: var(--success); font-weight: 600; }
+    .lg-impact-summary { font-size: 0.72rem; color: var(--text); margin-top: 0.3rem; font-style: italic; }
+    .lg-missing-info { background: rgba(248,113,113,0.05); border: 1px solid var(--danger); border-radius: 4px; padding: 0.5rem; margin-top: 0.5rem; }
+    .lg-missing-title { font-size: 0.75rem; font-weight: 600; color: var(--danger); }
+    .lg-missing-item { font-size: 0.72rem; color: var(--text-dim); padding: 0.15rem 0; }
+
+    .lg-approval-prompt { background: rgba(251,191,36,0.08); border: 2px solid var(--warning); border-radius: 8px; padding: 0.8rem; margin-top: 0.8rem; }
+    .lg-approval-header { display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.5rem; }
+    .lg-approval-title { font-size: 1rem; font-weight: 700; color: var(--warning); }
+    .lg-approval-wo { background: var(--surface2); border-radius: 6px; padding: 0.5rem; margin-bottom: 0.5rem; }
+    .lg-wo-id { font-size: 0.7rem; font-weight: 700; color: var(--accent7); }
+    .lg-wo-asset { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+    .lg-wo-problem { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.2rem; }
+    .lg-wo-details { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.3rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem; }
+    .lg-approval-evidence { font-size: 0.72rem; margin-bottom: 0.5rem; }
+    .lg-evidence-bullet { color: var(--text-dim); padding: 0.1rem 0; }
+    .lg-approval-impact { font-size: 0.75rem; margin-bottom: 0.5rem; }
+    .lg-approval-buttons { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .lg-btn-approve { background: var(--success); color: var(--bg); border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .lg-btn-approve:hover { opacity: 0.85; }
+    .lg-btn-reject { background: var(--danger); color: var(--bg); border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .lg-btn-reject:hover { opacity: 0.85; }
+    .lg-btn-changes { background: var(--surface2); color: var(--text); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }
+    .lg-btn-changes:hover { border-color: var(--accent7); }
+    .lg-approval-note { font-size: 0.68rem; color: var(--text-dim); font-style: italic; }
+    .lg-approval-result { padding: 0.8rem; border-radius: 6px; text-align: center; }
+    .lg-approved { background: rgba(52,211,153,0.1); border: 1px solid var(--success); }
+    .lg-rejected { background: rgba(248,113,113,0.1); border: 1px solid var(--danger); }
+    .lg-changes { background: rgba(6,182,212,0.1); border: 1px solid var(--accent7); }
+    .lg-approval-text { font-size: 0.85rem; color: var(--text); margin-top: 0.3rem; }
+    .lg-btn-exec { background: var(--accent5); color: var(--bg); border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 0.5rem; }
+
+    .lg-plan-revision { background: rgba(249,115,22,0.08); border: 1px solid var(--accent6); border-radius: 6px; padding: 0.6rem; margin-top: 0.5rem; }
+    .lg-revision-header { font-size: 0.85rem; font-weight: 600; color: var(--accent6); margin-bottom: 0.3rem; }
+    .lg-revision-text { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.3rem; }
+    .lg-revised-plan { font-size: 0.72rem; color: var(--text); }
+    .lg-revised-plan > div { padding: 0.15rem 0; }
+    .lg-revision-note { font-size: 0.68rem; color: var(--text-dim); font-style: italic; margin-top: 0.3rem; }
+
+    /* ── AGENT TRACE ── */
+    .lg-agent-trace { display: flex; flex-direction: column; gap: 0.2rem; }
+    .lg-trace-entry { display: flex; gap: 0.3rem; align-items: flex-start; padding: 0.3rem 0.4rem; border-radius: 4px; font-size: 0.72rem; }
+    .lg-trace-entry:nth-child(odd) { background: rgba(255,255,255,0.02); }
+    .lg-trace-time { color: var(--text-dim); font-size: 0.65rem; flex-shrink: 0; min-width: 50px; }
+    .lg-trace-agent { color: var(--accent7); font-size: 0.68rem; flex-shrink: 0; min-width: 100px; }
+    .lg-trace-icon { flex-shrink: 0; }
+    .lg-trace-text { color: var(--text); flex: 1; }
+    .lg-trace-success .lg-trace-text { color: var(--success); }
+    .lg-trace-warning .lg-trace-text { color: var(--warning); }
+    .lg-trace-error .lg-trace-text { color: var(--danger); }
+
+    /* ── EXECUTIVE ── */
+    .lg-exec-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
+    .lg-exec-header { text-align: center; margin-bottom: 1.5rem; }
+    .lg-exec-header h2 { font-size: 1.5rem; color: var(--text); }
+    .lg-exec-investigation { font-size: 0.8rem; color: var(--text-dim); margin-top: 0.3rem; }
+    .lg-exec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+    .lg-exec-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; text-align: center; }
+    .lg-exec-label { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .lg-exec-value { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+    .lg-exec-sub { font-size: 0.7rem; color: var(--text-dim); margin-top: 0.2rem; }
+    .lg-exec-scale { background: rgba(83,216,251,0.05); border: 1px solid var(--accent); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+    .lg-exec-scale-title { font-size: 0.9rem; font-weight: 600; color: var(--accent); margin-bottom: 0.3rem; }
+    .lg-exec-scale-text { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; }
+    .lg-exec-actions { display: flex; gap: 0.5rem; justify-content: center; }
+    .lg-btn-back { background: var(--surface2); color: var(--text); border: 1px solid var(--border); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+    .lg-btn-back:hover { border-color: var(--accent5); }
+    .lg-btn-primary { background: var(--accent5); color: var(--bg); border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+    .lg-btn-primary:hover { opacity: 0.85; }
+    .lg-btn-event { background: var(--surface2); color: var(--accent7); border: 1px solid var(--accent7); padding: 0.35rem 0.7rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+    .lg-btn-event:hover { background: rgba(6,182,212,0.1); }
+    .lg-btn-grafana { background: var(--surface2); color: var(--accent); border: 1px solid var(--accent); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem; }
+    .lg-btn-grafana:hover { background: rgba(83,216,251,0.1); }
+    .lg-grafana-embed { margin-top: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .lg-grafana-embed-header { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.8rem; background: var(--surface2); border-bottom: 1px solid var(--border); }
+    .lg-grafana-embed-header h4 { font-size: 0.85rem; color: var(--accent); }
+    .lg-grafana-link { font-size: 0.75rem; color: var(--accent); text-decoration: none; }
+    .lg-grafana-link:hover { text-decoration: underline; }
+    .lg-grafana-embed iframe { display: block; background: #0a0a1a; }
+    .lg-btn-reset { background: rgba(248,113,113,0.1); color: var(--danger); border: 1px solid var(--danger); padding: 0.35rem 0.7rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+    .lg-btn-reset:hover { background: rgba(248,113,113,0.2); }
+
+    /* ── TOAST ── */
+    .lg-toast { position: fixed; bottom: 20px; right: 20px; background: var(--surface); border: 1px solid var(--accent5); color: var(--text); padding: 0.7rem 1.2rem; border-radius: 8px; font-size: 0.85rem; z-index: 10000; opacity: 0; transform: translateY(20px); transition: all 0.3s; }
+    .lg-toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── CHAT ── */
+    .lg-chat-message { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .lg-chat-avatar { font-size: 1.2rem; flex-shrink: 0; }
+    .lg-chat-bubble { background: var(--surface2); border-radius: 8px; padding: 0.5rem 0.8rem; font-size: 0.82rem; max-width: 80%; }
+    .lg-chat-agent .lg-chat-bubble { background: rgba(83,216,251,0.1); border: 1px solid var(--accent); }
+    .lg-typing-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim); margin: 0 1px; animation: lg-bounce 1s infinite; }
+    .lg-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .lg-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes lg-bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .lg-asset-body { grid-template-columns: 1fr; }
+      .lg-invest-grid { grid-template-columns: 1fr; grid-template-rows: auto; height: auto; }
+      .lg-exec-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .lg-asset-charts { grid-template-columns: 1fr; }
+      .lg-exec-grid { grid-template-columns: 1fr; }
+    }
   </style>
   <script src="chart.min.js"></script>
+  <script src="cyber-timeline.js"></script>
+  <script src="cyber-attack-sim.js"></script>
+  <script src="cyber-forensic.js"></script>
+  <script src="ab-compare.js?v=3"></script>
+  <script src="onboarding.js?v=5"></script>
 </head>
 <body>
 
@@ -1645,6 +1987,7 @@
 <div class="header">
   <h1>⚡ AI Solutions Demo</h1>
   <p>Interactive demos powered by LLM — RAG, Market Research, Financial Analysis & more</p>
+  <a href="/manual.html" class="header-manual-link">📖 Demo Manual — What does each demo do?</a>
   <div class="api-bar">
     <div class="api-status" id="apiStatus"></div>
     <input type="password" id="apiKeyInput" placeholder="Enter your API key (OpenAI-compatible endpoint)">
@@ -1658,7 +2001,8 @@
       </optgroup>
       <optgroup label="DeepSeek">
         <option value="deepseek/deepseek-v4-pro">DeepSeek V4 Pro</option>
-        <option value="deepseek/deepseek-v4-flash" selected>DeepSeek V4 Flash</option>
+        <option value="deepseek/deepseek-v4-flash-0731" selected>DeepSeek V4 Flash 0731</option>
+        <option value="deepseek/deepseek-v4-flash">DeepSeek V4 Flash (retires Aug 7)</option>
         <option value="deepseek/deepseek-r1-0528">DeepSeek R1</option>
         <option value="deepseek/deepseek-chat-v3.1">DeepSeek V3.1</option>
         <option value="deepseek/deepseek-v3.2">DeepSeek V3.2</option>
@@ -1678,6 +2022,13 @@
         <option value="minimax/minimax-m3">MiniMax M3</option>
         <option value="nvidia/nemotron-3-super-120b-a12b">Nemotron 3 Super</option>
         <option value="openai/gpt-oss-120b">GPT-OSS 120B</option>
+      </optgroup>
+      <optgroup label="Anthropic">
+        <option value="anthropic/claude-sonnet-5">Claude Sonnet 5</option>
+        <option value="anthropic/claude-opus-5">Claude Opus 5</option>
+        <option value="anthropic/claude-sonnet-4-5-20250929">Claude Sonnet 4.5</option>
+        <option value="anthropic/claude-haiku-4-5-20251001">Claude Haiku 4.5</option>
+        <option value="anthropic/claude-opus-4-5-20251101">Claude Opus 4.5</option>
       </optgroup>
     </select>
     <button class="btn btn-secondary" onclick="saveApiKey()" style="margin-top:0">Connect</button>
@@ -1748,22 +2099,17 @@
       <span class="tag onprem">Infrastructure</span>
     </div>
   </div>
-  <!-- TCO CALCULATOR CARD -->
-  <div class="card" onclick="openDemo('tco')">
-    <div class="card-header-img tco" id="card-header-tco">
-      <img src="/icons/tco.png" alt="" id="card-img-tco">
-      <div class="card-icon tco" id="card-emoji-tco"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><line x1="7" y1="6" x2="7" y2="6"/><line x1="12" y1="6" x2="12" y2="6"/><line x1="17" y1="6" x2="17" y2="6"/><line x1="7" y1="10" x2="7" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="17" y1="10" x2="17" y2="10"/><line x1="7" y1="14" x2="7" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><path d="M15 18h2"/><circle cx="7" cy="6" r="0.8" fill="#10b981" stroke="none"/><circle cx="12" cy="6" r="0.8" fill="#10b981" stroke="none"/><circle cx="17" cy="6" r="0.8" fill="#10b981" stroke="none"/><circle cx="7" cy="10" r="0.8" fill="#10b981" stroke="none"/><circle cx="12" cy="10" r="0.8" fill="#10b981" stroke="none"/><circle cx="17" cy="10" r="0.8" fill="#10b981" stroke="none"/><circle cx="7" cy="14" r="0.8" fill="#10b981" stroke="none"/><circle cx="12" cy="14" r="0.8" fill="#10b981" stroke="none"/></svg></div>
-      <div class="card-gen-overlay" id="card-gen-tco">✨ Generating...</div>
+  <div class="card admin-only" id="card-gmq" style="display:none;" onclick="openGmq()">
+    <div class="card-header-img gmq">
+      <div class="card-icon gmq">💡</div>
     </div>
     <div class="card-body">
-      <h2>Inference TCO Calculator</h2>
-      <p>Compare on-premise GPU inference vs cloud APIs and GPU instances. Adjust workload, model, and hardware to build a 3-year TCO business case. Supports Llama, DeepSeek, GLM, Qwen, and more.</p>
-      <span class="tag tco">Infrastructure</span>
+      <h2>GMQ Lighting Upgrade</h2>
+      <p>Interactive proposal visualisation for Google Grand Mill Quay — lighting infrastructure upgrade with DALI controls, energy/carbon metrics, lifecycle TCO, and a live building lighting simulator.</p>
+      <span class="tag" style="background: rgba(251,191,36,0.15); color: var(--accent5);">Private · Proposal</span>
     </div>
   </div>
 </div>
-
-<!-- FINANCE DEMOS -->
 <div class="category-header"><span class="cat-icon">💰</span> Finance Demos <span class="cat-count">4</span></div>
 <div class="cards">
   <div class="card" onclick="openDemo('finance')">
@@ -1817,7 +2163,7 @@
 </div>
 
 <!-- TELCO DEMOS -->
-<div class="category-header"><span class="cat-icon">📡</span> Telco Demos <span class="cat-count">3</span></div>
+<div class="category-header"><span class="cat-icon">📡</span> Telco Demos <span class="cat-count">2</span></div>
 <div class="cards">
   <!-- TELCO NETWORK INTELLIGENCE CARD -->
   <div class="card" onclick="openDemo('network')">
@@ -1847,24 +2193,86 @@
     </div>
   </div>
 
-  <!-- VODAFONE AI ROI OPTIMIZER CARD -->
-  <div class="card" onclick="openDemo('vodafone')">
-    <div class="card-header-img vodafone" id="card-header-vodafone">
-      <img src="/icons/vodafone.png" alt="" id="card-img-vodafone">
-      <div class="card-icon vodafone" id="card-emoji-vodafone">
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#e60000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2C7 2 3 6 3 11c0 5 4 9 9 9s9-4 9-9c0-5-4-9-9-9z" fill="none"/>
-          <path d="M12 6c-2.5 0-4.5 2-4.5 4.5S9.5 15 12 15s4.5-2 4.5-4.5S14.5 6 12 6z" fill="rgba(230,0,0,0.15)"/>
-          <circle cx="12" cy="10.5" r="1.5" fill="#e60000" stroke="none"/>
-          <path d="M8 16c1.2 0.8 2.5 1.2 4 1.2s2.8-0.4 4-1.2" stroke-dasharray="2 2"/>
-        </svg>
-      </div>
-      <div class="card-gen-overlay" id="card-gen-vodafone">✨ Generating...</div>
+</div>
+
+<!-- CYBER SECURITY DEMOS -->
+<div class="category-header"><span class="cat-icon">🛡️</span> Cyber Security Demos <span class="cat-count">3</span></div>
+<div class="cards">
+  <!-- TIMELINE WALKTHROUGH CARD -->
+  <div class="card" onclick="openDemo('cyber-timeline')">
+    <div class="card-header-img cyber" id="card-header-cyber-timeline">
+      <div class="card-icon cyber" id="card-emoji-cyber-timeline"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#f87171" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4z"/><path d="M9 12l2 2 4-4"/></svg></div>
     </div>
     <div class="card-body">
-      <h2>Vodafone Ireland AI ROI Optimizer</h2>
-      <p>Interactive financial simulator. Allocate AI investment across Vodafone Ireland's operations — network automation, customer service, churn prevention, predictive maintenance — and see real-time ROI, payback period, and 5-year NPV with AI-generated strategic analysis.</p>
-      <span class="tag vodafone">Financial Simulation</span>
+      <h2>AI-vs-AI Incident Timeline</h2>
+      <p>Walk through the HuggingFace July 2026 security incident phase-by-phase. See how an autonomous AI agent attacked, and how AI-assisted detection, forensic analysis, and remediation responded — including the guardrail asymmetry problem.</p>
+      <span class="tag cyber">Incident Response</span>
+    </div>
+  </div>
+
+  <!-- ATTACK SIMULATION CARD -->
+  <div class="card" onclick="openDemo('cyber-sim')">
+    <div class="card-header-img cyber" id="card-header-cyber-sim">
+      <div class="card-icon cyber" id="card-emoji-cyber-sim"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#f87171" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/><circle cx="6" cy="6" r="0.5" fill="#f87171" stroke="none"/><circle cx="6" cy="12" r="0.5" fill="#fbbf24" stroke="none"/><circle cx="6" cy="15" r="0.5" fill="#34d399" stroke="none"/></svg></div>
+    </div>
+    <div class="card-body">
+      <h2>Autonomous Threat Simulation</h2>
+      <p>Real-time split-screen: watch an autonomous AI agent attack a mock AI platform while a defense agent detects, contains, and remediates. Three scenarios including the HuggingFace supply chain attack, AI-driven ransomware, and insider data exfiltration.</p>
+      <span class="tag cyber">Attack & Defense</span>
+    </div>
+  </div>
+
+  <!-- FORENSIC LOG ANALYZER CARD -->
+  <div class="card" onclick="openDemo('cyber-forensic')">
+    <div class="card-header-img cyber" id="card-header-cyber-forensic">
+      <div class="card-icon cyber" id="card-emoji-cyber-forensic"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#f87171" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 4 4 5-5"/><circle cx="7" cy="14" r="1" fill="#f87171" stroke="none"/><circle cx="10" cy="11" r="1" fill="#fbbf24" stroke="none"/><circle cx="14" cy="15" r="1" fill="#34d399" stroke="none"/></svg></div>
+    </div>
+    <div class="card-body">
+      <h2>AI Forensic Log Analyzer</h2>
+      <p>Feed a realistic 17,000-event attack log to an LLM and watch it reconstruct the attack in real-time: timeline, IOCs, compromised credentials, MITRE ATT&CK mapping, and remediation playbook. Toggle between commercial (guardrail-blocked) and open-weight models.</p>
+      <span class="tag cyber">Forensic Analysis</span>
+    </div>
+  </div>
+</div>
+
+<!-- CYBER TIMELINE DEMO -->
+<div class="demo-overlay" id="demo-cyber-timeline">
+  <div class="demo-panel">
+    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
+    <h2 class="demo-title">🛡️ AI-vs-AI Incident Timeline</h2>
+    <p class="demo-desc">Walk through the HuggingFace July 2026 security incident phase-by-phase. Each phase shows real telemetry and live AI analysis. Based on the actual <a href="https://huggingface.co/blog/security-incident-july-2026" target="_blank" style="color:var(--accent)">security disclosure</a>.</p>
+    <div class="demo-body">
+      <div class="demo-output" style="min-height: 600px;">
+        <div id="cyber-timeline-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CYBER ATTACK SIM DEMO -->
+<div class="demo-overlay" id="demo-cyber-sim">
+  <div class="demo-panel">
+    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
+    <h2 class="demo-title">🛡️ Autonomous Threat Simulation</h2>
+    <p class="demo-desc">Real-time split-screen: an autonomous AI agent attacks while a defense agent detects, contains, and remediates. All simulated — no real systems are targeted.</p>
+    <div class="demo-body">
+      <div class="demo-output" style="min-height: 600px;">
+        <div id="cyber-sim-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CYBER FORENSIC DEMO -->
+<div class="demo-overlay" id="demo-cyber-forensic">
+  <div class="demo-panel">
+    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
+    <h2 class="demo-title">🛡️ AI Forensic Log Analyzer</h2>
+    <p class="demo-desc">Feed a realistic attack log to an LLM and watch it reconstruct the attack: timeline, IOCs, MITRE ATT&CK mapping, and remediation playbook. Toggle between commercial (guardrail-blocked) and open-weight models.</p>
+    <div class="demo-body">
+      <div class="demo-output" style="min-height: 600px;">
+        <div id="cyber-forensic-content"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -2286,16 +2694,6 @@
   </div>
 </div>
 
-<!-- TCO CALCULATOR DEMO -->
-<div class="demo-overlay" id="demo-tco">
-  <div class="demo-panel" style="max-width:1400px;padding:1rem">
-    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
-    <h2 class="demo-title" style="font-size:1.4rem;margin:0.5rem 0">💰 Inference TCO Calculator</h2>
-    <p class="demo-desc" style="margin-bottom:0.5rem">Adjust sliders to compare on-premise vs cloud inference costs in real-time. All prices in EUR.</p>
-    <iframe src="/tco-calculator.html" style="width:100%;height:calc(100vh - 140px);border:none;border-radius:12px;background:var(--bg)"></iframe>
-  </div>
-</div>
-
 <!-- TELCO NETWORK INTELLIGENCE DEMO -->
 <div class="demo-overlay" id="demo-network">
   <div class="demo-panel" style="max-width:1300px">
@@ -2442,70 +2840,6 @@
   <p>AI Solutions Demo Portal — Powered by <a href="https://tensorx.ai" target="_blank">Tensorx</a> — Built with ❤️ by <a href="https://github.com/bowdenneil" target="_blank">Pug</a></p>
 </div>
 
-<!-- VODAFONE AI ROI OPTIMIZER DEMO -->
-<div class="demo-overlay" id="demo-vodafone">
-  <div class="demo-panel" style="max-width:1400px">
-    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
-    <h2 class="demo-title">🔴 Vodafone Ireland AI ROI Optimizer</h2>
-    <p class="demo-desc">Allocate AI investment across Vodafone Ireland's six operational domains. The simulator models real financial returns based on Vodafone Group's reported AI initiatives, Irish market scale, and industry benchmarks. Adjust sliders to see real-time ROI, payback period, and 5-year NPV. Generate an AI strategic briefing tailored to your allocation.</p>
-
-    <div class="vf-layout">
-      <!-- LEFT: Investment Sliders -->
-      <div class="vf-sidebar">
-        <h3>💰 AI Investment Allocation (€M/year)</h3>
-        <div id="vf-sliders"></div>
-        <div class="vf-invest-display">
-          <div class="vf-total-invest" id="vf-total-invest">€0M</div>
-          <div class="vf-invest-label">Total Annual AI Investment</div>
-        </div>
-        <div class="vf-preset-row">
-          <button class="vf-preset-btn" onclick="vfPreset('balanced')">⚖️ Balanced</button>
-          <button class="vf-preset-btn" onclick="vfPreset('aggressive')">🚀 Aggressive</button>
-          <button class="vf-preset-btn" onclick="vfPreset('lean')">🌱 Lean Start</button>
-          <button class="vf-preset-btn" onclick="vfPreset('customer')">📞 Customer-Centric</button>
-        </div>
-        <button class="btn btn-vodafone" id="vf-analyze-btn" onclick="vfAnalyze()" style="width:100%;margin-top:0.5rem">🧠 Generate Strategic Briefing</button>
-      </div>
-
-      <!-- RIGHT: Dashboard -->
-      <div>
-        <!-- KPI Strip -->
-        <div class="vf-metric-grid" id="vf-metrics"></div>
-
-        <!-- Charts -->
-        <div class="vf-chart-grid">
-          <div class="vf-chart-card">
-            <h4>ROI by Domain (%)</h4>
-            <canvas id="vf-chart-roi"></canvas>
-          </div>
-          <div class="vf-chart-card">
-            <h4>5-Year Cash Flow (€M)</h4>
-            <canvas id="vf-chart-cashflow"></canvas>
-          </div>
-          <div class="vf-chart-card">
-            <h4>Cost Savings (€M/yr)</h4>
-            <canvas id="vf-chart-savings"></canvas>
-          </div>
-          <div class="vf-chart-card">
-            <h4>Revenue Uplift (€M/yr)</h4>
-            <canvas id="vf-chart-revenue"></canvas>
-          </div>
-        </div>
-
-        <!-- Domain Detail -->
-        <div class="vf-chart-card" style="margin-bottom:1rem">
-          <h4>Domain Breakdown</h4>
-          <div id="vf-domain-detail"></div>
-        </div>
-
-        <!-- AI Strategic Briefing -->
-        <div id="vf-output" class="demo-output" style="display:none"></div>
-        <div id="vf-sources" style="margin-top:1rem"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- SWARM DEMO OVERLAY -->
 <div class="demo-overlay" id="demo-swarm">
   <div class="demo-panel" style="max-width:1400px">
@@ -2522,7 +2856,6 @@
       </div>
       <div class="swarm-presets" id="swarm-presets">
         <button class="swarm-preset-btn" onclick="swarmPreset('dell')">Dell AI in Telecom</button>
-        <button class="swarm-preset-btn" onclick="swarmPreset('vodafone')">Vodafone vs Competitors</button>
         <button class="swarm-preset-btn" onclick="swarmPreset('energy')">AI for Energy Grid</button>
         <button class="swarm-preset-btn" onclick="swarmPreset('edge')">Edge Computing Market 2026</button>
       </div>
@@ -2541,8 +2874,45 @@
   </div>
 </div>
 
+<!-- GMQ OVERLAY (admin only) -->
+<div class="demo-overlay" id="demo-gmq">
+  <div class="demo-panel" style="max-width:100%; padding:0;">
+    <button class="demo-back" onclick="closeGmq()" style="padding:1rem 2rem;">← Back to Demos</button>
+    <iframe id="gmq-iframe" style="flex:1; border:none; width:100%; min-height:calc(100vh - 50px);" src=""></iframe>
+  </div>
+</div>
+
+<!-- ONBOARDING OVERLAY -->
+<div class="demo-overlay" id="demo-onboarding">
+  <div class="demo-panel" style="max-width:1200px">
+    <button class="demo-back" onclick="closeDemo()">← Back to Demos</button>
+    <h2 class="demo-title">🚀 Agentic Employee Onboarding</h2>
+    <p class="demo-desc">Chat with an AI onboarding coordinator powered by DeepSeek. 6 specialist agents run real LLM→tool→result loops, calling simulated IT systems (email, Slack, GitHub, inventory, contracts, VPN). Watch their reasoning live. Inject failures to test resilience. Onboarded employees are saved to a database — type "review employees" to see them.</p>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:0.5rem">
+      <label class="ob-tts-toggle"><input type="checkbox" id="ob-tts-enabled" checked> 🔊 Agent speaks</label>
+    </div>
+    <div class="demo-body" style="flex-direction:column">
+      <div class="ob-chat-area" id="ob-chat-area"></div>
+      <div class="ob-input-area" id="ob-input-area">
+        <input type="text" id="ob-chat-input" placeholder="" onkeydown="if(event.key==='Enter')obSubmitInput()">
+        <button class="btn-ob-mic" id="ob-mic-btn" onclick="obToggleMic()" title="Voice input">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </button>
+        <button class="btn-ob-send" onclick="obSubmitInput()">Send</button>
+      </div>
+      <div class="ob-workflow-area" id="ob-workflow-area" style="display:none"></div>
+      <div class="ob-complete-area" id="ob-complete-area" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
 <!-- AGENTIC DEMOS -->
-<div class="category-header"><span class="cat-icon">🤖</span> Agentic Demos <span class="cat-count">1</span></div>
+<div class="category-header"><span class="cat-icon">🤖</span> Agentic Demos <span class="cat-count">4</span></div>
 <div class="cards">
   <div class="card" onclick="openDemo('swarm')">
     <div class="card-header-img swarm" id="card-header-swarm">
@@ -2564,9 +2934,172 @@
       <span class="tag swarm">Agentic AI</span>
     </div>
   </div>
+  <div class="card" onclick="openDemo('onboarding')">
+    <div class="card-header-img onboarding" id="card-header-onboarding">
+      <div class="card-icon onboarding" id="card-emoji-onboarding">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M20 8v6M23 11h-6"/>
+        </svg>
+      </div>
+      <div class="card-gen-overlay" id="card-gen-onboarding">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Agentic Employee Onboarding</h2>
+      <p>Chat with an AI onboarding coordinator powered by DeepSeek. 6 specialist agents run real LLM→tool→result loops, calling simulated IT systems (email, Slack, GitHub, inventory, contracts, VPN). Watch their reasoning live. Inject failures to test resilience. Onboarded employees are saved to a database — type "review employees" to see them.</p>
+      <span class="tag" style="background: rgba(52,211,153,0.15); color: var(--accent4);">Agentic Workflow</span>
+    </div>
+  </div>
+  <div class="card" onclick="openDemo('lineguard')">
+    <div class="card-header-img lineguard" id="card-header-lineguard">
+      <div class="card-icon lineguard" id="card-emoji-lineguard">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4z"/>
+          <path d="M12 8v4"/>
+          <circle cx="12" cy="16" r="1" fill="#fbbf24" stroke="none"/>
+        </svg>
+      </div>
+      <div class="card-gen-overlay" id="card-gen-lineguard">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>LineGuard AI — Predictive Maintenance</h2>
+      <p>Agentic predictive-maintenance system for a manufacturing line. 5 connected assets, live telemetry simulation, multi-agent investigation (signal analysis → failure diagnosis → impact → planner → action). Human approval gates before work orders. Inject events mid-demo to test adaptation.</p>
+      <span class="tag" style="background: rgba(251,191,36,0.15); color: var(--accent5);">Industrial AI</span>
+    </div>
+  </div>
+  <div class="card" onclick="window.location.href='/quant-arena.html'">
+    <div class="card-header-img" style="background: linear-gradient(135deg, rgba(83,216,251,0.12) 0%, rgba(124,92,252,0.08) 100%);">
+      <div class="card-icon" style="background: linear-gradient(135deg, rgba(83,216,251,0.15), rgba(124,92,252,0.15));">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#53d8fb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 3v18h18"/>
+          <path d="M7 14l4-4 4 4 5-5"/>
+          <circle cx="7" cy="14" r="1" fill="#53d8fb" stroke="none"/>
+          <circle cx="11" cy="10" r="1" fill="#53d8fb" stroke="none"/>
+          <circle cx="15" cy="14" r="1" fill="#53d8fb" stroke="none"/>
+          <circle cx="20" cy="9" r="1" fill="#53d8fb" stroke="none"/>
+        </svg>
+      </div>
+      <div class="card-gen-overlay" id="card-gen-quant">✨ Generating...</div>
+    </div>
+    <div class="card-body">
+      <h2>Quant Arena — Capital Markets Forecasting</h2>
+      <p>Split-screen A/B model comparison for bank CTO audiences. Two AI models analyse real market data (yield curves, credit spreads, FX) in parallel — write Python code, execute it, and produce forecasts. Track cost, latency, and accuracy side by side. Admin-only.</p>
+      <span class="tag" style="background: rgba(83,216,251,0.15); color: var(--accent);">Capital Markets</span>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- LINEGUARD AI DEMO -->
+<div class="demo-overlay" id="demo-lineguard">
+  <div class="demo-panel" style="max-width: 1400px;">
+    <button class="demo-back" onclick="closeDemo(); lgStopTelemetryPoll();">← Back to Demos</button>
+    <h2 class="demo-title">🏭 LineGuard AI — Agentic Predictive Maintenance</h2>
+    <p class="demo-desc">An agentic AI system monitors a 5-asset production line, detects anomalies, diagnoses failures, and coordinates human-approved maintenance. Watch the agent pipeline investigate a bearing degradation on Hydraulic Press HP-500.</p>
+
+    <!-- Nav bar -->
+    <div class="lg-navbar">
+      <div class="lg-nav-item active" id="lg-nav-overview" onclick="lgShowScreen('overview'); lgRenderOverview();">📊 Line Overview</div>
+      <div class="lg-nav-item" id="lg-nav-asset" onclick="lgShowScreen('asset')">🏭 Asset Health</div>
+      <div class="lg-nav-item" id="lg-nav-investigation" onclick="lgShowScreen('investigation')">🔬 Investigation</div>
+      <div class="lg-nav-item" id="lg-nav-executive" onclick="lgShowScreen('executive')">📈 Executive</div>
+    </div>
+
+    <div class="demo-body" style="min-height: 700px;">
+
+      <!-- SCREEN 1: LINE OVERVIEW -->
+      <div class="lg-screen lg-screen-overview" id="lg-screen-overview" style="display:flex;flex-direction:column;">
+        <div class="lg-overview-header">
+          <h3>Line 03 — Production Overview</h3>
+          <div class="lg-overview-controls">
+            <button class="btn lg-btn-primary" onclick="lgOpenAsset('PRESS-02'); setTimeout(() => lgStartInvestigation(), 100);">🔬 Investigate Press-02</button>
+          </div>
+        </div>
+        <div class="lg-asset-grid" id="lg-asset-grid"></div>
+      </div>
+
+      <!-- SCREEN 2: ASSET HEALTH -->
+      <div class="lg-screen lg-screen-asset" id="lg-screen-asset" style="display:none;flex-direction:column;">
+        <div class="lg-asset-header">
+          <button class="btn lg-btn-back" onclick="lgShowScreen('overview'); lgRenderOverview();">← Back to Line</button>
+          <div>
+            <h3 id="lg-asset-title">Asset</h3>
+            <div class="lg-asset-meta" id="lg-asset-meta"></div>
+          </div>
+          <div style="display:flex;gap:0.5rem;">
+            <a href="https://demos.bowdenneil.com/grafana/d/lineguard-ai/lineguard-ai-e28094-plant-floor-dashboard?kiosk=tv" target="_blank" class="btn lg-btn-grafana">📊 Open in Grafana</a>
+            <button class="btn lg-btn-primary" onclick="lgStartInvestigation()">🔬 Start Investigation</button>
+          </div>
+        </div>
+        <div class="lg-grafana-embed" style="flex:1;display:flex;flex-direction:column;">
+          <div class="lg-grafana-embed-header">
+            <h4>📊 Live Plant Floor Telemetry — Grafana</h4>
+            <a href="https://demos.bowdenneil.com/grafana/d/lineguard-ai/lineguard-ai-e28094-plant-floor-dashboard?kiosk=tv" target="_blank" class="lg-grafana-link">Open full dashboard →</a>
+          </div>
+          <iframe src="https://demos.bowdenneil.com/grafana/d/lineguard-ai/lineguard-ai-e28094-plant-floor-dashboard?kiosk=tv&from=now-1h&to=now&theme=dark" style="flex:1;min-height:700px;width:100%;border:none;" loading="lazy"></iframe>
+        </div>
+      </div>
+
+      <!-- SCREEN 3: INVESTIGATION WORKSPACE -->
+      <div class="lg-screen lg-screen-investigation" id="lg-screen-investigation" style="display:none;flex-direction:column;">
+        <div class="lg-invest-header">
+          <button class="btn lg-btn-back" onclick="lgShowScreen('asset')">← Back to Asset</button>
+          <h3>Investigation Workspace</h3>
+          <div class="lg-invest-controls">
+            <button class="btn lg-btn-event" onclick="lgInjectEvent('delay_part')">📦 Delay Bearing Kit</button>
+            <button class="btn lg-btn-event" onclick="lgInjectEvent('operator_obs')">📝 Add Operator Obs</button>
+            <button class="btn lg-btn-event" onclick="lgInjectEvent('escalate')">⚠ Escalate</button>
+            <button class="btn lg-btn-reset" onclick="lgInjectEvent('reset')">🔄 Reset</button>
+          </div>
+        </div>
+        <div class="lg-invest-grid">
+          <!-- Panel 1: What changed -->
+          <div class="lg-invest-panel">
+            <div class="lg-panel-title">
+              <span>📡 What Changed</span>
+              <span class="lg-panel-status" id="lg-panel-status-signals"></span>
+            </div>
+            <div class="lg-panel-content" id="lg-invest-signals"></div>
+          </div>
+          <!-- Panel 2: Why it matters -->
+          <div class="lg-invest-panel">
+            <div class="lg-panel-title">
+              <span>🔬 Why It Matters</span>
+              <span class="lg-panel-status" id="lg-panel-status-hypotheses"></span>
+            </div>
+            <div class="lg-panel-content" id="lg-invest-hypotheses"></div>
+          </div>
+          <!-- Panel 3: What happens next -->
+          <div class="lg-invest-panel">
+            <div class="lg-panel-title">
+              <span>🔧 What Happens Next</span>
+              <span class="lg-panel-status" id="lg-panel-status-recommendation"></span>
+            </div>
+            <div class="lg-panel-content" id="lg-invest-recommendation"></div>
+          </div>
+          <!-- Panel 4: Agent activity -->
+          <div class="lg-invest-panel">
+            <div class="lg-panel-title">
+              <span>🤖 Agent Activity</span>
+              <span class="lg-panel-status" id="lg-panel-status-trace"></span>
+            </div>
+            <div class="lg-panel-content lg-agent-trace" id="lg-invest-trace"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 5: EXECUTIVE OUTCOME -->
+      <div class="lg-screen lg-screen-executive" id="lg-screen-executive" style="display:none;flex-direction:column;">
+        <div id="lg-exec-content"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="/lineguard.js?v=2"></script>
 
 <script>
 // ─── CHART.JS DEFAULTS ───
@@ -2579,11 +3112,16 @@ let API_KEY=***  // server proxy handles auth
 let API_BASE = (window.location.hostname !== 'bowdenneil.github.io')
   ? window.location.origin + '/api'     // same-origin proxy (localhost, Hetzner, any custom domain)
   : 'https://api.tensorx.ai/v1';        // GitHub Pages — direct (needs CORS)
-let MODEL = document.getElementById('modelSelect')?.value || 'deepseek/deepseek-v4-flash';
+let MODEL = document.getElementById('modelSelect')?.value || 'deepseek/deepseek-v4-flash-0731';
 
 // Restore saved model from localStorage
 (function() {
-  const saved = localStorage.getItem('ai_demo_model');
+  let saved = localStorage.getItem('ai_demo_model');
+  // Migrate retired model to new version
+  if (saved === 'deepseek/deepseek-v4-flash') {
+    saved = 'deepseek/deepseek-v4-flash-0731';
+    localStorage.setItem('ai_demo_model', saved);
+  }
   if (saved) {
     const sel = document.getElementById('modelSelect');
     if (sel) {
@@ -2656,7 +3194,7 @@ async function callLLM(messages, onChunk) {
       const res = await fetch(`${API_BASE}/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: MODEL, messages, stream, max_tokens: 4096 })
+        body: JSON.stringify({ model: MODEL, messages, stream, max_tokens: 2048 })
       });
       if (!res.ok) {
         const err = await res.text();
@@ -2764,12 +3302,42 @@ function openDemo(name) {
   document.getElementById(`demo-${name}`).classList.add('active');
   document.body.style.overflow = 'hidden';
   if (name === 'network') setTimeout(() => networkInit(), 50);
-  if (name === 'vodafone') setTimeout(() => vfInit(), 50);
+  if (name === 'cyber-timeline') setTimeout(() => cyberTimelineInit(), 50);
+  if (name === 'cyber-sim') setTimeout(() => cyberSimInit(), 50);
+  if (name === 'cyber-forensic') setTimeout(() => cyberForensicInit(), 50);
+  if (name === 'onboarding') setTimeout(() => { if (typeof obInit === 'function') obInit(); }, 60);
+  if (name === 'lineguard') setTimeout(() => { if (typeof lgInit === 'function') lgInit(); }, 60);
+  // Initialize A/B comparison for finance demos
+  if (['finance', 'earnings', 'regulatory', 'churn'].includes(name)) {
+    setTimeout(() => {
+      const demoId = `demo-${name}`;
+      const outputId = `${name === 'finance' ? 'fin' : name === 'earnings' ? 'earn' : name === 'regulatory' ? 'reg' : 'churn'}-output`;
+      if (typeof ABCompare !== 'undefined' && !ABCompare._states[demoId]) {
+        ABCompare.init(demoId, outputId);
+      }
+    }, 50);
+  }
 }
 
 function closeDemo() {
   document.querySelectorAll('.demo-overlay').forEach(o => o.classList.remove('active'));
   document.body.style.overflow = '';
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  if (typeof obStopListening === 'function') obStopListening();
+}
+
+function openGmq() {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY) || '';
+  const iframe = document.getElementById('gmq-iframe');
+  iframe.src = '/gmq.html?token=' + encodeURIComponent(token);
+  document.getElementById('demo-gmq').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeGmq() {
+  document.getElementById('demo-gmq').classList.remove('active');
+  document.body.style.overflow = '';
+  document.getElementById('gmq-iframe').src = '';
 }
 
 // Listen for TCO cross-link from readiness assessment iframe
@@ -3678,17 +4246,21 @@ ${webResults.length ? `\nWeb Search Results (use for benchmarks, recent news, ma
   ];
 
   try {
-    let fullText = '';
-    await callLLM(messages, (text) => {
-      fullText = text;
-      output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
-    });
-    output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
+    if (ABCompare.isCompareMode('demo-finance')) {
+      await ABCompare.runComparison('demo-finance', messages);
+    } else {
+      let fullText = '';
+      await callLLM(messages, (text) => {
+        fullText = text;
+        output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
+      });
+      output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
+    }
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
   spinner.classList.remove('active');
-  renderFinCharts(fullText);
+  if (!ABCompare.isCompareMode('demo-finance')) renderFinCharts(fullText);
 }
 
 // ─── CHART: FINANCIAL ANALYSIS ───
@@ -3863,12 +4435,16 @@ Provide:
   ];
 
   try {
-    let fullText = '';
-    await callLLM(messages, (text) => {
-      fullText = text;
-      output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
-    });
-    output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
+    if (ABCompare.isCompareMode('demo-regulatory')) {
+      await ABCompare.runComparison('demo-regulatory', messages);
+    } else {
+      let fullText = '';
+      await callLLM(messages, (text) => {
+        fullText = text;
+        output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
+      });
+      output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
+    }
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
@@ -4075,17 +4651,21 @@ Provide:
   ];
 
   try {
-    let fullText = '';
-    await callLLM(messages, (text) => {
-      fullText = text;
-      output.innerHTML = discoveryBanner + formatMarkdown(text) + '<span class="typing-cursor"></span>';
-    });
-    output.innerHTML = discoveryBanner + postProcessLLMOutput(formatMarkdown(fullText));
+    if (ABCompare.isCompareMode('demo-earnings')) {
+      await ABCompare.runComparison('demo-earnings', messages);
+    } else {
+      let fullText = '';
+      await callLLM(messages, (text) => {
+        fullText = text;
+        output.innerHTML = discoveryBanner + formatMarkdown(text) + '<span class="typing-cursor"></span>';
+      });
+      output.innerHTML = discoveryBanner + postProcessLLMOutput(formatMarkdown(fullText));
+    }
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
   spinner.classList.remove('active');
-  renderEarningsChart(fullText);
+  if (!ABCompare.isCompareMode('demo-earnings')) renderEarningsChart(fullText);
 }
 
 // ─── CHART: EARNINGS SENTIMENT ───
@@ -4272,17 +4852,21 @@ Provide:
   ];
 
   try {
-    let fullText = '';
-    await callLLM(messages, (text) => {
-      fullText = text;
-      output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
-    });
-    output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
+    if (ABCompare.isCompareMode('demo-churn')) {
+      await ABCompare.runComparison('demo-churn', messages);
+    } else {
+      let fullText = '';
+      await callLLM(messages, (text) => {
+        fullText = text;
+        output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
+      });
+      output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
+    }
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
   }
   spinner.classList.remove('active');
-  renderChurnCharts(fullText);
+  if (!ABCompare.isCompareMode('demo-churn')) renderChurnCharts(fullText);
 }
 
 // ─── CHART: CHURN PREDICTION ───
@@ -4625,11 +5209,22 @@ const AUTH_TOKEN_KEY = 'ai_demo_token';
 function applyGuestRestrictions(email) {
   const sel = document.getElementById('modelSelect');
   if (!sel) return;
-  if (email === 'guest@aidemos.com') {
+  const guest = email === 'guest@aidemos.com';
+  if (guest) {
     sel.style.display = 'none';
   } else {
     sel.style.display = '';
   }
+  // Show admin-only cards (e.g. GMQ proposal) for authorised users
+  const adminEmails = ['neil.bowden@dell.com', 'j.bowden@waveguideltd.com'];
+  const adminCards = document.querySelectorAll('.admin-only');
+  adminCards.forEach(card => {
+    card.style.display = adminEmails.includes(email) ? '' : 'none';
+  });
+}
+
+function isGuest() {
+  return localStorage.getItem('ai_demo_email') === 'guest@aidemos.com';
 }
 
 async function handleLogin(e) {
@@ -4726,7 +5321,7 @@ window.fetch = function(url, options = {}) {
 };
 
 // ─── ICON LOADING ───
-const ICON_DEMOS = ['rag', 'market', 'finance', 'regulatory', 'earnings', 'churn', 'rfp', 'image', 'onprem', 'vodafone'];
+const ICON_DEMOS = ['rag', 'market', 'finance', 'regulatory', 'earnings', 'churn', 'rfp', 'image', 'onprem'];
 
 async function loadIcons() {
   for (const demo of ICON_DEMOS) {
@@ -5976,7 +6571,6 @@ let swarmAgentState = {};  // per-agent accumulated text + status
 function swarmPreset(key) {
   const presets = {
     dell: 'Should Dell expand its AI infrastructure business into the European telecom market?',
-    vodafone: 'Analyse the competitive positioning of Vodafone Ireland vs Three vs Eir in 5G enterprise services',
     energy: 'Evaluate the market opportunity for AI-powered smart grid optimization in Europe',
     edge: 'What is the market outlook for edge computing in telecom networks for 2026?',
   };
@@ -6074,7 +6668,7 @@ async function swarmRun() {
 
   // Get auth token
   const token = localStorage.getItem(AUTH_TOKEN_KEY) || '';
-  const model = MODEL || 'deepseek/deepseek-v4-flash';
+  const model = MODEL || 'deepseek/deepseek-v4-flash-0731';
 
   try {
     const resp = await fetch('/api/swarm', {
@@ -6218,475 +6812,6 @@ function swarmHandleEvent(evt) {
 document.getElementById('swarm-query')?.addEventListener('keydown', e => {
   if (e.key === 'Enter') swarmRun();
 });
-
-// ═══════════════════════════════════════════════════════════════
-// ─── VODAFONE IRELAND AI ROI OPTIMIZER ─────────────────────────
-// ═══════════════════════════════════════════════════════════════
-
-const VF_DOMAINS = {
-  cx:     { icon:'📞', name:'Customer Service AI',   max:5, roi:3.2, savingsPct:0.70, revPct:0.30, desc:'TOBi chatbot, voice AI, agent assist' },
-  net:    { icon:'📡', name:'Network Automation',     max:8, roi:2.8, savingsPct:0.85, revPct:0.15, desc:'Self-optimizing RAN, fault detection, autonomous healing' },
-  churn:  { icon:'🔄', name:'Churn Prevention',       max:4, roi:4.5, savingsPct:0.20, revPct:0.80, desc:'Predictive churn scoring, retention campaigns, win-back' },
-  maint:  { icon:'🔧', name:'Predictive Maintenance', max:6, roi:3.5, savingsPct:0.90, revPct:0.10, desc:'Site equipment failure prediction, truck roll reduction' },
-  energy: { icon:'⚡', name:'Energy Optimization',    max:4, roi:2.2, savingsPct:0.95, revPct:0.05, desc:'Cell site power management, cooling, renewable scheduling' },
-  rev:    { icon:'📊', name:'Revenue Intelligence',   max:5, roi:3.8, savingsPct:0.15, revPct:0.85, desc:'Dynamic pricing, ARPU uplift, 5G upsell, personalized offers' },
-};
-
-const VF_PRESETS = {
-  balanced:  { cx:2, net:4, churn:2, maint:3, energy:2, rev:2.5 },
-  aggressive:{ cx:4, net:7, churn:3.5, maint:5, energy:3.5, rev:4 },
-  lean:      { cx:1, net:1.5, churn:0.8, maint:1, energy:0.5, rev:1 },
-  customer:  { cx:4, net:2, churn:3.5, maint:1.5, energy:1, rev:3 },
-};
-
-const VF_COLORS = ['#e60000','#ff3333','#ff6666','#cc0000','#ff1a1a','#b30000'];
-const VF_RAMP = [0.65, 0.85, 1.0, 1.0, 1.0]; // year 1-5 maturity ramp
-let vfCharts = {};
-let vfState = {};
-
-function vfInit() {
-  vfBuildSliders();
-  vfState = vfPresetValues('balanced');
-  vfApplyValues();
-  vfCalc();
-}
-
-function vfBuildSliders() {
-  const container = document.getElementById('vf-sliders');
-  container.innerHTML = '';
-  for (const [key, d] of Object.entries(VF_DOMAINS)) {
-    const group = document.createElement('div');
-    group.className = 'vf-slider-group';
-    group.innerHTML = `
-      <div class="vf-slider-label">
-        <span>${d.icon} ${d.name}</span>
-        <span class="vf-amount" id="vf-amt-${key}">€0M</span>
-      </div>
-      <input type="range" class="vf-slider" id="vf-slider-${key}"
-             min="0" max="${d.max}" step="0.1" value="0"
-             data-domain="${key}">
-      <div class="vf-slider-meta">
-        <span>€0M</span>
-        <span>€${d.max}M</span>
-      </div>`;
-    container.appendChild(group);
-    const slider = group.querySelector('input');
-    slider.addEventListener('input', () => {
-      vfState[key] = parseFloat(slider.value);
-      vfUpdateSliderTrack(slider);
-      vfUpdateAmount(key);
-      vfCalc();
-    });
-  }
-}
-
-function vfUpdateSliderTrack(slider) {
-  const pct = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
-  slider.style.setProperty('--pct', pct + '%');
-}
-
-function vfUpdateAmount(key) {
-  const el = document.getElementById('vf-amt-' + key);
-  if (el) el.textContent = '€' + vfState[key].toFixed(1) + 'M';
-}
-
-function vfPresetValues(name) {
-  const preset = VF_PRESETS[name] || VF_PRESETS.balanced;
-  return { ...preset };
-}
-
-function vfApplyValues() {
-  for (const [key, val] of Object.entries(vfState)) {
-    const slider = document.getElementById('vf-slider-' + key);
-    if (slider) {
-      slider.value = val;
-      vfUpdateSliderTrack(slider);
-      vfUpdateAmount(key);
-    }
-  }
-}
-
-function vfPreset(name) {
-  vfState = vfPresetValues(name);
-  vfApplyValues();
-  vfCalc();
-}
-
-function vfCalc() {
-  const results = {};
-  let totalInvest = 0;
-  let totalReturnY1 = 0;
-  let totalReturnMature = 0;
-  let totalSavings = 0;
-  let totalRevenue = 0;
-
-  for (const [key, d] of Object.entries(VF_DOMAINS)) {
-    const invest = vfState[key] || 0;
-    totalInvest += invest;
-
-    // Diminishing returns above 60% of max
-    let dimMult = 1.0;
-    if (invest > 0.6 * d.max) {
-      dimMult = 1 - 0.3 * ((invest / d.max) - 0.6) / 0.4;
-    }
-
-    const baseReturn = invest * d.roi * dimMult;
-    const yearReturns = VF_RAMP.map(r => baseReturn * r);
-    const matureReturn = baseReturn; // year 3+
-
-    totalReturnY1 += yearReturns[0];
-    totalReturnMature += matureReturn;
-
-    const savings = matureReturn * d.savingsPct;
-    const revenue = matureReturn * d.revPct;
-    totalSavings += savings;
-    totalRevenue += revenue;
-
-    results[key] = {
-      invest,
-      baseReturn,
-      yearReturns,
-      matureReturn,
-      savings,
-      revenue,
-      roiPct: invest > 0 ? (matureReturn / invest) * 100 : 0,
-      netY1: yearReturns[0] - invest,
-      dimMult,
-    };
-  }
-
-  // Payback period (months)
-  const monthlyReturn = totalReturnY1 / 12;
-  let paybackMonths = 0;
-  if (totalInvest > 0 && monthlyReturn > 0) {
-    paybackMonths = Math.ceil(totalInvest / monthlyReturn);
-  }
-
-  // 5-year cumulative cash flow
-  const cashflow = [];
-  let cumulative = 0;
-  for (let y = 0; y < 5; y++) {
-    const yearReturn = Object.values(results).reduce((sum, r) => sum + r.yearReturns[y], 0);
-    const net = yearReturn - totalInvest;
-    cumulative += net;
-    cashflow.push(cumulative);
-  }
-
-  const summary = {
-    results, totalInvest, totalReturnY1, totalReturnMature,
-    totalSavings, totalRevenue, paybackMonths, cashflow,
-    roiPct: totalInvest > 0 ? (totalReturnMature / totalInvest) * 100 : 0,
-    netY1: totalReturnY1 - totalInvest,
-  };
-  vfUpdateUI(summary);
-  return summary;
-}
-
-function vfUpdateUI(data) {
-  // Total investment
-  document.getElementById('vf-total-invest').textContent = '€' + data.totalInvest.toFixed(1) + 'M';
-
-  // KPI cards
-  const metrics = document.getElementById('vf-metrics');
-  metrics.innerHTML = `
-    <div class="vf-metric">
-      <div class="vf-metric-icon">💰</div>
-      <div class="vf-metric-value">€${data.totalInvest.toFixed(1)}M</div>
-      <div class="vf-metric-label">Annual Investment</div>
-    </div>
-    <div class="vf-metric">
-      <div class="vf-metric-icon">📈</div>
-      <div class="vf-metric-value" style="color:${data.netY1 >= 0 ? 'var(--success)' : 'var(--danger)'}">
-        ${data.netY1 >= 0 ? '+' : ''}€${data.netY1.toFixed(1)}M
-      </div>
-      <div class="vf-metric-label">Year 1 Net Return</div>
-      <div class="vf-metric-sub">${data.netY1 >= 0 ? 'Profitable Y1' : 'Investment phase'}</div>
-    </div>
-    <div class="vf-metric">
-      <div class="vf-metric-icon">🎯</div>
-      <div class="vf-metric-value">${data.roiPct.toFixed(0)}%</div>
-      <div class="vf-metric-label">ROI at Maturity</div>
-      <div class="vf-metric-sub">Year 3+</div>
-    </div>
-    <div class="vf-metric">
-      <div class="vf-metric-icon">⏱️</div>
-      <div class="vf-metric-value">${data.paybackMonths > 0 ? data.paybackMonths + 'mo' : '—'}</div>
-      <div class="vf-metric-label">Payback Period</div>
-    </div>`;
-
-  // Domain detail rows
-  const detail = document.getElementById('vf-domain-detail');
-  detail.innerHTML = Object.entries(data.results).map(([key, r]) => {
-    const d = VF_DOMAINS[key];
-    const roiClass = r.roiPct > 0 ? 'positive' : 'negative';
-    return `<div class="vf-domain-row">
-      <span class="vf-domain-icon">${d.icon}</span>
-      <span class="vf-domain-name">
-        <strong>${d.name}</strong>
-        <div style="font-size:0.65rem;color:var(--text-dim)">${d.desc}</div>
-      </span>
-      <span style="color:var(--text-dim);font-size:0.75rem;min-width:60px;text-align:right">€${r.invest.toFixed(1)}M</span>
-      <span style="color:var(--text-dim);font-size:0.75rem;min-width:60px;text-align:right">→ €${r.matureReturn.toFixed(1)}M</span>
-      <span class="vf-domain-roi ${roiClass}">${r.invest > 0 ? r.roiPct.toFixed(0) + '%' : '—'}</span>
-    </div>`;
-  }).join('');
-
-  // Render charts
-  vfRenderROIChart(data);
-  vfRenderCashflowChart(data);
-  vfRenderSavingsChart(data);
-  vfRenderRevenueChart(data);
-}
-
-function vfDestroyChart(key) {
-  if (vfCharts[key]) { vfCharts[key].destroy(); delete vfCharts[key]; }
-}
-
-function vfRenderROIChart(data) {
-  vfDestroyChart('roi');
-  const ctx = document.getElementById('vf-chart-roi').getContext('2d');
-  const keys = Object.keys(VF_DOMAINS);
-  vfCharts.roi = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: keys.map(k => VF_DOMAINS[k].icon + ' ' + VF_DOMAINS[k].name),
-      datasets: [{
-        label: 'ROI %',
-        data: keys.map(k => data.results[k].roiPct),
-        backgroundColor: keys.map((_, i) => VF_COLORS[i]),
-        borderRadius: 4,
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { callback: v => v + '%' } }
-      }
-    }
-  });
-}
-
-function vfRenderCashflowChart(data) {
-  vfDestroyChart('cashflow');
-  const ctx = document.getElementById('vf-chart-cashflow').getContext('2d');
-  vfCharts.cashflow = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
-      datasets: [{
-        label: 'Cumulative Net Cash Flow (€M)',
-        data: data.cashflow,
-        borderColor: '#e60000',
-        backgroundColor: 'rgba(230,0,0,0.1)',
-        borderWidth: 2.5,
-        fill: true,
-        tension: 0.3,
-        pointBackgroundColor: data.cashflow.map(v => v >= 0 ? '#34d399' : '#f87171'),
-        pointRadius: 5,
-      }, {
-        label: 'Break-even',
-        data: [0, 0, 0, 0, 0],
-        borderColor: '#34d399',
-        borderWidth: 1.5,
-        borderDash: [5, 5],
-        pointRadius: 0,
-        fill: false,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: true, labels: { boxWidth: 12, font: { size: 10 } } },
-        tooltip: { callbacks: { label: ctx => '€' + ctx.parsed.y.toFixed(1) + 'M' } }
-      },
-      scales: {
-        y: { ticks: { callback: v => '€' + v.toFixed(0) + 'M' } }
-      }
-    }
-  });
-}
-
-function vfRenderSavingsChart(data) {
-  vfDestroyChart('savings');
-  const ctx = document.getElementById('vf-chart-savings').getContext('2d');
-  const keys = Object.keys(VF_DOMAINS);
-  vfCharts.savings = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: keys.map(k => VF_DOMAINS[k].icon + ' ' + VF_DOMAINS[k].name),
-      datasets: [{
-        data: keys.map(k => data.results[k].savings),
-        backgroundColor: VF_COLORS,
-        borderColor: '#12122a',
-        borderWidth: 2,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'right', labels: { boxWidth: 10, font: { size: 9 } } },
-        tooltip: { callbacks: { label: ctx => ctx.label + ': €' + ctx.parsed.toFixed(1) + 'M' } }
-      }
-    }
-  });
-}
-
-function vfRenderRevenueChart(data) {
-  vfDestroyChart('revenue');
-  const ctx = document.getElementById('vf-chart-revenue').getContext('2d');
-  const keys = Object.keys(VF_DOMAINS);
-  vfCharts.revenue = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: keys.map(k => VF_DOMAINS[k].icon),
-      datasets: [
-        {
-          label: 'Year 1',
-          data: keys.map(k => data.results[k].yearReturns[0] * VF_DOMAINS[k].revPct),
-          backgroundColor: '#ff6666',
-          borderRadius: 3,
-        },
-        {
-          label: 'Year 3+ (Mature)',
-          data: keys.map(k => data.results[k].matureReturn * VF_DOMAINS[k].revPct),
-          backgroundColor: '#e60000',
-          borderRadius: 3,
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: true, labels: { boxWidth: 12, font: { size: 10 } } },
-        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': €' + ctx.parsed.y.toFixed(1) + 'M' } }
-      },
-      scales: {
-        y: { ticks: { callback: v => '€' + v + 'M' } }
-      }
-    }
-  });
-}
-
-async function vfAnalyze() {
-  const btn = document.getElementById('vf-analyze-btn');
-  const output = document.getElementById('vf-output');
-  const sourcesEl = document.getElementById('vf-sources');
-
-  btn.disabled = true;
-  btn.textContent = '⏳ Analyzing...';
-  output.style.display = 'block';
-  output.innerHTML = '<div class="spinner active"></div>';
-  sourcesEl.innerHTML = '';
-
-  // Gather current model data (vfCalc returns the summary + per-domain results)
-  const data = vfCalc();
-  const domainSummary = Object.entries(VF_DOMAINS).map(([key, d]) => {
-    const r = data.results[key];
-    return `${d.icon} ${d.name}: €${r.invest.toFixed(1)}M investment → €${r.matureReturn.toFixed(1)}M mature annual return (${r.invest > 0 ? r.roiPct.toFixed(0) : 0}% ROI, dimMult ${r.dimMult.toFixed(2)})`;
-  }).join('\n');
-
-  // Use the aggregate figures already computed by vfCalc.
-  const totalInv = data.totalInvest;
-  const totalRet = data.totalReturnMature;
-  const totalSav = data.totalSavings;
-  const totalRev = data.totalRevenue;
-
-  // Web search for Vodafone AI context
-  const searches = [
-    'Vodafone Ireland AI automation technology investment 2025 2026',
-    'Vodafone Group AI ROI savings results digital transformation'
-  ];
-
-  let allResults = [];
-  for (const q of searches) {
-    const results = await webSearch(q, 8);
-    allResults = allResults.concat(results);
-  }
-  // Dedupe by URL
-  const seen = new Set();
-  allResults = allResults.filter(r => {
-    if (seen.has(r.url)) return false;
-    seen.add(r.url);
-    return true;
-  });
-
-  const searchCtx = searchContext(allResults);
-
-  const systemPrompt = `You are a senior telecommunications strategy consultant specializing in AI transformation for European telcos. You are analyzing a Vodafone Ireland AI investment portfolio simulation.
-
-Your analysis must be:
-1. **Financially rigorous** — reference specific ROI figures, payback periods, and NPV from the simulation data
-2. **Contextually grounded** — use Vodafone's actual reported AI initiatives, partnerships, and market positioning from the web search results
-3. **Strategically actionable** — provide concrete recommendations on allocation optimization, timing, and risk mitigation
-4. **Industry-aware** — benchmark against other European telcos (Deutsche Telekom, Telefónica, BT) where relevant
-
-Structure your analysis as:
-## Executive Summary
-## Investment Portfolio Analysis
-## Financial Returns Assessment
-## Competitive Benchmarking
-## Risk Assessment
-## Recommendations
-## Implementation Roadmap
-
-Vodafone Ireland context:
-- ~2.3M mobile subscribers, part of Vodafone Group (€37B revenue)
-- Vodafone Ireland annual revenue ~€700M
-- TOBi digital assistant handles ~70% of customer queries
-- Partnerships with Google Cloud, Microsoft Azure for AI
-- TM Forum autonomous networks framework participant
-- Active 5G rollout across Ireland`;
-
-  const userMessage = `Analyze this AI investment allocation for Vodafone Ireland:
-
-## Current Allocation
-${domainSummary}
-
-## Aggregate Financial Model
-- Total Annual AI Investment: €${totalInv.toFixed(1)}M
-- Total Annual Return at Maturity (Year 3+): €${totalRet.toFixed(1)}M
-- Overall ROI: ${totalInv > 0 ? ((totalRet / totalInv) * 100).toFixed(0) : 0}%
-- Annual Cost Savings: €${totalSav.toFixed(1)}M
-- Annual Revenue Uplift: €${totalRev.toFixed(1)}M
-- Year 1 Net Return (after investment): €${data.netY1.toFixed(1)}M
-- Payback Period: ~${data.paybackMonths > 0 ? data.paybackMonths : 0} months
-
-## 5-Year Cumulative Cash Flow (€M)
-${data.cashflow.map((v, i) => `Year ${i+1}: €${v.toFixed(1)}M`).join('\n')}
-
-## Web Search Context (Latest Vodafone AI News)
-${searchCtx || 'No web results found — analyze based on simulation data and general industry knowledge.'}
-
-Provide a strategic briefing on this allocation. Is it optimal? What would you change? What are the risks? How does this compare to what Vodafone is actually doing?`;
-
-  try {
-    const fullText = await callLLM([
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userMessage }
-    ], (chunk) => {
-      output.innerHTML = formatMarkdown(chunk) + '<span class="typing-cursor"></span>';
-    });
-
-    output.innerHTML = formatMarkdown(fullText);
-
-    if (allResults.length) {
-      renderSearchResults(allResults, 'vf-sources');
-    }
-
-    btn.disabled = false;
-    btn.textContent = '🧠 Generate Strategic Briefing';
-  } catch (e) {
-    output.innerHTML = '<div class="error-card"><strong>❌ Analysis failed.</strong><br><span class="dim">Error: ' + (e.message || 'Unknown error') + '</span></div>';
-    btn.disabled = false;
-    btn.textContent = '🧠 Generate Strategic Briefing';
-  }
-}
 
 </script>
 </body>

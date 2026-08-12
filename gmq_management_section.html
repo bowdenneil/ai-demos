@@ -1,0 +1,2418 @@
+<!-- ============================================================
+     GMQ Management Portal Tab — DALI Lighting Management Dashboard
+     Insert this entire block into gmq.html as the last tab content div.
+     Add a tab button: <div class="tab" onclick="switchTab('management')">🖥️ Management Portal</div>
+     ============================================================ -->
+
+<style>
+/* ============ Management Portal Styles ============ */
+#tab-management {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+#tab-management.active {
+  display: flex;
+}
+
+.mgmt-layout {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+/* Sidebar */
+.mgmt-sidebar {
+  width: 64px;
+  min-width: 64px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+  gap: 4px;
+}
+
+.mgmt-nav-item {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 22px;
+  transition: all 0.2s;
+  position: relative;
+  color: var(--text-dim);
+}
+
+.mgmt-nav-item:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+.mgmt-nav-item.active {
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  color: #fff;
+  box-shadow: 0 0 12px rgba(83,216,251,0.3);
+}
+
+.mgmt-nav-item .nav-tooltip {
+  position: absolute;
+  left: 58px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--surface2);
+  color: var(--text);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 100;
+  border: 1px solid var(--border);
+}
+
+.mgmt-nav-item:hover .nav-tooltip {
+  opacity: 1;
+}
+
+.mgmt-nav-divider {
+  width: 32px;
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+/* Main content area */
+.mgmt-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mgmt-view {
+  display: none;
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+  position: relative;
+}
+
+.mgmt-view.active {
+  display: block;
+}
+
+.mgmt-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.mgmt-view-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.mgmt-view-subtitle {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* Control bar */
+.mgmt-control-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.mgmt-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all 0.15s;
+}
+
+.mgmt-btn:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mgmt-btn.primary {
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  border: none;
+  color: #fff;
+}
+
+.mgmt-btn.primary:hover {
+  filter: brightness(1.15);
+}
+
+.mgmt-btn.danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.mgmt-btn.danger:hover {
+  background: rgba(248,113,113,0.1);
+}
+
+.mgmt-btn.success {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.mgmt-btn.success:hover {
+  background: rgba(52,211,153,0.1);
+}
+
+.mgmt-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.mgmt-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.mgmt-toggle input {
+  accent-color: var(--accent);
+}
+
+/* Floor plan */
+.floorplan-container {
+  display: flex;
+  gap: 12px;
+  height: calc(100% - 60px);
+}
+
+.floorplan-canvas {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  min-height: 400px;
+}
+
+.floorplan-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.floorplan-sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  overflow-y: auto;
+}
+
+.fixture-detail-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.fixture-detail-card .fd-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.fixture-detail-card .fd-value {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.fixture-state-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Luminaire styles in SVG */
+.lum {
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.lum-on {
+  fill: var(--accent5);
+  filter: drop-shadow(0 0 4px var(--accent5));
+}
+
+.lum-off {
+  fill: #333350;
+  opacity: 0.5;
+}
+
+.lum-fault {
+  fill: var(--danger);
+  filter: drop-shadow(0 0 6px var(--danger));
+  animation: lumPulse 1s infinite;
+}
+
+.lum-daylit {
+  fill: var(--accent);
+  filter: drop-shadow(0 0 4px var(--accent));
+}
+
+.lum-emergency {
+  fill: var(--success);
+  filter: drop-shadow(0 0 4px var(--success));
+}
+
+@keyframes lumPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.room-rect {
+  fill: var(--surface2);
+  stroke: var(--border);
+  stroke-width: 1;
+  rx: 4;
+}
+
+.room-rect.occupied {
+  fill: rgba(249, 83, 186, 0.15);
+  stroke: var(--accent3);
+}
+
+.room-label {
+  fill: var(--text-dim);
+  font-size: 10px;
+  font-family: var(--font);
+  pointer-events: none;
+}
+
+/* Network topology */
+.topo-container {
+  display: flex;
+  gap: 12px;
+  height: calc(100% - 60px);
+}
+
+.topo-canvas {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.topo-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.topo-sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  overflow-y: auto;
+}
+
+.topo-node {
+  cursor: pointer;
+}
+
+.topo-node rect {
+  transition: all 0.2s;
+}
+
+.topo-node:hover rect {
+  filter: brightness(1.3);
+}
+
+.topo-node.selected rect {
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+.topo-label {
+  fill: var(--text);
+  font-size: 11px;
+  font-family: var(--font);
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.topo-sublabel {
+  fill: var(--text-dim);
+  font-size: 9px;
+  font-family: var(--font);
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.topo-line {
+  stroke: var(--border);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.topo-line.online {
+  stroke: var(--success);
+  opacity: 0.5;
+}
+
+.topo-line.offline {
+  stroke: var(--danger);
+  opacity: 0.4;
+  stroke-dasharray: 4 4;
+}
+
+.topo-dot {
+  fill: var(--accent);
+  opacity: 0.8;
+}
+
+/* Emergency monitoring */
+.emerg-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.emerg-summary {
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.emerg-summary.ok {
+  border-color: var(--success);
+}
+
+.emerg-summary.fault {
+  border-color: var(--danger);
+}
+
+.emerg-summary-status {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.emerg-summary-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.emerg-stat {
+  text-align: center;
+}
+
+.emerg-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.emerg-stat-label {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.emerg-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  overflow: auto;
+}
+
+.emerg-device-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 80px 80px 80px 70px;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.emerg-device-row:hover {
+  background: var(--surface2);
+}
+
+.emerg-device-row.fault {
+  background: rgba(248,113,113,0.05);
+}
+
+.signal-bar {
+  display: inline-block;
+  width: 4px;
+  border-radius: 1px;
+  margin-right: 2px;
+  background: var(--success);
+}
+
+.signal-bar.s1 { height: 6px; }
+.signal-bar.s2 { height: 9px; }
+.signal-bar.s3 { height: 12px; }
+.signal-bar.s4 { height: 16px; }
+
+.signal-bar.weak { background: var(--danger); }
+.signal-bar.med { background: var(--warning); }
+
+.battery-bar {
+  width: 40px;
+  height: 10px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  position: relative;
+  display: inline-block;
+}
+
+.battery-fill {
+  height: 100%;
+  border-radius: 1px;
+  transition: width 0.3s;
+}
+
+.test-progress {
+  width: 100%;
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.test-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  width: 0%;
+  transition: width 0.3s;
+}
+
+.emerg-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.emerg-log-table th {
+  text-align: left;
+  padding: 6px 8px;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emerg-log-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Energy dashboard */
+.energy-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.energy-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.energy-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.energy-card-wide {
+  grid-column: 1 / -1;
+}
+
+.energy-metric {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.energy-metric-sub {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.zone-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.zone-bar-label {
+  width: 100px;
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: right;
+}
+
+.zone-bar-track {
+  flex: 1;
+  height: 16px;
+  background: var(--surface2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.zone-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s;
+}
+
+.zone-bar-value {
+  width: 50px;
+  font-size: 11px;
+  color: var(--text);
+}
+
+.savings-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.savings-badge.pos {
+  background: rgba(52,211,153,0.15);
+  color: var(--success);
+}
+
+.savings-badge.neg {
+  background: rgba(248,113,113,0.15);
+  color: var(--danger);
+}
+
+/* Scene management */
+.scene-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.scene-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.scene-card:hover {
+  border-color: var(--accent);
+}
+
+.scene-card.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px rgba(83,216,251,0.2);
+}
+
+.scene-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.scene-preview-cell {
+  aspect-ratio: 1;
+  border-radius: 3px;
+}
+
+.scene-name {
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.schedule-grid-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  overflow: auto;
+}
+
+.schedule-table {
+  border-collapse: collapse;
+  font-size: 10px;
+  width: 100%;
+}
+
+.schedule-table th {
+  padding: 4px 2px;
+  color: var(--text-dim);
+  text-align: center;
+  font-size: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.schedule-table td {
+  padding: 0;
+  border: 1px solid var(--border);
+}
+
+.schedule-cell {
+  width: 100%;
+  height: 22px;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.schedule-cell:hover {
+  filter: brightness(1.4);
+}
+
+/* Device registry */
+.registry-toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.registry-search {
+  flex: 1;
+  min-width: 200px;
+  padding: 6px 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--font);
+}
+
+.registry-search:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.registry-select {
+  padding: 6px 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 12px;
+  font-family: var(--font);
+  cursor: pointer;
+}
+
+.registry-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.registry-table th {
+  text-align: left;
+  padding: 8px 10px;
+  background: var(--surface2);
+  color: var(--text-dim);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.registry-table th:hover {
+  color: var(--accent);
+}
+
+.registry-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.registry-table tbody tr {
+  cursor: pointer;
+}
+
+.registry-table tbody tr:hover {
+  background: var(--surface2);
+}
+
+.registry-table tbody tr.expanded {
+  background: var(--surface2);
+}
+
+.registry-row-detail td {
+  background: var(--bg);
+  padding: 12px 16px;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.status-dot.online { background: var(--success); }
+.status-dot.offline { background: var(--text-dim); }
+.status-dot.fault { background: var(--danger); }
+.status-dot.maintenance { background: var(--warning); }
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.detail-item .di-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.detail-item .di-value {
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* Animations */
+@keyframes dataFlow {
+  from { offset-distance: 0%; }
+  to { offset-distance: 100%; }
+}
+
+/* Scrollbar */
+.mgmt-view::-webkit-scrollbar,
+.floorplan-sidebar::-webkit-scrollbar,
+.topo-sidebar::-webkit-scrollbar,
+.emerg-card::-webkit-scrollbar,
+.schedule-grid-wrap::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.mgmt-view::-webkit-scrollbar-track,
+.floorplan-sidebar::-webkit-scrollbar-track,
+.topo-sidebar::-webkit-scrollbar-track,
+.emerg-card::-webkit-scrollbar-track,
+.schedule-grid-wrap::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+.mgmt-view::-webkit-scrollbar-thumb,
+.floorplan-sidebar::-webkit-scrollbar-thumb,
+.topo-sidebar::-webkit-scrollbar-thumb,
+.emerg-card::-webkit-scrollbar-thumb,
+.schedule-grid-wrap::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .floorplan-sidebar, .topo-sidebar { width: 220px; min-width: 220px; }
+  .scene-grid { grid-template-columns: repeat(2, 1fr); }
+  .energy-grid { grid-template-columns: 1fr; }
+  .emerg-grid { grid-template-columns: 1fr; }
+}
+
+/* Toast notifications */
+.mgmt-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-size: 13px;
+  z-index: 9999;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  transform: translateX(400px);
+  transition: transform 0.3s;
+  max-width: 350px;
+}
+
+.mgmt-toast.show {
+  transform: translateX(0);
+}
+
+.mgmt-toast.success { border-left: 4px solid var(--success); }
+.mgmt-toast.warning { border-left: 4px solid var(--warning); }
+.mgmt-toast.danger { border-left: 4px solid var(--danger); }
+.mgmt-toast.info { border-left: 4px solid var(--accent); }
+
+/* RF mesh viz */
+.rf-mesh-viz {
+  width: 100%;
+  height: 120px;
+  background: var(--surface2);
+  border-radius: 6px;
+  margin-top: 8px;
+}
+</style>
+
+<!-- ==================== TAB CONTENT ==================== -->
+<div id="tab-management" class="tab-content">
+  <div class="mgmt-layout">
+    <!-- Sidebar Navigation -->
+    <div class="mgmt-sidebar">
+      <div class="mgmt-nav-item active" data-view="floorplan" onclick="mgmtSwitchView('floorplan')">
+        🏠<span class="nav-tooltip">Floor Plan</span>
+      </div>
+      <div class="mgmt-nav-item" data-view="topology" onclick="mgmtSwitchView('topology')">
+        🌐<span class="nav-tooltip">Network Topology</span>
+      </div>
+      <div class="mgmt-nav-item" data-view="emergency" onclick="mgmtSwitchView('emergency')">
+        🚨<span class="nav-tooltip">Emergency Monitoring</span>
+      </div>
+      <div class="mgmt-nav-item" data-view="energy" onclick="mgmtSwitchView('energy')">
+        ⚡<span class="nav-tooltip">Energy Dashboard</span>
+      </div>
+      <div class="mgmt-nav-item" data-view="scene" onclick="mgmtSwitchView('scene')">
+        🎬<span class="nav-tooltip">Scene Management</span>
+      </div>
+      <div class="mgmt-nav-item" data-view="registry" onclick="mgmtSwitchView('registry')">
+        📋<span class="nav-tooltip">Device Registry</span>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="mgmt-main">
+      <!-- Floor Plan View -->
+      <div id="mgmt-view-floorplan" class="mgmt-view active">
+        <div class="mgmt-view-header">
+          <div>
+            <div class="mgmt-view-title">Floor Plan — Grand Mill Quay</div>
+            <div class="mgmt-view-subtitle">Real-time luminaire monitoring • DALI bus status • Click any fixture for details</div>
+          </div>
+        </div>
+        <div class="mgmt-control-bar">
+          <button class="mgmt-btn primary" onclick="mgmtAllOn()">💡 All On</button>
+          <button class="mgmt-btn" onclick="mgmtAllOff()">⭕ All Off</button>
+          <button class="mgmt-btn" onclick="mgmtApplySceneToFloor('workday')">☀️ Workday Scene</button>
+          <button class="mgmt-btn" onclick="mgmtApplySceneToFloor('afterhours')">🌙 After Hours</button>
+          <button class="mgmt-btn danger" onclick="mgmtEmergencyTest()">🚨 Emergency Test</button>
+          <label class="mgmt-toggle">
+            <input type="checkbox" id="mgmt-occupancy-toggle" onchange="mgmtToggleOccupancy()">
+            🔥 Occupancy Heat Map
+          </label>
+          <span style="margin-left:auto;font-size:11px;color:var(--text-dim);" id="mgmt-fp-stats">— luminaires monitored</span>
+        </div>
+        <div class="floorplan-container">
+          <div class="floorplan-canvas" id="mgmt-floorplan-canvas">
+            <svg class="floorplan-svg" id="mgmt-floorplan-svg" viewBox="0 0 800 560" preserveAspectRatio="xMidYMid meet"></svg>
+          </div>
+          <div class="floorplan-sidebar" id="mgmt-floorplan-sidebar">
+            <div class="mgmt-view-title" style="font-size:15px;">Fixture Details</div>
+            <div class="mgmt-view-subtitle">Select a luminaire to view details</div>
+            <div id="mgmt-fixture-detail"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Network Topology View -->
+      <div id="mgmt-view-topology" class="mgmt-view">
+        <div class="mgmt-view-header">
+          <div>
+            <div class="mgmt-view-title">Network Topology</div>
+            <div class="mgmt-view-subtitle">Delmatic system architecture • Server → IP Routers → LCMs → DALI bus → Fixtures</div>
+          </div>
+        </div>
+        <div class="topo-container">
+          <div class="topo-canvas">
+            <svg class="topo-svg" id="mgmt-topo-svg" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid meet"></svg>
+          </div>
+          <div class="topo-sidebar">
+            <div class="mgmt-view-title" style="font-size:15px;">Node Details</div>
+            <div class="mgmt-view-subtitle">Click a node to view details</div>
+            <div id="mgmt-topo-detail"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Emergency Monitoring View -->
+      <div id="mgmt-view-emergency" class="mgmt-view">
+        <div class="mgmt-view-header">
+          <div>
+            <div class="mgmt-view-title">Emergency Monitoring — Clevertronics HIVE</div>
+            <div class="mgmt-view-subtitle">Wireless RF mesh • Automated testing • 12-year battery • Continuous compliance monitoring</div>
+          </div>
+        </div>
+        <div class="emerg-grid">
+          <div class="emerg-summary" id="mgmt-emerg-summary">
+            <div>
+              <div class="emerg-summary-status" id="mgmt-emerg-status">All Systems Operational</div>
+              <div class="mgmt-view-subtitle">Last sync: <span id="mgmt-emerg-sync">—</span></div>
+            </div>
+            <div class="emerg-summary-stats">
+              <div class="emerg-stat"><div class="emerg-stat-value" id="mgmt-emerg-total">0</div><div class="emerg-stat-label">Devices</div></div>
+              <div class="emerg-stat"><div class="emerg-stat-value" style="color:var(--success);" id="mgmt-emerg-ok">0</div><div class="emerg-stat-label">OK</div></div>
+              <div class="emerg-stat"><div class="emerg-stat-value" style="color:var(--danger);" id="mgmt-emerg-faults">0</div><div class="emerg-stat-label">Faults</div></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="mgmt-btn success" id="mgmt-btn-func-test" onclick="mgmtRunFunctionTest()">⚡ Run Function Test Now</button>
+          <button class="mgmt-btn success" id="mgmt-btn-dur-test" onclick="mgmtRunDurationTest()">🔋 Run Duration Test Now</button>
+        </div>
+        <div id="mgmt-test-progress-wrap" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:13px;color:var(--text);" id="mgmt-test-label">Running test...</span>
+            <span style="font-size:12px;color:var(--text-dim);" id="mgmt-test-pct">0%</span>
+          </div>
+          <div class="test-progress"><div class="test-progress-fill" id="mgmt-test-bar"></div></div>
+        </div>
+        <div class="emerg-grid">
+          <div class="emerg-card">
+            <div class="mgmt-view-title" style="font-size:14px;margin-bottom:8px;">Emergency Luminaires</div>
+            <div id="mgmt-emerg-devices"></div>
+          </div>
+          <div class="emerg-card">
+            <div class="mgmt-view-title" style="font-size:14px;margin-bottom:8px;">Automated Test Log</div>
+            <table class="emerg-log-table" id="mgmt-emerg-log"></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Energy Dashboard View -->
+      <div id="mgmt-view-energy" class="mgmt-view">
+        <div class="mgmt-view-header">
+          <div>
+            <div class="mgmt-view-title">Energy Dashboard</div>
+            <div class="mgmt-view-subtitle">Real-time power monitoring • Daylight harvesting • Occupancy-based savings</div>
+          </div>
+        </div>
+        <div class="energy-grid">
+          <div class="energy-card">
+            <div class="energy-card-title">Live Power Consumption</div>
+            <svg id="mgmt-energy-gauge" width="180" height="180" viewBox="0 0 180 180"></svg>
+            <div class="energy-metric" id="mgmt-energy-live">— kW</div>
+            <div class="energy-metric-sub" id="mgmt-energy-live-sub">of — kW peak capacity</div>
+          </div>
+          <div class="energy-card">
+            <div class="energy-card-title">Today vs Baseline</div>
+            <div id="mgmt-energy-savings"></div>
+          </div>
+          <div class="energy-card energy-card-wide">
+            <div class="energy-card-title">24-Hour Energy Trend</div>
+            <svg id="mgmt-energy-chart" width="100%" height="200" viewBox="0 0 700 200" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="energy-card energy-card-wide">
+            <div class="energy-card-title">Per-Zone Energy Breakdown</div>
+            <div id="mgmt-zone-energy"></div>
+          </div>
+          <div class="energy-card">
+            <div class="energy-card-title">Daylight Harvesting</div>
+            <div id="mgmt-daylight-contrib"></div>
+          </div>
+          <div class="energy-card">
+            <div class="energy-card-title">Occupancy Savings</div>
+            <div id="mgmt-occupancy-savings"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene Management View -->
+      <div id="mgmt-view-scene" class="mgmt-view">
+        <div class="mgmt-view-header">
+          <div>
+            <div class="mgmt-view-title">Scene Management</div>
+            <div class="mgmt-view-subtitle">DALI scenes (0-15) • Schedule-based automation • Biodynamic lighting</div>
+          </div>
+        </div>
+        <div class="scene-grid" id="mgmt-scene-grid"></div>
+        <div class="schedule-grid-wrap">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div class="mgmt-view-title" style="font-size:14px;">Weekly Schedule</div>
+            <div>
+              <button class="mgmt-btn primary" onclick="mgmtActivateSchedule()">▶ Activate Schedule</button>
+              <button class="mgmt-btn" onclick="mgmtClearSchedule()">Clear</button>
+            </div>
+          </div>
+          <table class="schedule-table" id="mgmt-schedule-table"></table>
+          <div style="margin-top:8px;font-size:11px;color:var(--text-dim);">Click a cell to cycle through scenes. Each column = 1 hour (00:00–23:00).</div>
+        </div>
+      </div>
+
+      <!-- Device Registry View -->
+      <div id="mgmt-view-registry" class="mgmt-view">
+        <div class="mgmt-view-header">
+          <div>
+            <div class="mgmt-view-title">Device Registry</div>
+            <div class="mgmt-view-subtitle">All DALI devices on the network • Click a row for full details</div>
+          </div>
+        </div>
+        <div class="registry-toolbar">
+          <input type="text" class="registry-search" placeholder="🔍 Search devices..." id="mgmt-registry-search" oninput="mgmtRenderRegistry()">
+          <select class="registry-select" id="mgmt-filter-type" onchange="mgmtRenderRegistry()">
+            <option value="">All Types</option>
+          </select>
+          <select class="registry-select" id="mgmt-filter-location" onchange="mgmtRenderRegistry()">
+            <option value="">All Locations</option>
+          </select>
+          <select class="registry-select" id="mgmt-filter-status" onchange="mgmtRenderRegistry()">
+            <option value="">All Statuses</option>
+          </select>
+          <span style="font-size:12px;color:var(--text-dim);" id="mgmt-registry-count">0 devices</span>
+        </div>
+        <table class="registry-table" id="mgmt-registry-table"></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MANAGEMENT PORTAL SCRIPT ==================== -->
+<script>
+// ==================== DATA MODEL ====================
+const MGMT = {
+  rooms: [],
+  fixtures: [],
+  emergencyDevices: [],
+  devices: [],
+  topology: null,
+  scenes: {},
+  schedule: [],
+  energy: { live: 0, history: [], zoneData: [], baseline: 0, daylight: 0, occupancy: 0 },
+  selectedFixture: null,
+  occupancyOverlay: false,
+  activeView: 'floorplan',
+  activeScene: 'workday',
+  testRunning: false,
+  testLog: [],
+  registrySort: { col: 'address', dir: 1 },
+  expandedRow: null,
+  topologyNodes: [],
+  topologyLines: [],
+  topologyDots: [],
+};
+
+// Room definitions for the floor plan (12+ zones)
+const MGMT_ROOMS = [
+  { id: 'r1', name: 'Open Office A', x: 20, y: 20, w: 220, h: 120, floor: 1 },
+  { id: 'r2', name: 'Open Office B', x: 250, y: 20, w: 220, h: 120, floor: 1 },
+  { id: 'r3', name: 'Meeting Room 1', x: 480, y: 20, w: 140, h: 80, floor: 1 },
+  { id: 'r4', name: 'Meeting Room 2', x: 630, y: 20, w: 150, h: 80, floor: 1 },
+  { id: 'r5', name: 'Reception', x: 480, y: 110, w: 140, h: 80, floor: 1 },
+  { id: 'r6', name: 'Kitchen', x: 630, y: 110, w: 150, h: 80, floor: 1 },
+  { id: 'r7', name: 'Corridor North', x: 20, y: 150, w: 440, h: 40, floor: 1 },
+  { id: 'r8', name: 'Server Room', x: 20, y: 200, w: 100, h: 100, floor: 1 },
+  { id: 'r9', name: 'Stairwell A', x: 130, y: 200, w: 80, h: 100, floor: 1 },
+  { id: 'r10', name: 'Open Office C', x: 220, y: 200, w: 250, h: 120, floor: 1 },
+  { id: 'r11', name: 'Print/Copy', x: 480, y: 200, w: 140, h: 60, floor: 1 },
+  { id: 'r12', name: 'Plant Room', x: 630, y: 200, w: 150, h: 60, floor: 1 },
+  { id: 'r13', name: 'Corridor South', x: 480, y: 270, w: 300, h: 40, floor: 1 },
+  { id: 'r14', name: 'WC Male', x: 20, y: 310, w: 100, h: 70, floor: 1 },
+  { id: 'r15', name: 'WC Female', x: 130, y: 310, w: 80, h: 70, floor: 1 },
+  { id: 'r16', name: 'Plant Room 2', x: 220, y: 310, w: 120, h: 70, floor: 1 },
+  { id: 'r17', name: 'Storage', x: 350, y: 310, w: 120, h: 70, floor: 1 },
+  { id: 'r18', name: 'Breakout Area', x: 480, y: 310, w: 300, h: 70, floor: 1 },
+];
+
+// Scene definitions
+const MGMT_SCENES = {
+  morning:   { name: 'Morning',       color: '#fbbf24', levels: [30,50,60,20,40,30,20,50,10,60,40,40] },
+  workday:   { name: 'Workday',       color: '#53d8fb', levels: [80,80,90,90,70,60,50,50,60,80,70,70] },
+  meeting:   { name: 'Meeting',       color: '#7c5cfc', levels: [60,60,100,100,70,50,40,50,50,50,80,50] },
+  lunch:     { name: 'Lunch',         color: '#34d399', levels: [40,40,50,50,60,80,30,40,40,40,60,70] },
+  afterhours:{ name: 'After Hours',   color: '#f953ba', levels: [10,10,20,20,15,20,5,30,10,10,20,20] },
+  night:     { name: 'Night',          color: '#53d8fb', levels: [5,5,5,5,5,5,0,10,5,5,5,5] },
+  emergency: { name: 'Emergency',     color: '#34d399', levels: [0,0,0,0,0,0,0,0,0,0,0,0] },
+  maintenance:{ name: 'Maintenance',  color: '#fbbf24', levels: [50,50,50,50,50,50,50,50,50,50,50,50] },
+};
+
+const MGMT_SCENE_NAMES = Object.keys(MGMT_SCENES);
+
+// DALI device types
+const MGMT_DEVICE_TYPES = ['LED Driver', 'PIR Sensor', 'Wall Switch', 'Emergency', 'DALI Relay'];
+
+// ==================== INITIALIZATION ====================
+function mgmtInit() {
+  mgmtGenerateFixtures();
+  mgmtGenerateEmergencyDevices();
+  mgmtGenerateRegistry();
+  mgmtGenerateTopology();
+  mgmtGenerateSchedule();
+  mgmtGenerateEnergyData();
+  mgmtRenderAll();
+  mgmtStartLiveUpdates();
+}
+
+// ==================== FIXTURE GENERATION ====================
+function mgmtGenerateFixtures() {
+  MGMT.fixtures = [];
+  MGMT.rooms = JSON.parse(JSON.stringify(MGMT_ROOMS));
+  let shortAddr = 0;
+  let groupId = 0;
+
+  MGMT.rooms.forEach((room, ri) => {
+    room.fixtures = [];
+    room.occupancy = Math.random();
+    // Number of fixtures based on room size
+    const area = room.w * room.h;
+    const count = Math.max(2, Math.min(8, Math.floor(area / 2500)));
+    const cols = Math.ceil(Math.sqrt(count));
+    const rows = Math.ceil(count / cols);
+
+    const padX = 30, padY = 30;
+    const spacingX = (room.w - padX * 2) / Math.max(1, cols - 1);
+    const spacingY = (room.h - padY * 2) / Math.max(1, rows - 1);
+
+    for (let i = 0; i < count; i++) {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const fx = room.x + padX + col * spacingX;
+      const fy = room.y + padY + row * spacingY;
+
+      const types = ['LED Driver', 'LED Driver', 'LED Driver', 'Emergency'];
+      const type = types[Math.floor(Math.random() * types.length)];
+      const states = ['on', 'on', 'on', 'on', 'off', 'daylit'];
+      const state = type === 'Emergency' ? 'emergency' : states[Math.floor(Math.random() * states.length)];
+
+      const fixture = {
+        id: 'fx-' + shortAddr,
+        shortAddress: shortAddr,
+        group: groupId % 16,
+        scene: ri % 16,
+        type: type,
+        power: type === 'Emergency' ? 8 : (Math.floor(Math.random() * 30) + 20),
+        status: state,
+        dimLevel: state === 'on' ? 60 + Math.floor(Math.random() * 40) : (state === 'off' ? 0 : 30 + Math.floor(Math.random() * 30)),
+        room: room.name,
+        roomId: room.id,
+        x: fx, y: fy,
+        lcm: 'LCM-' + (Math.floor(shortAddr / 8) + 1),
+        firmware: 'v' + (2 + Math.floor(Math.random() * 3)) + '.' + Math.floor(Math.random() * 10) + '.' + Math.floor(Math.random() * 10),
+        failureCode: state === 'fault' ? 'E' + (100 + Math.floor(Math.random() * 50)) : null,
+      };
+      MGMT.fixtures.push(fixture);
+      room.fixtures.push(fixture);
+      shortAddr++;
+    }
+    if ((ri + 1) % 4 === 0) groupId++;
+  });
+}
+
+// ==================== EMERGENCY DEVICE GENERATION ====================
+function mgmtGenerateEmergencyDevices() {
+  MGMT.emergencyDevices = [];
+  const emergFixtures = MGMT.fixtures.filter(f => f.type === 'Emergency');
+  emergFixtures.forEach((fx, i) => {
+    const batteryHealth = Math.random() > 0.85 ? 'Degraded' : 'Good';
+    const rfStrength = 2 + Math.floor(Math.random() * 3); // 2-4 bars
+    const lastFunc = new Date(Date.now() - Math.random() * 86400000 * 3);
+    const lastDur = new Date(Date.now() - Math.random() * 86400000 * 30);
+    const nextTest = new Date(Date.now() + Math.random() * 86400000 * 7);
+    MGMT.emergencyDevices.push({
+      id: fx.id,
+      address: fx.shortAddress,
+      name: 'EM-' + String(i + 1).padStart(3, '0'),
+      location: fx.room,
+      battery: batteryHealth,
+      batteryPct: batteryHealth === 'Good' ? 80 + Math.floor(Math.random() * 20) : 40 + Math.floor(Math.random() * 30),
+      rfStrength: rfStrength,
+      lastFuncTest: lastFunc,
+      lastDurTest: lastDur,
+      nextTest: nextTest,
+      status: 'OK',
+      lumenOutput: 650 + Math.floor(Math.random() * 200),
+      ratedDuration: 180, // 3 hours
+    });
+  });
+
+  // Generate some test log entries
+  for (let i = 0; i < 8; i++) {
+    MGMT.testLog.push({
+      time: new Date(Date.now() - i * 3600000 * (3 + Math.random() * 5)),
+      device: MGMT.emergencyDevices[i % MGMT.emergencyDevices.length].name,
+      type: i % 2 === 0 ? 'Function' : 'Duration',
+      result: Math.random() > 0.2 ? 'Pass' : 'Fail',
+      duration: i % 2 === 0 ? null : (120 + Math.floor(Math.random() * 60)),
+    });
+  }
+}
+
+// ==================== DEVICE REGISTRY GENERATION ====================
+function mgmtGenerateRegistry() {
+  MGMT.devices = [];
+  let addr = 0;
+  const locations = [...new Set(MGMT_ROOMS.map(r => r.name))];
+  const lcms = ['LCM-1', 'LCM-2', 'LCM-3', 'LCM-4', 'LCM-5'];
+
+  MGMT.fixtures.forEach(fx => {
+    MGMT.devices.push({
+      address: fx.shortAddress,
+      name: 'DALI-' + String(fx.shortAddress).padStart(2, '0'),
+      type: fx.type,
+      location: fx.room,
+      lcm: fx.lcm,
+      status: fx.status === 'fault' ? 'Fault' : (fx.status === 'off' ? 'Offline' : 'Online'),
+      firmware: fx.firmware,
+      power: fx.power,
+      group: fx.group,
+      scene: fx.scene,
+      dimLevel: fx.dimLevel,
+    });
+  });
+
+  // Add sensors and switches
+  for (let i = 0; i < 8; i++) {
+    const room = locations[i % locations.length];
+    MGMT.devices.push({
+      address: addr + 60 + i,
+      name: 'PIR-' + String(i + 1).padStart(2, '0'),
+      type: 'PIR Sensor',
+      location: room,
+      lcm: lcms[i % lcms.length],
+      status: 'Online',
+      firmware: 'v1.' + (5 + Math.floor(Math.random() * 4)) + '.2',
+      power: 2,
+      group: i % 16,
+      scene: i % 16,
+      dimLevel: null,
+    });
+  }
+
+  for (let i = 0; i < 6; i++) {
+    const room = locations[i % locations.length];
+    MGMT.devices.push({
+      address: 63 - i,
+      name: 'SW-' + String(i + 1).padStart(2, '0'),
+      type: 'Wall Switch',
+      location: room,
+      lcm: lcms[i % lcms.length],
+      status: 'Online',
+      firmware: 'v1.' + (2 + Math.floor(Math.random() * 3)) + '.0',
+      power: 1,
+      group: i % 16,
+      scene: i % 16,
+      dimLevel: null,
+    });
+  }
+
+  // DALI Relays
+  for (let i = 0; i < 4; i++) {
+    MGMT.devices.push({
+      address: 50 + i,
+      name: 'RLY-' + String(i + 1).padStart(2, '0'),
+      type: 'DALI Relay',
+      location: locations[i],
+      lcm: lcms[i],
+      status: 'Online',
+      firmware: 'v2.1.0',
+      power: 5,
+      group: i,
+      scene: i,
+      dimLevel: null,
+    });
+  }
+}
+
+// ==================== TOPOLOGY GENERATION ====================
+function mgmtGenerateTopology() {
+  MGMT.topologyNodes = [];
+  MGMT.topologyLines = [];
+
+  // Server
+  MGMT.topologyNodes.push({
+    id: 'server', type: 'server', label: 'Delmatic Server', sublabel: 'Lightscape PC',
+    x: 400, y: 30, w: 160, h: 36, status: 'online',
+    details: { ip: '192.168.1.10', role: 'Central Management', uptime: '99.98%', software: 'Lightscape v4.2.1' }
+  });
+
+  // IP Routers
+  const routers = [
+    { id: 'router-1', label: 'IP Router — Floor 1', x: 200, y: 110, w: 160, h: 36, status: 'online' },
+    { id: 'router-2', label: 'IP Router — Floor 2', x: 540, y: 110, w: 160, h: 36, status: 'online' },
+  ];
+  routers.forEach(r => {
+    r.type = 'router'; r.sublabel = 'DALI Gateway'; r.details = { ip: '192.168.1.' + (r.id === 'router-1' ? '20' : '21'), mac: '00:1A:2B:3C:4' + (r.id === 'router-1' ? '0' : '1'), role: 'DALI-2 IP Router' };
+    MGMT.topologyNodes.push(r);
+  });
+
+  // LCMs
+  const lcms = [
+    { id: 'lcm-1', parent: 'router-1', label: 'LCM-1', x: 60, y: 210, w: 100, h: 36, status: 'online' },
+    { id: 'lcm-2', parent: 'router-1', label: 'LCM-2', x: 180, y: 210, w: 100, h: 36, status: 'online' },
+    { id: 'lcm-3', parent: 'router-1', label: 'LCM-3', x: 300, y: 210, w: 100, h: 36, status: 'online' },
+    { id: 'lcm-4', parent: 'router-2', label: 'LCM-4', x: 440, y: 210, w: 100, h: 36, status: 'online' },
+    { id: 'lcm-5', parent: 'router-2', label: 'LCM-5', x: 560, y: 210, w: 100, h: 36, status: 'online' },
+    { id: 'lcm-6', parent: 'router-2', label: 'LCM-6', x: 680, y: 210, w: 100, h: 36, status: 'online' },
+  ];
+  lcms.forEach(l => {
+    l.type = 'lcm'; l.sublabel = 'DALI Bus Controller'; l.details = { dalibus: 'DALI Bus A/B', channels: 2, devices: 8 + Math.floor(Math.random() * 8), role: 'Lighting Control Module' };
+    MGMT.topologyNodes.push(l);
+  });
+
+  // DALI Bus lines with fixtures
+  lcms.forEach((lcm, li) => {
+    const busX = lcm.x + lcm.w / 2;
+    const busY = 260;
+    const busEndY = 310;
+    // Bus line node
+    MGMT.topologyNodes.push({
+      id: 'bus-' + li, type: 'bus', label: 'DALI Bus ' + String.fromCharCode(65 + li), sublabel: lcm.details.devices + ' devices',
+      x: busX - 50, y: busY, w: 100, h: 24, status: 'online',
+      details: { protocol: 'DALI-2 IEC 62386', speed: '250 bps', devices: lcm.details.devices, voltage: '16V DC' }
+    });
+    // Connection LCM to bus
+    MGMT.topologyLines.push({ from: lcm.id, to: 'bus-' + li, type: 'dali' });
+
+    // Fixtures on bus
+    const fxCount = 5;
+    for (let f = 0; f < fxCount; f++) {
+      const fxX = busX - 60 + f * 30;
+      const fxId = 'busfx-' + li + '-' + f;
+      MGMT.topologyNodes.push({
+        id: fxId, type: 'fixture', label: 'FX', sublabel: String(li * 5 + f),
+        x: fxX - 12, y: busEndY + 10, w: 24, h: 24, status: Math.random() > 0.1 ? 'online' : 'offline',
+        details: { type: 'LED Driver', power: 30 + Math.floor(Math.random() * 20), address: li * 5 + f }
+      });
+      // Line from bus to fixture
+      MGMT.topologyLines.push({ from: 'bus-' + li, to: fxId, type: 'dali' });
+    }
+  });
+
+  // Server to routers
+  MGMT.topologyLines.push({ from: 'server', to: 'router-1', type: 'ethernet' });
+  MGMT.topologyLines.push({ from: 'server', to: 'router-2', type: 'ethernet' });
+  // Routers to LCMs
+  lcms.forEach(l => {
+    MGMT.topologyLines.push({ from: l.parent, to: l.id, type: 'ethernet' });
+  });
+}
+
+// ==================== SCHEDULE GENERATION ====================
+function mgmtGenerateSchedule() {
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  MGMT.schedule = [];
+  for (let d = 0; d < 7; d++) {
+    const row = [];
+    for (let h = 0; h < 24; h++) {
+      let scene = null;
+      if (d < 5) { // Weekday
+        if (h < 6) scene = 'night';
+        else if (h < 8) scene = 'morning';
+        else if (h < 9) scene = 'workday';
+        else if (h < 10) scene = 'meeting';
+        else if (h < 12) scene = 'workday';
+        else if (h < 14) scene = 'lunch';
+        else if (h < 17) scene = 'workday';
+        else if (h < 19) scene = 'afterhours';
+        else if (h < 22) scene = 'afterhours';
+        else scene = 'night';
+      } else { // Weekend
+        if (h < 8) scene = 'night';
+        else if (h < 18) scene = 'afterhours';
+        else scene = 'night';
+      }
+      row.push(scene);
+    }
+    MGMT.schedule.push(row);
+  }
+}
+
+// ==================== ENERGY DATA GENERATION ====================
+function mgmtGenerateEnergyData() {
+  MGMT.energy.history = [];
+  for (let h = 0; h < 24; h++) {
+    let val;
+    if (h < 6) val = 5 + Math.random() * 3;
+    else if (h < 8) val = 8 + Math.random() * 5;
+    else if (h < 17) val = 20 + Math.random() * 10;
+    else if (h < 19) val = 12 + Math.random() * 5;
+    else if (h < 22) val = 8 + Math.random() * 3;
+    else val = 5 + Math.random() * 2;
+    MGMT.energy.history.push(val);
+  }
+  MGMT.energy.live = 22.5 + Math.random() * 5;
+  MGMT.energy.baseline = 35.0;
+  MGMT.energy.daylight = 15 + Math.floor(Math.random() * 10); // % savings from daylight
+  MGMT.energy.occupancy = 12 + Math.floor(Math.random() * 8); // % savings from occupancy
+
+  // Zone energy
+  MGMT.energy.zoneData = MGMT.rooms.slice(0, 12).map(r => ({
+    name: r.name.length > 14 ? r.name.substring(0, 12) + '..' : r.name,
+    kWh: Math.random() * 15 + 2,
+    color: MGMT_SCENES.workday.color,
+  }));
+}
+
+// ==================== RENDER FUNCTIONS ====================
+function mgmtRenderAll() {
+  mgmtRenderFloorPlan();
+  mgmtRenderTopology();
+  mgmtRenderEmergency();
+  mgmtRenderEnergy();
+  mgmtRenderScenes();
+  mgmtRenderSchedule();
+  mgmtRenderRegistry();
+  mgmtUpdateFilterOptions();
+}
+
+// ==================== VIEW SWITCHING ====================
+function mgmtSwitchView(view) {
+  MGMT.activeView = view;
+  document.querySelectorAll('.mgmt-nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelector('.mgmt-nav-item[data-view="' + view + '"]').classList.add('active');
+  document.querySelectorAll('.mgmt-view').forEach(el => el.classList.remove('active'));
+  document.getElementById('mgmt-view-' + view).classList.add('active');
+}
+
+// ==================== FLOOR PLAN RENDERING ====================
+function mgmtRenderFloorPlan() {
+  const svg = document.getElementById('mgmt-floorplan-svg');
+  if (!svg) return;
+  let html = '';
+
+  // Rooms
+  MGMT.rooms.forEach(room => {
+    const occClass = (MGMT.occupancyOverlay && room.occupancy > 0.3) ? ' occupied' : '';
+    let fillCol = 'var(--surface2)';
+    if (MGMT.occupancyOverlay) {
+      const intensity = room.occupancy;
+      fillCol = `rgba(249,83,186,${0.05 + intensity * 0.35})`;
+    }
+    html += `<rect class="room-rect${occClass}" x="${room.x}" y="${room.y}" width="${room.w}" height="${room.h}" rx="4" style="fill:${fillCol}"/>`;
+    html += `<text class="room-label" x="${room.x + 6}" y="${room.y + 14}">${room.name}</text>`;
+    if (MGMT.occupancyOverlay) {
+      html += `<text class="room-label" x="${room.x + room.w - 40}" y="${room.y + 14}" fill="var(--accent3)">${Math.round(room.occupancy * 100)}%</text>`;
+    }
+  });
+
+  // Fixtures
+  MGMT.fixtures.forEach(fx => {
+    const stateClass = 'lum-' + fx.status;
+    const r = fx.type === 'Emergency' ? 5 : 4;
+    html += `<circle class="lum ${stateClass}" cx="${fx.x}" cy="${fx.y}" r="${r}" onclick="mgmtSelectFixture('${fx.id}')" data-fx-id="${fx.id}"/>`;
+  });
+
+  // Legend
+  html += `<g transform="translate(10, 510)">`;
+  html += `<rect x="0" y="0" width="780" height="40" rx="6" fill="var(--surface)" stroke="var(--border)" opacity="0.9"/>`;
+  const legend = [
+    { label: 'ON', class: 'lum-on' }, { label: 'OFF', class: 'lum-off' },
+    { label: 'FAULT', class: 'lum-fault' }, { label: 'DAYLIT', class: 'lum-daylit' },
+    { label: 'EMERGENCY', class: 'lum-emergency' }
+  ];
+  legend.forEach((item, i) => {
+    const lx = 20 + i * 150;
+    html += `<circle class="${item.class}" cx="${lx}" cy="20" r="5"/>`;
+    html += `<text x="${lx + 10}" y="24" fill="var(--text-dim)" font-size="11" font-family="var(--font)">${item.label}</text>`;
+  });
+  html += `</g>`;
+
+  svg.innerHTML = html;
+
+  const statsEl = document.getElementById('mgmt-fp-stats');
+  if (statsEl) {
+    const on = MGMT.fixtures.filter(f => f.status === 'on' || f.status === 'daylit').length;
+    const off = MGMT.fixtures.filter(f => f.status === 'off').length;
+    const fault = MGMT.fixtures.filter(f => f.status === 'fault').length;
+    statsEl.textContent = `${MGMT.fixtures.length} luminaires • ${on} on • ${off} off • ${fault} faults`;
+  }
+}
+
+function mgmtSelectFixture(fxId) {
+  const fx = MGMT.fixtures.find(f => f.id === fxId);
+  if (!fx) return;
+  MGMT.selectedFixture = fx;
+  const detailEl = document.getElementById('mgmt-fixture-detail');
+  if (!detailEl) return;
+
+  const stateColors = {
+    on: 'var(--accent5)', off: 'var(--text-dim)', fault: 'var(--danger)',
+    daylit: 'var(--accent)', emergency: 'var(--success)'
+  };
+
+  detailEl.innerHTML = `
+    <div class="fixture-detail-card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div style="width:12px;height:12px;border-radius:50%;background:${stateColors[fx.status]};box-shadow:0 0 8px ${stateColors[fx.status]};"></div>
+        <span style="font-size:15px;font-weight:600;color:var(--text);">${fx.type === 'Emergency' ? '🚨' : '💡'} ${fx.type}</span>
+      </div>
+      <div class="fd-label">DALI Short Address</div>
+      <div class="fd-value">${fx.shortAddress} <span style="color:var(--text-dim);font-size:12px;">(0–63 range)</span></div>
+      <div class="fd-label">Group</div>
+      <div class="fd-value">Group ${fx.group} <span style="color:var(--text-dim);font-size:12px;">(0–15 range)</span></div>
+      <div class="fd-label">Scene</div>
+      <div class="fd-value">Scene ${fx.scene} <span style="color:var(--text-dim);font-size:12px;">(0–15 range)</span></div>
+      <div class="fd-label">Location</div>
+      <div class="fd-value">${fx.room}</div>
+      <div class="fd-label">LCM</div>
+      <div class="fd-value">${fx.lcm}</div>
+      <div class="fd-label">Power Rating</div>
+      <div class="fd-value">${fx.power} W</div>
+      <div class="fd-label">Status</div>
+      <div class="fd-value"><span class="fixture-state-badge" style="background:${stateColors[fx.status]}22;color:${stateColors[fx.status]};">${fx.status.toUpperCase()}</span></div>
+      <div class="fd-label">Dim Level</div>
+      <div class="fd-value">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="flex:1;height:8px;background:var(--surface);border-radius:4px;overflow:hidden;">
+            <div style="width:${fx.dimLevel}%;height:100%;background:var(--accent);border-radius:4px;"></div>
+          </div>
+          <span>${fx.dimLevel}%</span>
+        </div>
+      </div>
+      <div class="fd-label">Firmware</div>
+      <div class="fd-value" style="font-size:12px;">${fx.firmware}</div>
+      ${fx.failureCode ? `<div class="fd-label">Failure Code</div><div class="fd-value" style="color:var(--danger);">${fx.failureCode}</div>` : ''}
+    </div>
+    <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">
+      <button class="mgmt-btn" onclick="mgmtToggleFixture('${fx.id}')">Toggle On/Off</button>
+      <button class="mgmt-btn" onclick="mgmtIdentifyFixture('${fx.id}')">Identify (Flash)</button>
+    </div>
+  `;
+}
+
+function mgmtToggleFixture(fxId) {
+  const fx = MGMT.fixtures.find(f => f.id === fxId);
+  if (!fx) return;
+  if (fx.status === 'off') {
+    fx.status = 'on';
+    fx.dimLevel = 80;
+  } else if (fx.status === 'on' || fx.status === 'daylit') {
+    fx.status = 'off';
+    fx.dimLevel = 0;
+  }
+  mgmtRenderFloorPlan();
+  mgmtSelectFixture(fxId);
+}
+
+function mgmtIdentifyFixture(fxId) {
+  const fx = MGMT.fixtures.find(f => f.id === fxId);
+  if (!fx) return;
+  const el = document.querySelector(`[data-fx-id="${fxId}"]`);
+  if (el) {
+    let flashes = 0;
+    const interval = setInterval(() => {
+      el.style.opacity = flashes % 2 === 0 ? '0.2' : '1';
+      flashes++;
+      if (flashes > 5) {
+        clearInterval(interval);
+        el.style.opacity = '';
+      }
+    }, 200);
+  }
+  mgmtToast('Identify signal sent to DALI address ' + fx.shortAddress, 'info');
+}
+
+function mgmtAllOn() {
+  MGMT.fixtures.forEach(f => {
+    if (f.type === 'Emergency') return;
+    f.status = 'on';
+    f.dimLevel = 80;
+  });
+  mgmtRenderFloorPlan();
+  mgmtToast('All luminaires ON — broadcast command sent', 'success');
+}
+
+function mgmtAllOff() {
+  MGMT.fixtures.forEach(f => {
+    if (f.type === 'Emergency') return;
+    f.status = 'off';
+    f.dimLevel = 0;
+  });
+  mgmtRenderFloorPlan();
+  mgmtToast('All luminaires OFF — broadcast command sent', 'info');
+}
+
+function mgmtApplySceneToFloor(sceneName) {
+  const scene = MGMT_SCENES[sceneName];
+  if (!scene) return;
+  MGMT.activeScene = sceneName;
+  MGMT.fixtures.forEach((fx, i) => {
+    if (fx.type === 'Emergency') return;
+    const levelIdx = MGMT.rooms.findIndex(r => r.id === fx.roomId);
+    const level = scene.levels[levelIdx % scene.levels.length];
+    fx.dimLevel = level;
+    if (level === 0) fx.status = 'off';
+    else if (level < 30) fx.status = 'daylit';
+    else fx.status = 'on';
+  });
+  mgmtRenderFloorPlan();
+  mgmtToast('Scene "' + scene.name + '" applied to floor plan', 'success');
+  // Update scene cards
+  document.querySelectorAll('.scene-card').forEach(c => c.classList.remove('active'));
+  const sc = document.querySelector(`.scene-card[data-scene="${sceneName}"]`);
+  if (sc) sc.classList.add('active');
+}
+
+function mgmtToggleOccupancy() {
+  MGMT.occupancyOverlay = document.getElementById('mgmt-occupancy-toggle').checked;
+  mgmtRenderFloorPlan();
+}
+
+function mgmtEmergencyTest() {
+  mgmtToast('Emergency test initiated — all emergency luminaires activated for 5s', 'warning');
+  const emergFixtures = MGMT.fixtures.filter(f => f.type === 'Emergency');
+  emergFixtures.forEach(f => f._origStatus = f.status);
+  emergFixtures.forEach(f => { f.status = 'emergency'; });
+  mgmtRenderFloorPlan();
+  setTimeout(() => {
+    emergFixtures.forEach(f => { f.status = f._origStatus || 'emergency'; });
+    mgmtRenderFloorPlan();
+    mgmtToast('Emergency test complete — all devices passed', 'success');
+  }, 5000);
+}
+
+// ==================== NETWORK TOPOLOGY RENDERING ====================
+function mgmtRenderTopology() {
+  const svg = document.getElementById('mgmt-topo-svg');
+  if (!svg) return;
+  let html = '';
+
+  // Background grid
+  for (let x = 0; x < 900; x += 40) {
+    html += `<line x1="${x}" y1="0" x2="${x}" y2="600" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>`;
+  }
+  for (let y = 0; y < 600; y += 40) {
+    html += `<line x1="0" y1="${y}" x2="900" y2="${y}" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>`;
+  }
+
+  // Lines/connections
+  MGMT.topologyLines.forEach(line => {
+    const fromNode = MGMT.topologyNodes.find(n => n.id === line.from);
+    const toNode = MGMT.topologyNodes.find(n => n.id === line.to);
+    if (!fromNode || !toNode) return;
+    const x1 = fromNode.x + fromNode.w / 2;
+    const y1 = fromNode.y + fromNode.h;
+    const x2 = toNode.x + toNode.w / 2;
+    const y2 = toNode.y;
+    const statusClass = fromNode.status === 'online' && toNode.status === 'online' ? 'online' : 'offline';
+    const midY = (y1 + y2) / 2;
+    html += `<path class="topo-line ${statusClass}" d="M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}" id="topo-line-${line.from}-${line.to}"/>`;
+
+    // Data flow dot
+    if (statusClass === 'online') {
+      const pathId = `topopath-${line.from}-${line.to}`;
+      html += `<path id="${pathId}" d="M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}" fill="none" stroke="none"/>`;
+      html += `<circle r="3" class="topo-dot"><animateMotion dur="${1.5 + Math.random()}s" repeatCount="indefinite"><mpath href="#${pathId}"/></animateMotion></circle>`;
+      // Second dot offset
+      html += `<circle r="2" class="topo-dot" opacity="0.5"><animateMotion dur="${2 + Math.random()}s" begin="${Math.random()}s" repeatCount="indefinite"><mpath href="#${pathId}"/></animateMotion></circle>`;
+    }
+  });
+
+  // Nodes
+  const typeIcons = { server: '🖥️', router: '🌐', lcm: '📦', bus: '🔌', fixture: '💡' };
+  const typeColors = { server: 'var(--accent2)', router: 'var(--accent)', lcm: 'var(--accent4)', bus: 'var(--accent5)', fixture: 'var(--text-dim)' };
+
+  MGMT.topologyNodes.forEach(node => {
+    const isSelected = MGMT.selectedTopoNode === node.id;
+    const stroke = isSelected ? 'var(--accent)' : typeColors[node.type];
+    const fill = node.status === 'offline' ? 'rgba(248,113,113,0.1)' : 'var(--surface2)';
+    html += `<g class="topo-node ${isSelected ? 'selected' : ''}" onclick="mgmtSelectTopoNode('${node.id}')">`;
+    html += `<rect x="${node.x}" y="${node.y}" width="${node.w}" height="${node.h}" rx="6" fill="${fill}" stroke="${stroke}" stroke-width="${isSelected ? 2 : 1}"/>`;
+    html += `<text x="${node.x + 10}" y="${node.y + 15}" font-size="12">${typeIcons[node.type]}</text>`;
+    html += `<text class="topo-label" x="${node.x + node.w / 2}" y="${node.y + 16}" text-anchor="middle" fill="var(--text)" font-size="10">${node.label}</text>`;
+    if (node.sublabel) {
+      html += `<text class="topo-sublabel" x="${node.x + node.w / 2}" y="${node.y + 28}" text-anchor="middle">${node.sublabel}</text>`;
+    }
+    // Status indicator
+    const dotColor = node.status === 'online' ? 'var(--success)' : 'var(--danger)';
+    html += `<circle cx="${node.x + node.w - 8}" cy="${node.y + 8}" r="3" fill="${dotColor}"/>`;
+    html += `</g>`;
+  });
+
+  svg.innerHTML = html;
+}
+
+function mgmtSelectTopoNode(nodeId) {
+  const node = MGMT.topologyNodes.find(n => n.id === nodeId);
+  if (!node) return;
+  MGMT.selectedTopoNode = nodeId;
+  mgmtRenderTopology();
+  const detailEl = document.getElementById('mgmt-topo-detail');
+  if (!detailEl) return;
+  const typeIcons = { server: '🖥️', router: '🌐', lcm: '📦', bus: '🔌', fixture: '💡' };
+  let html = `<div class="fixture-detail-card">`;
+  html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">`;
+  html += `<span style="font-size:20px;">${typeIcons[node.type]}</span>`;
+  html += `<span style="font-size:15px;font-weight:600;color:var(--text);">${node.label}</span>`;
+  html += `</div>`;
+  html += `<div class="fd-label">Type</div><div class="fd-value">${node.type.toUpperCase()}</div>`;
+  html += `<div class="fd-label">Status</div><div class="fd-value"><span class="fixture-state-badge" style="background:${node.status === 'online' ? 'var(--success)22' : 'var(--danger)22'};color:${node.status === 'online' ? 'var(--success)' : 'var(--danger)'};">${node.status.toUpperCase()}</span></div>`;
+  if (node.details) {
+    Object.entries(node.details).forEach(([k, v]) => {
+      html += `<div class="fd-label">${k.charAt(0).toUpperCase() + k.slice(1)}</div><div class="fd-value">${v}</div>`;
+    });
+  }
+  html += `</div>`;
+  detailEl.innerHTML = html;
+}
+
+// ==================== EMERGENCY MONITORING RENDERING ====================
+function mgmtRenderEmergency() {
+  // Summary
+  const total = MGMT.emergencyDevices.length;
+  const faults = MGMT.emergencyDevices.filter(d => d.status !== 'OK').length;
+  const ok = total - faults;
+  document.getElementById('mgmt-emerg-total').textContent = total;
+  document.getElementById('mgmt-emerg-ok').textContent = ok;
+  document.getElementById('mgmt-emerg-faults').textContent = faults;
+  document.getElementById('mgmt-emerg-sync').textContent = new Date().toLocaleTimeString('en-GB');
+
+  const summaryEl = document.getElementById('mgmt-emerg-summary');
+  const statusEl = document.getElementById('mgmt-emerg-status');
+  if (faults > 0) {
+    summaryEl.classList.add('fault');
+    summaryEl.classList.remove('ok');
+    statusEl.textContent = `${faults} Fault${faults > 1 ? 's' : ''} Detected`;
+    statusEl.style.color = 'var(--danger)';
+  } else {
+    summaryEl.classList.add('ok');
+    summaryEl.classList.remove('fault');
+    statusEl.textContent = 'All Systems Operational';
+    statusEl.style.color = 'var(--success)';
+  }
+
+  // Device list
+  const devEl = document.getElementById('mgmt-emerg-devices');
+  if (!devEl) return;
+  let html = '<div style="display:grid;grid-template-columns:32px 1fr 80px 80px 80px 70px;gap:8px;padding:4px 6px;font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);">';
+  html += '<div></div><div>Device</div><div>Battery</div><div>Last Func</div><div>Last Dur</div><div>RF Signal</div></div>';
+
+  MGMT.emergencyDevices.forEach(d => {
+    const batColor = d.battery === 'Good' ? 'var(--success)' : (d.battery === 'Degraded' ? 'var(--warning)' : 'var(--danger)');
+    const statusColor = d.status === 'OK' ? 'var(--success)' : 'var(--danger)';
+    const isFault = d.status !== 'OK';
+    html += `<div class="emerg-device-row${isFault ? ' fault' : ''}">`;
+    html += `<div style="width:10px;height:10px;border-radius:50%;background:${statusColor};box-shadow:0 0 4px ${statusColor};"></div>`;
+    html += `<div><div style="font-weight:600;color:var(--text);">${d.name}</div><div style="font-size:10px;color:var(--text-dim);">${d.location}</div></div>`;
+    html += `<div><div class="battery-bar"><div class="battery-fill" style="width:${d.batteryPct}%;background:${batColor};"></div></div><div style="font-size:10px;margin-top:2px;color:${batColor};">${d.batteryPct}%</div></div>`;
+    html += `<div style="font-size:10px;color:var(--text-dim);">${d.lastFuncTest.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}<br>${d.lastFuncTest.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>`;
+    html += `<div style="font-size:10px;color:var(--text-dim);">${d.lastDurTest.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}<br>${d.lastDurTest.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>`;
+    html += `<div>`;
+    for (let s = 1; s <= 4; s++) {
+      const cls = s <= d.rfStrength ? (s <= 1 ? 's1 weak' : s <= 2 ? 's2 med' : 's' + s) : '';
+      const opacity = s <= d.rfStrength ? '1' : '0.2';
+      html += `<span class="signal-bar ${cls}" style="opacity:${opacity};background:${s <= d.rfStrength ? (s <= 1 ? 'var(--danger)' : s <= 2 ? 'var(--warning)' : 'var(--success)') : 'var(--border)'};"></span>`;
+    }
+    html += `</div>`;
+    html += `</div>`;
+  });
+  devEl.innerHTML = html;
+
+  // Test log
+  const logEl = document.getElementById('mgmt-emerg-log');
+  if (!logEl) return;
+  let logHtml = '<thead><tr><th>Time</th><th>Device</th><th>Type</th><th>Result</th><th>Duration</th></tr></thead><tbody>';
+  MGMT.testLog.forEach(entry => {
+    const resultColor = entry.result === 'Pass' ? 'var(--success)' : 'var(--danger)';
+    logHtml += `<tr>`;
+    logHtml += `<td style="font-size:11px;">${entry.time.toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</td>`;
+    logHtml += `<td>${entry.device}</td>`;
+    logHtml += `<td>${entry.type}</td>`;
+    logHtml += `<td style="color:${resultColor};font-weight:600;">${entry.result}</td>`;
+    logHtml += `<td>${entry.duration ? entry.duration + ' min' : '—'}</td>`;
+    logHtml += `</tr>`;
+  });
+  logHtml += '</tbody>';
+  logEl.innerHTML = logHtml;
+}
+
+function mgmtRunFunctionTest() {
+  if (MGMT.testRunning) return;
+  MGMT.testRunning = true;
+  const btnFunc = document.getElementById('mgmt-btn-func-test');
+  const btnDur = document.getElementById('mgmt-btn-dur-test');
+  btnFunc.disabled = true; btnDur.disabled = true;
+  const wrap = document.getElementById('mgmt-test-progress-wrap');
+  const bar = document.getElementById('mgmt-test-bar');
+  const label = document.getElementById('mgmt-test-label');
+  const pct = document.getElementById('mgmt-test-pct');
+  wrap.style.display = 'block';
+  label.textContent = 'Running function test across all emergency luminaires...';
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += 5 + Math.random() * 8;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(interval);
+      bar.style.width = '100%';
+      pct.textContent = '100%';
+      setTimeout(() => {
+        // Results
+        const tested = MGMT.emergencyDevices.length;
+        const passed = tested - Math.floor(Math.random() * 2);
+        MGMT.testLog.unshift({
+          time: new Date(),
+          device: 'ALL (' + tested + ' devices)',
+          type: 'Function',
+          result: 'Pass',
+          duration: null,
+        });
+        // Randomly update last func test
+        MGMT.emergencyDevices.forEach(d => { d.lastFuncTest = new Date(); });
+        mgmtRenderEmergency();
+        wrap.style.display = 'none';
+        MGMT.testRunning = false;
+        btnFunc.disabled = false; btnDur.disabled = false;
+        mgmtToast(`Function test complete: ${passed}/${tested} passed`, passed === tested ? 'success' : 'warning');
+      }, 500);
+    }
+    bar.style.width = progress + '%';
+    pct.textContent = Math.round(progress) + '%';
+  }, 200);
+}
+
+function mgmtRunDurationTest() {
+  if (MGMT.testRunning) return;
+  MGMT.testRunning = true;
+  const btnFunc = document.getElementById('mgmt-btn-func-test');
+  const btnDur = document.getElementById('mgmt-btn-dur-test');
+  btnFunc.disabled = true; btnDur.disabled = true;
+  const wrap = document.getElementById('mgmt-test-progress-wrap');
+  const bar = document.getElementById('mgmt-test-bar');
+  const label = document.getElementById('mgmt-test-label');
+  const pct = document.getElementById('mgmt-test-pct');
+  wrap.style.display = 'block';
+  label.textContent = 'Running duration test (180 min rated) — simulating 3hr discharge...';
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += 3 + Math.random() * 5;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(interval);
+      bar.style.width = '100%';
+      pct.textContent = '100%';
+      setTimeout(() => {
+        const tested = MGMT.emergencyDevices.length;
+        const passed = tested - Math.floor(Math.random() * 2);
+        MGMT.testLog.unshift({
+          time: new Date(),
+          device: 'ALL (' + tested + ' devices)',
+          type: 'Duration',
+          result: 'Pass',
+          duration: 180,
+        });
+        MGMT.emergencyDevices.forEach(d => { d.lastDurTest = new Date(); });
+        mgmtRenderEmergency();
+        wrap.style.display = 'none';
+        MGMT.testRunning = false;
+        btnFunc.disabled = false; btnDur.disabled = false;
+        mgmtToast(`Duration test complete: ${passed}/${tested} passed — 180 min rated`, passed === tested ? 'success' : 'warning');
+      }, 500);
+    }
+    bar.style.width = progress + '%';
+    pct.textContent = Math.round(progress) + '%';
+  }, 150);
+}
+
+// ==================== ENERGY DASHBOARD RENDERING ====================
+function mgmtRenderEnergy() {
+  // Gauge
+  const gauge = document.getElementById('mgmt-energy-gauge');
+  if (gauge) {
+    const val = MGMT.energy.live;
+    const max = 40;
+    const pct = Math.min(1, val / max);
+    const angle = -90 + pct * 270;
+    const r = 70, cx = 90, cy = 90;
+    const startAngle = -90;
+    const endAngle = startAngle + 270 * pct;
+    const x1 = cx + r * Math.cos(startAngle * Math.PI / 180);
+    const y1 = cy + r * Math.sin(startAngle * Math.PI / 180);
+    const x2 = cx + r * Math.cos(endAngle * Math.PI / 180);
+    const y2 = cy + r * Math.sin(endAngle * Math.PI / 180);
+    const largeArc = pct > 0.5 ? 1 : 0;
+    let html = '';
+    // Background arc
+    html += `<path d="M ${cx + r * Math.cos(startAngle * Math.PI / 180)} ${cy + r * Math.sin(startAngle * Math.PI / 180)} A ${r} ${r} 0 1 1 ${cx + r * Math.cos((startAngle + 270) * Math.PI / 180)} ${cy + r * Math.sin((startAngle + 270) * Math.PI / 180)}" fill="none" stroke="var(--surface2)" stroke-width="12" stroke-linecap="round"/>`;
+    // Value arc
+    html += `<path d="M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}" fill="none" stroke="${pct > 0.8 ? 'var(--warning)' : 'var(--accent)'}" stroke-width="12" stroke-linecap="round"/>`;
+    // Needle
+    const needleX = cx + (r - 15) * Math.cos(angle * Math.PI / 180);
+    const needleY = cy + (r - 15) * Math.sin(angle * Math.PI / 180);
+    html += `<line x1="${cx}" y1="${cy}" x2="${needleX}" y2="${needleY}" stroke="var(--text)" stroke-width="3" stroke-linecap="round"/>`;
+    html += `<circle cx="${cx}" cy="${cy}" r="5" fill="var(--text)"/>`;
+    gauge.innerHTML = html;
+    document.getElementById('mgmt-energy-live').textContent = val.toFixed(1) + ' kW';
+    document.getElementById('mgmt-energy-live-sub').textContent = 'of ' + max + ' kW peak capacity';
+  }
+
+  // 24h chart
+  const chart = document.getElementById('mgmt-energy-chart');
+  if (chart) {
+    const data = MGMT.energy.history;
+    const w = 700, h = 200, pad = 30;
+    const maxVal = Math.max(...data, 35);
+    const stepX = (w - pad * 2) / (data.length - 1);
+    let points = data.map((v, i) => {
+      const x = pad + i * stepX;
+      const y = h - pad - (v / maxVal) * (h - pad * 2);
+      return `${x},${y}`;
+    });
+    let html = '';
+    // Grid
+    for (let i = 0; i <= 4; i++) {
+      const y = pad + (i / 4) * (h - pad * 2);
+      const val = maxVal - (i / 4) * maxVal;
+      html += `<line x1="${pad}" y1="${y}" x2="${w - pad}" y2="${y}" stroke="var(--border)" stroke-width="0.5" opacity="0.3"/>`;
+      html += `<text x="${pad - 5}" y="${y + 4}" font-size="9" fill="var(--text-dim)" text-anchor="end">${val.toFixed(0)}</text>`;
+    }
+    // Baseline
+    const baseY = h - pad - (MGMT.energy.baseline / maxVal) * (h - pad * 2);
+    html += `<line x1="${pad}" y1="${baseY}" x2="${w - pad}" y2="${baseY}" stroke="var(--accent3)" stroke-width="1" stroke-dasharray="4 4"/>`;
+    html += `<text x="${w - pad}" y="${baseY - 4}" font-size="9" fill="var(--accent3)" text-anchor="end">Baseline ${MGMT.energy.baseline}kW</text>`;
+    // Area
+    html += `<path d="M ${pad} ${h - pad} L ${points.join(' L ')} L ${w - pad} ${h - pad} Z" fill="url(#energyGrad)" opacity="0.3"/>`;
+    html += `<defs><linearGradient id="energyGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>`;
+    // Line
+    html += `<path d="M ${points.join(' L ')}" fill="none" stroke="var(--accent)" stroke-width="2"/>`;
+    // X-axis labels
+    for (let i = 0; i < 24; i += 4) {
+      const x = pad + i * stepX;
+      html += `<text x="${x}" y="${h - pad + 15}" font-size="9" fill="var(--text-dim)" text-anchor="middle">${i}:00</text>`;
+    }
+    chart.innerHTML = html;
+  }
+
+  // Zone energy bars
+  const zoneEl = document.getElementById('mgmt-zone-energy');
+  if (zoneEl) {
+    const max = Math.max(...MGMT.energy.zoneData.map(z => z.kWh));
+    let html = '';
+    const colors = ['var(--accent)','var(--accent2)','var(--accent3)','var(--accent4)','var(--accent5)','var(--accent6)'];
+    MGMT.energy.zoneData.forEach((z, i) => {
+      const pct = (z.kWh / max) * 100;
+      html += `<div class="zone-bar-row">`;
+      html += `<div class="zone-bar-label">${z.name}</div>`;
+      html += `<div class="zone-bar-track"><div class="zone-bar-fill" style="width:${pct}%;background:${colors[i % colors.length]};"></div></div>`;
+      html += `<div class="zone-bar-value">${z.kWh.toFixed(1)}kWh</div>`;
+      html += `</div>`;
+    });
+    zoneEl.innerHTML = html;
+  }
+
+  // Savings
+  const savingsEl = document.getElementById('mgmt-energy-savings');
+  if (savingsEl) {
+    const today = MGMT.energy.history.reduce((a, b) => a + b, 0);
+    const baseline = MGMT.energy.baseline * 24;
+    const savingsPct = ((baseline - today) / baseline * 100).toFixed(1);
+    const isPositive = savingsPct > 0;
+    savingsEl.innerHTML = `
+      <div style="font-size:32px;font-weight:700;color:${isPositive ? 'var(--success)' : 'var(--danger)'};">${isPositive ? '↓' : '↑'} ${Math.abs(savingsPct)}%</div>
+      <div class="energy-metric-sub">${today.toFixed(0)} kWh today vs ${baseline.toFixed(0)} kWh baseline</div>
+      <div style="margin-top:12px;display:flex;gap:16px;flex-wrap:wrap;">
+        <div class="savings-badge ${isPositive ? 'pos' : 'neg'}">${isPositive ? 'Saving' : 'Over'} ${Math.abs(today - baseline).toFixed(0)} kWh</div>
+        <div class="savings-badge pos">≈ €${(Math.abs(today - baseline) * 0.25).toFixed(2)}</div>
+      </div>
+    `;
+  }
+
+  // Daylight
+  const dlEl = document.getElementById('mgmt-daylight-contrib');
+  if (dlEl) {
+    const dl = MGMT.energy.daylight;
+    dlEl.innerHTML = `
+      <div style="font-size:28px;font-weight:700;color:var(--accent);">${dl}%</div>
+      <div class="energy-metric-sub">of lighting load offset by daylight harvesting</div>
+      <div style="margin-top:8px;height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;">
+        <div style="width:${dl}%;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent4));border-radius:5px;"></div>
+      </div>
+      <div style="margin-top:6px;font-size:11px;color:var(--text-dim);">DALI photo-sensors dim perimeter zones automatically</div>
+    `;
+  }
+
+  // Occupancy savings
+  const occEl = document.getElementById('mgmt-occupancy-savings');
+  if (occEl) {
+    const oc = MGMT.energy.occupancy;
+    occEl.innerHTML = `
+      <div style="font-size:28px;font-weight:700;color:var(--accent3);">${oc}%</div>
+      <div class="energy-metric-sub">energy saved via occupancy-based control</div>
+      <div style="margin-top:8px;height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;">
+        <div style="width:${oc}%;height:100%;background:linear-gradient(90deg,var(--accent3),var(--accent6));border-radius:5px;"></div>
+      </div>
+      <div style="margin-top:6px;font-size:11px;color:var(--text-dim);">PIR sensors turn off lights in unoccupied zones</div>
+    `;
+  }
+}
+
+// ==================== SCENE MANAGEMENT RENDERING ====================
+function mgmtRenderScenes() {
+  const grid = document.getElementById('mgmt-scene-grid');
+  if (!grid) return;
+  let html = '';
+  Object.entries(MGMT_SCENES).forEach(([key, scene]) => {
+    const isActive = key === MGMT.activeScene;
+    let preview = '';
+    for (let i = 0; i < 16; i++) {
+      const level = scene.levels[i % scene.levels.length];
+      const brightness = level / 100;
+      preview += `<div class="scene-preview-cell" style="background:${scene.color};opacity:${0.1 + brightness * 0.9};"></div>`;
+    }
+    html += `<div class="scene-card${isActive ? ' active' : ''}" data-scene="${key}" onclick="mgmtApplyScene('${key}')">`;
+    html += `<div class="scene-preview-grid">${preview}</div>`;
+    html += `<div class="scene-name" style="color:${scene.color};">${scene.name}</div>`;
+    html += `</div>`;
+  });
+  grid.innerHTML = html;
+}
+
+function mgmtApplyScene(sceneKey) {
+  const scene = MGMT_SCENES[sceneKey];
+  if (!scene) return;
+  MGMT.activeScene = sceneKey;
+  mgmtApplySceneToFloor(sceneKey);
+  mgmtRenderScenes();
+  mgmtToast('Scene "' + scene.name + '" activated', 'success');
+}
+
+// ==================== SCHEDULE RENDERING ====================
+function mgmtRenderSchedule() {
+  const table = document.getElementById('mgmt-schedule-table');
+  if (!table) return;
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  let html = '<thead><tr><th style="width:30px;"></th>';
+  for (let h = 0; h < 24; h++) {
+    html += `<th style="width:28px;">${h.toString().padStart(2,'0')}</th>`;
+  }
+  html += '</tr></thead><tbody>';
+  days.forEach((day, d) => {
+    html += `<tr><td style="font-size:10px;color:var(--text-dim);padding:2px;">${day}</td>`;
+    for (let h = 0; h < 24; h++) {
+      const scene = MGMT.schedule[d][h];
+      const color = scene ? MGMT_SCENES[scene].color : 'transparent';
+      const opacity = scene ? 0.7 : 0;
+      html += `<td><div class="schedule-cell" style="background:${color};opacity:${opacity};" onclick="mgmtCycleSchedule(${d},${h})" title="${day} ${h}:00 - ${scene ? MGMT_SCENES[scene].name : 'None'}"></div></td>`;
+    }
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+function mgmtCycleSchedule(day, hour) {
+  const current = MGMT.schedule[day][hour];
+  const idx = current ? MGMT_SCENE_NAMES.indexOf(current) : -1;
+  const next = MGMT_SCENE_NAMES[(idx + 1) % MGMT_SCENE_NAMES.length];
+  MGMT.schedule[day][hour] = next;
+  mgmtRenderSchedule();
+}
+
+function mgmtActivateSchedule() {
+  mgmtToast('Weekly schedule activated — scenes will auto-apply at scheduled times', 'success');
+}
+
+function mgmtClearSchedule() {
+  for (let d = 0; d < 7; d++) {
+    for (let h = 0; h < 24; h++) {
+      MGMT.schedule[d][h] = null;
+    }
+  }
+  mgmtRenderSchedule();
+  mgmtToast('Schedule cleared', 'info');
+}
+
+// ==================== DEVICE REGISTRY RENDERING ====================
+function mgmtUpdateFilterOptions() {
+  const types = [...new Set(MGMT.devices.map(d => d.type))].sort();
+  const locations = [...new Set(MGMT.devices.map(d => d.location))].sort();
+  const statuses = [...new Set(MGMT.devices.map(d => d.status))].sort();
+
+  const typeSel = document.getElementById('mgmt-filter-type');
+  const locSel = document.getElementById('mgmt-filter-location');
+  const statSel = document.getElementById('mgmt-filter-status');
+
+  const prevType = typeSel.value, prevLoc = locSel.value, prevStat = statSel.value;
+
+  typeSel.innerHTML = '<option value="">All Types</option>' + types.map(t => `<option value="${t}">${t}</option>`).join('');
+  locSel.innerHTML = '<option value="">All Locations</option>' + locations.map(l => `<option value="${l}">${l}</option>`).join('');
+  statSel.innerHTML = '<option value="">All Statuses</option>' + statuses.map(s => `<option value="${s}">${s}</option>`).join('');
+
+  typeSel.value = prevType; locSel.value = prevLoc; statSel.value = prevStat;
+}
+
+function mgmtRenderRegistry() {
+  const table = document.getElementById('mgmt-registry-table');
+  if (!table) return;
+  const search = document.getElementById('mgmt-registry-search').value.toLowerCase();
+  const typeFilter = document.getElementById('mgmt-filter-type').value;
+  const locFilter = document.getElementById('mgmt-filter-location').value;
+  const statFilter = document.getElementById('mgmt-filter-status').value;
+
+  let filtered = MGMT.devices.filter(d => {
+    if (search && !d.name.toLowerCase().includes(search) && !d.location.toLowerCase().includes(search) && !String(d.address).includes(search)) return false;
+    if (typeFilter && d.type !== typeFilter) return false;
+    if (locFilter && d.location !== locFilter) return false;
+    if (statFilter && d.status !== statFilter) return false;
+    return true;
+  });
+
+  // Sort
+  const { col, dir } = MGMT.registrySort;
+  filtered.sort((a, b) => {
+    let va = a[col], vb = b[col];
+    if (typeof va === 'string') return va.localeCompare(vb) * dir;
+    return (va - vb) * dir;
+  });
+
+  document.getElementById('mgmt-registry-count').textContent = filtered.length + ' devices';
+
+  let html = '<thead><tr>';
+  const cols = [
+    { key: 'address', label: 'DALI Addr' },
+    { key: 'name', label: 'Device Name' },
+    { key: 'type', label: 'Type' },
+    { key: 'location', label: 'Location' },
+    { key: 'lcm', label: 'LCM' },
+    { key: 'status', label: 'Status' },
+    { key: 'firmware', label: 'Firmware' },
+  ];
+  cols.forEach(c => {
+    const arrow = MGMT.registrySort.col === c.key ? (dir > 0 ? ' ↑' : ' ↓') : '';
+    html += `<th onclick="mgmtSortRegistry('${c.key}')">${c.label}${arrow}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  filtered.forEach(d => {
+    const isExpanded = MGMT.expandedRow === d.address;
+    const statusColor = d.status === 'Online' ? 'var(--success)' : d.status === 'Fault' ? 'var(--danger)' : d.status === 'Offline' ? 'var(--text-dim)' : 'var(--warning)';
+    html += `<tr class="${isExpanded ? 'expanded' : ''}" onclick="mgmtExpandRow(${d.address})">`;
+    html += `<td style="font-family:monospace;color:var(--accent);">${d.address}</td>`;
+    html += `<td style="font-weight:600;">${d.name}</td>`;
+    html += `<td>${d.type}</td>`;
+    html += `<td style="color:var(--text-dim);">${d.location}</td>`;
+    html += `<td style="color:var(--text-dim);">${d.lcm}</td>`;
+    html += `<td><span class="status-dot ${d.status.toLowerCase()}"></span>${d.status}</td>`;
+    html += `<td style="font-size:11px;color:var(--text-dim);">${d.firmware}</td>`;
+    html += `</tr>`;
+    if (isExpanded) {
+      html += `<tr class="registry-row-detail"><td colspan="7">`;
+      html += `<div class="detail-grid">`;
+      html += `<div class="detail-item"><div class="di-label">DALI Short Address</div><div class="di-value">${d.address}</div></div>`;
+      html += `<div class="detail-item"><div class="di-label">Group</div><div class="di-value">Group ${d.group}</div></div>`;
+      html += `<div class="detail-item"><div class="di-label">Scene</div><div class="di-value">Scene ${d.scene}</div></div>`;
+      html += `<div class="detail-item"><div class="di-label">Power</div><div class="di-value">${d.power} W</div></div>`;
+      html += `<div class="detail-item"><div class="di-label">Dim Level</div><div class="di-value">${d.dimLevel !== null ? d.dimLevel + '%' : 'N/A'}</div></div>`;
+      html += `<div class="detail-item"><div class="di-label">Firmware</div><div class="di-value">${d.firmware}</div></div>`;
+      html += `<div class="detail-item"><div class="di-label">LCM Assignment</div><div class="di-value">${d.lcm}</div></div>`;
+      html += `<div class="detail-item"><div class="di-label">Device Type</div><div class="di-value">${d.type}</div></div>`;
+      html += `</div>`;
+      html += `</td></tr>`;
+    }
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+function mgmtSortRegistry(col) {
+  if (MGMT.registrySort.col === col) {
+    MGMT.registrySort.dir *= -1;
+  } else {
+    MGMT.registrySort.col = col;
+    MGMT.registrySort.dir = 1;
+  }
+  mgmtRenderRegistry();
+}
+
+function mgmtExpandRow(address) {
+  MGMT.expandedRow = MGMT.expandedRow === address ? null : address;
+  mgmtRenderRegistry();
+}
+
+// ==================== LIVE UPDATES ====================
+function mgmtStartLiveUpdates() {
+  // Floor plan updates
+  setInterval(() => {
+    if (MGMT.activeView !== 'floorplan' && MGMT.activeView !== 'energy') return;
+    // Randomly toggle some fixtures
+    const numChanges = Math.floor(Math.random() * 3) + 1;
+    for (let i = 0; i < numChanges; i++) {
+      const fx = MGMT.fixtures[Math.floor(Math.random() * MGMT.fixtures.length)];
+      if (fx.type === 'Emergency') continue;
+      const states = ['on', 'on', 'on', 'off', 'daylit', 'off'];
+      fx.status = states[Math.floor(Math.random() * states.length)];
+      if (fx.status === 'on') fx.dimLevel = 60 + Math.floor(Math.random() * 40);
+      else if (fx.status === 'off') fx.dimLevel = 0;
+      else fx.dimLevel = 30 + Math.floor(Math.random() * 30);
+    }
+    // Occasionally set a fault
+    if (Math.random() > 0.8) {
+      const fx = MGMT.fixtures[Math.floor(Math.random() * MGMT.fixtures.length)];
+      if (fx.type !== 'Emergency') {
+        fx.status = 'fault';
+        fx.failureCode = 'E' + (100 + Math.floor(Math.random() * 50));
+      }
+    }
+    // Occasionally clear a fault
+    const faults = MGMT.fixtures.filter(f => f.status === 'fault');
+    if (faults.length > 0 && Math.random() > 0.5) {
+      const fx = faults[Math.floor(Math.random() * faults.length)];
+      fx.status = 'on';
+      fx.failureCode = null;
+      fx.dimLevel = 80;
+    }
+    // Update occupancy
+    MGMT.rooms.forEach(r => {
+      r.occupancy = Math.max(0, Math.min(1, r.occupancy + (Math.random() - 0.5) * 0.2));
+    });
+    if (MGMT.activeView === 'floorplan') mgmtRenderFloorPlan();
+
+    // Energy updates
+    MGMT.energy.live = 20 + Math.random() * 15;
+    const currentHour = new Date().getHours();
+    if (currentHour >= 0 && currentHour < 24) {
+      MGMT.energy.history[currentHour] = MGMT.energy.live;
+    }
+    MGMT.energy.daylight = 12 + Math.floor(Math.random() * 12);
+    MGMT.energy.occupancy = 10 + Math.floor(Math.random() * 10);
+    MGMT.energy.zoneData.forEach(z => { z.kWh = Math.max(1, z.kWh + (Math.random() - 0.5) * 2); });
+    if (MGMT.activeView === 'energy') mgmtRenderEnergy();
+  }, 3000);
+
+  // Emergency updates
+  setInterval(() => {
+    if (MGMT.activeView !== 'emergency') return;
+    // Randomly introduce/clear faults
+    if (Math.random() > 0.7) {
+      const d = MGMT.emergencyDevices[Math.floor(Math.random() * MGMT.emergencyDevices.length)];
+      if (d.status === 'OK') {
+        d.status = 'FAULT';
+        d.battery = Math.random() > 0.5 ? 'Degraded' : 'Good';
+        d.batteryPct = Math.max(20, d.batteryPct - 20);
+        MGMT.testLog.unshift({
+          time: new Date(),
+          device: d.name,
+          type: 'Auto-Check',
+          result: 'Fail',
+          duration: null,
+        });
+        mgmtToast(`Fault detected: ${d.name} — battery degradation`, 'danger');
+      } else {
+        d.status = 'OK';
+        d.battery = 'Good';
+        d.batteryPct = 85 + Math.floor(Math.random() * 15);
+        mgmtToast(`${d.name} — fault cleared, status restored`, 'success');
+      }
+      if (MGMT.testLog.length > 20) MGMT.testLog = MGMT.testLog.slice(0, 20);
+    }
+    mgmtRenderEmergency();
+  }, 5000);
+
+  // Topology dot animation is SVG-native, but update status occasionally
+  setInterval(() => {
+    if (MGMT.activeView !== 'topology') return;
+    // Randomly toggle a bus status
+    if (Math.random() > 0.9) {
+      const buses = MGMT.topologyNodes.filter(n => n.type === 'bus');
+      const bus = buses[Math.floor(Math.random() * buses.length)];
+      bus.status = bus.status === 'online' ? 'offline' : 'online';
+      mgmtRenderTopology();
+      mgmtToast(`DALI bus ${bus.label} — ${bus.status === 'online' ? 'restored' : 'went offline'}`, bus.status === 'online' ? 'success' : 'danger');
+    }
+  }, 8000);
+}
+
+// ==================== TOAST UTILITY ====================
+function mgmtToast(msg, type) {
+  type = type || 'info';
+  const existing = document.querySelector('.mgmt-toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.className = 'mgmt-toast ' + type;
+  toast.innerHTML = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.classList.add('show'), 10);
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+// ==================== AUTO-INIT ====================
+(function() {
+  // Wait for DOM and switchTab to be available
+  function tryInit() {
+    if (document.getElementById('mgmt-floorplan-svg')) {
+      mgmtInit();
+    } else {
+      setTimeout(tryInit, 200);
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryInit);
+  } else {
+    tryInit();
+  }
+})();
+</script>
+<!-- ==================== END MANAGEMENT PORTAL ==================== -->

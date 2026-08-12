@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo Manual — AI Solutions Demo Portal</title>
+  <style>
+    :root {
+      --bg: #0a0a1a;
+      --surface: #12122a;
+      --surface2: #1a1a3a;
+      --border: #2a2a5a;
+      --accent: #53d8fb;
+      --accent2: #7c5cfc;
+      --accent3: #f953ba;
+      --accent4: #34d399;
+      --accent5: #fbbf24;
+      --accent6: #f97316;
+      --accent7: #06b6d4;
+      --danger: #f87171;
+      --text: #e8e8f0;
+      --text-dim: #8888aa;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+    .header {
+      background: linear-gradient(135deg, #0a0a2a 0%, #1a0a3a 50%, #0a1a2a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 2rem 1.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header p { color: var(--text-dim); margin-top: 0.5rem; font-size: 1rem; }
+    .header .back-link {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.5rem 1.25rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .header .back-link:hover { border-color: var(--accent); background: rgba(83,216,251,0.05); }
+
+    .manual {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .intro {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+    .intro strong { color: var(--text); }
+    .intro a { color: var(--accent); }
+
+    .section {
+      margin-bottom: 2.5rem;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+    }
+    .section-header .cat-icon { font-size: 1.1rem; }
+    .section-header .cat-count {
+      font-size: 0.65rem;
+      font-weight: 400;
+      background: var(--surface);
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      letter-spacing: 0;
+    }
+
+    .demo-entry {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    .demo-entry:hover { border-color: var(--text-dim); }
+    .demo-entry h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .demo-entry h3 .demo-icon { font-size: 1.3rem; }
+    .demo-entry h3 .demo-tag {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: auto;
+    }
+    .demo-entry .demo-desc {
+      color: var(--text-dim);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      margin-bottom: 0.75rem;
+    }
+    .demo-entry .demo-how {
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+    .demo-entry .demo-how strong { color: var(--accent); }
+    .demo-entry .demo-how ul { margin: 0.3rem 0 0.3rem 1.2rem; padding: 0; }
+    .demo-entry .demo-how li { margin-bottom: 0.2rem; }
+    .demo-entry .demo-why {
+      margin-top: 0.5rem;
+      padding: 0.6rem 0.8rem;
+      background: var(--surface2);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      border-left: 3px solid var(--accent);
+    }
+    .demo-entry .demo-why strong { color: var(--text); }
+
+    /* Tag colours */
+    .tag-rag { background: rgba(83,216,251,0.15); color: var(--accent); }
+    .tag-market { background: rgba(124,92,252,0.15); color: var(--accent2); }
+    .tag-finance { background: rgba(249,83,186,0.15); color: var(--accent3); }
+    .tag-regulatory { background: rgba(52,211,153,0.15); color: var(--accent4); }
+    .tag-earnings { background: rgba(251,191,36,0.15); color: var(--accent5); }
+    .tag-churn { background: rgba(249,115,22,0.15); color: var(--accent6); }
+    .tag-rfp { background: rgba(6,182,212,0.15); color: var(--accent7); }
+    .tag-image { background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(83,216,251,0.15)); color: var(--accent2); }
+    .tag-tco { background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.15)); color: #10b981; }
+    .tag-readiness { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+    .tag-network { background: rgba(59,130,246,0.15); color: #3b82f6; }
+    .tag-autonomous { background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(6,182,212,0.15)); color: var(--accent2); }
+    .tag-vodafone { background: rgba(230,0,0,0.15); color: #e60000; }
+    .tag-cyber { background: linear-gradient(135deg, rgba(248,113,113,0.15), rgba(124,92,252,0.15)); color: var(--danger); }
+    .tag-swarm { background: linear-gradient(135deg, rgba(83,216,251,0.15), rgba(124,92,252,0.15)); color: var(--accent); }
+
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+    .footer a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 640px) {
+      .manual { padding: 1rem; }
+      .demo-entry { padding: 1rem; }
+      .demo-entry h3 { font-size: 1rem; flex-wrap: wrap; }
+      .demo-entry h3 .demo-tag { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📖 Demo Manual</h1>
+  <p>A plain-English guide to every demo on the AI Solutions Demo Portal</p>
+  <a class="back-link" href="/">← Back to Demo Portal</a>
+</div>
+
+<div class="manual">
+
+  <div class="intro">
+    <strong>What is this portal?</strong><br>
+    This portal is a collection of interactive demos that show what large language models (LLMs) can do in real business scenarios. Each demo is a working application — you type something in, and an AI processes it live. No slides, no mockups — real AI calls in real time.<br><br>
+    <strong>How to use it:</strong> Pick any demo card, click it, and follow the instructions on screen. Most demos take 30–60 seconds to run. The AI models are hosted on <a href="https://tensorx.ai" target="_blank">Tensorx</a>, an EU-based AI provider. Your data stays in Europe and is not stored after processing.<br><br>
+    <strong>Who is this for?</strong> Anyone who wants to see AI in action — no technical knowledge required. The descriptions below explain what each demo does in plain terms.
+  </div>
+
+  <!-- GENERAL DEMOS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="cat-icon">⚙️</span> General Demos <span class="cat-count">6</span>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">📚</span> Retrieval-Augmented Generation (RAG) <span class="demo-tag tag-rag">Knowledge Base</span></h3>
+      <p class="demo-desc">Upload documents and ask questions — the AI retrieves relevant context from your docs and the web, generating grounded answers with source citations.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>You paste in one or more documents (product specs, policies, technical docs, anything)</li>
+          <li>You ask a question in plain English</li>
+          <li>The AI searches your documents for relevant passages</li>
+          <li>It can also search the web for supplementary information</li>
+          <li>It writes an answer and cites which document/website each fact came from</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> This is how companies build internal knowledge bases. Instead of searching through hundreds of pages, employees just ask questions and get instant answers with citations. It eliminates hallucinations because the AI only uses your source material.</div>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">📊</span> Market Research <span class="demo-tag tag-market">Competitive Intel</span></h3>
+      <p class="demo-desc">Analyse competitors, market trends, and industry dynamics with live web data. Get structured reports with SWOT analysis and strategic recommendations.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>You enter a company name, industry, or topic</li>
+          <li>The AI searches the web for the latest news, reports, and data</li>
+          <li>It structures the findings into a market research report</li>
+          <li>Includes SWOT analysis (Strengths, Weaknesses, Opportunities, Threats)</li>
+          <li>Provides strategic recommendations you could action</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> Market research that used to take a team of analysts a week can now be done in 60 seconds. The AI reads dozens of sources and synthesises them into a single coherent report.</div>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">📝</span> RFP Drafter <span class="demo-tag tag-rfp">Bid & Proposals</span></h3>
+      <p class="demo-desc">Paste RFP text or describe requirements — the system searches for relevant capabilities and case studies, then AI drafts section-by-section responses.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>You paste the requirements from a Request for Proposal (RFP) or tender document</li>
+          <li>The AI searches the web for your company's relevant capabilities and case studies</li>
+          <li>It drafts a professional response, section by section</li>
+          <li>Each section addresses the specific requirements in the RFP</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> RFP responses are time-consuming and repetitive. This demo shows how AI can draft the first 80% of a response in seconds, letting your team focus on review and customisation.</div>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">🎨</span> Image Generator <span class="demo-tag tag-image">Image Generation</span></h3>
+      <p class="demo-desc">Enter a text prompt and select a style — the AI generates a high-quality image using gpt-image-1.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>You type a description of the image you want (e.g., "a red fox in a snowy forest at sunset")</li>
+          <li>You can choose a style (photorealistic, digital art, oil painting, etc.)</li>
+          <li>The AI generates a unique image from scratch based on your description</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> Visual content creation is one of the most visible AI use cases. This demo shows how text can be turned into production-quality imagery — useful for marketing, design, and prototyping.</div>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">📋</span> AI Readiness Assessment <span class="demo-tag tag-readiness">Strategy</span></h3>
+      <p class="demo-desc">Executive diagnostic for C-level leaders. Guided 5-step assessment evaluates your AI maturity across strategy, data, infrastructure, governance, and investment — then recommends cloud, hybrid, or on-premise deployment with cost projections and a priority roadmap.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>You answer 5 sets of questions about your organisation's current state</li>
+          <li>Questions cover: AI strategy, data quality, infrastructure, governance, and budget</li>
+          <li>The AI scores your maturity on each dimension (1–5)</li>
+          <li>It recommends whether to use cloud, hybrid, or on-premise AI deployment</li>
+          <li>It generates a priority roadmap with cost projections</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> Many organisations want to adopt AI but don't know where to start. This assessment gives executives a clear picture of their readiness and a concrete action plan — in minutes, not months.</div>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">🧮</span> Inference TCO Calculator <span class="demo-tag tag-tco">Infrastructure</span></h3>
+      <p class="demo-desc">Compare on-premise GPU inference vs cloud APIs and GPU instances. Adjust workload, model, and hardware to build a 3-year TCO business case. Supports Llama, DeepSeek, GLM, Qwen, and more.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>You set your workload parameters: number of users, queries per day, model size</li>
+          <li>You choose hardware: GPU type (e.g., RTX 5000, H100), number of GPUs</li>
+          <li>The calculator compares three options: on-premise, cloud API (per-token), and cloud GPU instances</li>
+          <li>It shows the 3-year Total Cost of Ownership (TCO) for each</li>
+          <li>The AI generates a narrative business case explaining which option is best and why</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> Every CIO asks "should we run AI in the cloud or on our own servers?" This demo answers that with real numbers — hardware costs, electricity, personnel vs cloud per-token pricing. It turns a complex financial decision into a clear comparison.</div>
+    </div>
+  </div>
+
+  <!-- FINANCE DEMOS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="cat-icon">💰</span> Finance Demos <span class="cat-count">4</span>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">💰</span> Financial Analysis <span class="demo-tag tag-finance">Financial</span></h3>
+      <p class="demo-desc">Process financial data, fetch live market context, and generate investment insights. AI-powered analysis of revenue, margins, and valuation. Now with A/B model comparison mode.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>You enter a company name or paste financial data (revenue, margins, growth rates)</li>
+          <li>The AI fetches live market data and news from the web</li>
+          <li>It analyses revenue trends, profit margins, and valuation metrics</li>
+          <li>It generates an investment insight report with recommendations</li>
+          <li><strong>A/B Compare mode:</strong> Toggle to "A/B Compare" to run two AI models side by side on the same financial data. Select any two models (DeepSeek, GLM, Claude, Qwen) and watch both analyses stream in parallel with timing and cost tracking.</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> Financial analysts spend hours gathering data and building models. This demo shows how AI can pull live market data, run the numbers, and produce a structured analysis in seconds. The A/B comparison mode lets you evaluate which AI model produces better financial analysis — critical for deciding which models to deploy in production.</div>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">⚖️</span> Regulatory Impact Analyser <span class="demo-tag tag-regulatory">Compliance</span></h3>
+      <p class="demo-desc">Paste a regulation name or text — the system searches the web for latest guidance, then AI maps affected policies, identifies compliance gaps, and suggests remediation. Now with A/B model comparison mode.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>You enter a regulation (e.g., "EU AI Act", "GDPR Article 22", "DORA")</li>
+          <li>The AI searches the web for the latest regulatory guidance and interpretations</li>
+          <li>It maps which of your policies and processes are affected</li>
+          <li>It identifies compliance gaps — where you might fall short</li>
+          <li>It suggests specific remediation steps</li>
+          <li><strong>A/B Compare mode:</strong> Toggle to compare two AI models side by side on the same regulation. See which model identifies more compliance gaps, produces better remediation plans, or catches different risks.</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> Regulatory compliance is expensive and slow. AI can read regulations, compare them against your policies, and flag gaps — work that would take a legal team days. The A/B comparison lets compliance teams evaluate which model is more thorough at gap detection before deploying in production.</div>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">📈</span> Earnings Call Analyser <span class="demo-tag tag-earnings">Investor Relations</span></h3>
+      <p class="demo-desc">Enter a company name to search for recent earnings call data. AI extracts key themes, quantifies sentiment, flags risk language, and generates an investor brief. Now with A/B model comparison mode.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>You enter a public company name (e.g., "Microsoft", "Vodafone")</li>
+          <li>The AI searches for the company's latest earnings call transcript</li>
+          <li>It extracts the key themes discussed by management</li>
+          <li>It quantifies sentiment — is the CEO optimistic, cautious, or negative?</li>
+          <li>It flags risk language (e.g., "challenging", headwinds", "headcount reduction")</li>
+          <li>It generates a 1-page investor brief</li>
+          <li><strong>A/B Compare mode:</strong> Toggle to compare two AI models side by side on the same earnings call. Compare sentiment scores, risk flagging, and briefing quality between models in real time.</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> Earnings calls are dense, hour-long events. Investors and analysts need to extract signal from noise quickly. The A/B comparison mode is especially valuable here — sentiment analysis is subjective, and seeing two models' interpretations side by side reveals how different models weight bullish vs bearish signals.</div>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">🔄</span> Churn Prediction <span class="demo-tag tag-churn">Customer Retention</span></h3>
+      <p class="demo-desc">Enter customer data and the system searches for competitor offers and churn benchmarks. AI identifies at-risk customers, explains why, and recommends retention actions. Now with A/B model comparison mode.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>You enter customer information (usage patterns, tenure, support tickets, contract details)</li>
+          <li>The AI searches the web for current competitor offers and industry churn benchmarks</li>
+          <li>It identifies which customers are at risk of leaving (churning)</li>
+          <li>It explains why each at-risk customer might leave</li>
+          <li>It recommends specific retention actions (discounts, upgrades, outreach)</li>
+          <li><strong>A/B Compare mode:</strong> Toggle to compare two AI models side by side on the same customer data. See if both models agree on the churn risk level, and which one recommends more actionable retention strategies.</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> Acquiring a new customer costs 5–25× more than keeping an existing one. This demo shows how AI can predict churn before it happens. The A/B comparison lets customer success teams evaluate model accuracy — if two models disagree on churn risk, that's a signal the case needs human review.</div>
+    </div>
+  </div>
+
+  <!-- TELCO DEMOS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="cat-icon">📡</span> Telco Demos <span class="cat-count">2</span>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">📡</span> Telco Network Intelligence <span class="demo-tag tag-network">Network Analytics</span></h3>
+      <p class="demo-desc">Dashboard for telco CTOs. Visualise network traffic and customer usage data, segment subscribers by behaviour, and let AI recommend personalised data, roaming, and 5G offers with revenue uplift projections.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>The dashboard loads with simulated telecom network data (traffic, usage, subscriber profiles)</li>
+          <li>You can segment subscribers by behaviour (heavy data users, frequent roamers, etc.)</li>
+          <li>The AI analyses usage patterns and recommends personalised offers</li>
+          <li>It projects revenue uplift for each recommendation</li>
+          <li>Charts visualise network load, customer segments, and projected revenue</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> Telecom operators have millions of subscribers and vast network data. This demo shows how AI can turn raw network telemetry into personalised offers — moving from one-size-fits-all pricing to individualised plans that maximise both customer satisfaction and revenue.</div>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">🤖</span> Autonomous Network Simulator <span class="demo-tag tag-autonomous">Closed-Loop Automation</span></h3>
+      <p class="demo-desc">Interactive simulation of the Vodafone / Google Cloud / TM Forum autonomous networks framework. Inject network events into a 5G network slice and watch the three-tier loop-of-loops (Business → Service → Resource) cycle through the AADE closed-loop in real time — then get an AI-generated CTO briefing.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>A simulated 5G network slice is displayed with live KPIs (latency, throughput, availability)</li>
+          <li>You inject network events (e.g., "antenna failure", "traffic spike", "latency degradation")</li>
+          <li>The system runs the AADE closed loop: Awareness → Analysis → Decision → Execution</li>
+          <li>Three tiers cycle independently: Business, Service, and Resource</li>
+          <li>The network self-heals in real time — you watch the KPIs recover</li>
+          <li>The AI generates a CTO-level briefing explaining what happened and what was done</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> Telecom networks are moving from manually-managed to self-optimising. This demo shows the TM Forum autonomous networks framework in action — the same framework Vodafone, Google Cloud, and other operators are deploying. It demonstrates how AI can detect, diagnose, and fix network problems without human intervention.</div>
+    </div>
+
+  </div>
+
+  <!-- CYBER SECURITY DEMOS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="cat-icon">🛡️</span> Cyber Security Demos <span class="cat-count">3</span>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">🛡️</span> AI-vs-AI Incident Timeline <span class="demo-tag tag-cyber">Incident Response</span></h3>
+      <p class="demo-desc">Walk through the HuggingFace July 2026 security incident phase-by-phase. See how an autonomous AI agent attacked, and how AI-assisted detection, forensic analysis, and remediation responded — including the guardrail asymmetry problem.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>The demo presents 6 phases of a real security incident (the HuggingFace July 2026 breach)</li>
+          <li>Each phase shows security telemetry — timestamps, events, severity levels, source systems</li>
+          <li>You click "Run AI Analysis" on each phase</li>
+          <li>The AI processes the raw log data and explains what happened, maps it to MITRE ATT&CK techniques, and identifies what the attacker was doing</li>
+          <li>Phases: Initial Access → Lateral Movement → AI Detection → Forensic Analysis → Containment → The Asymmetry Problem</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> This is a real incident that happened in July 2026. An autonomous AI agent attacked HuggingFace, and they used AI to detect and respond. The demo shows the full timeline — attack and defense — and ends with a critical lesson: commercial AI models blocked the defenders from analysing attack artifacts, while the attacker had no such restrictions. This "guardrail asymmetry" is a problem every organisation needs to plan for.</div>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">⚔️</span> Autonomous Threat Simulation <span class="demo-tag tag-cyber">Attack & Defense</span></h3>
+      <p class="demo-desc">Real-time split-screen: watch an autonomous AI agent attack a mock AI platform while a defense agent detects, contains, and remediates. Three scenarios including the HuggingFace supply chain attack, AI-driven ransomware, and insider data exfiltration.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>You choose a scenario: Supply Chain Attack, Ransomware, or Insider Data Exfiltration</li>
+          <li>You click "Start Simulation" and watch a real-time split-screen</li>
+          <li>The left panel shows the attacker agent executing steps (upload, exploit, harvest, spread)</li>
+          <li>The right panel shows the defense agent responding (detect, correlate, contain, remediate)</li>
+          <li>You can adjust speed (0.5× to 4×)</li>
+          <li>When the simulation finishes, you can generate an AI-written incident briefing</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> Autonomous AI attacks are no longer theoretical — the HuggingFace incident proved it. This demo shows what an AI-vs-AI attack looks like in real time: the attacker runs thousands of actions at machine speed, and the defender must use AI to keep up. It's a visual demonstration of why manual incident response can't match autonomous threats.</div>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">🔍</span> AI Forensic Log Analyzer <span class="demo-tag tag-cyber">Forensic Analysis</span></h3>
+      <p class="demo-desc">Feed a realistic 17,000-event attack log to an LLM and watch it reconstruct the attack in real-time: timeline, IOCs, compromised credentials, MITRE ATT&CK mapping, and remediation playbook. Toggle between commercial (guardrail-blocked) and open-weight models.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>The demo loads a realistic attack log (simulated events from a HuggingFace-style breach)</li>
+          <li>You choose your analysis model: Commercial API (e.g., GPT, Claude) or Open-Weight (GLM 5.2 on-premise)</li>
+          <li>If you pick Commercial: you see the requests get <strong>blocked by safety guardrails</strong> — the model refuses to process attack commands, C2 addresses, and credentials (exactly what happened to HuggingFace)</li>
+          <li>If you pick Open-Weight: the AI runs the full forensic analysis — reconstructs the attack timeline, extracts IOCs (IPs, domains, hashes), maps MITRE ATT&CK techniques, identifies compromised credentials, and generates a remediation playbook</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> This demo is the most important one for security teams. It demonstrates the "guardrail asymmetry problem": commercial AI models can't tell the difference between an attacker and a defender, so they block incident responders from analysing real attack artifacts. Meanwhile, attackers use unrestricted models. The lesson: you need a capable open-weight model on your own infrastructure, vetted and ready <em>before</em> an incident. This also keeps sensitive attack data and credentials from leaving your environment.</div>
+    </div>
+  </div>
+
+  <!-- ADVANCED -->
+  <div class="section">
+    <div class="section-header">
+      <span class="cat-icon">🤖</span> Agentic Demos <span class="cat-count">2</span>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">🐝</span> Multi-Agent Research Swarm <span class="demo-tag tag-swarm">Multi-Agent</span></h3>
+      <p class="demo-desc">Ask a complex business question and watch a team of specialist AI agents work in parallel — each searching the web, reasoning independently, then combining findings into an executive briefing.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>You ask a complex question (e.g., "Should we enter the Polish telecom market?")</li>
+          <li>The system deploys multiple AI agents, each with a different role (market analyst, financial analyst, risk assessor, strategist)</li>
+          <li>Each agent independently searches the web and reasons about the question from its own perspective</li>
+          <li>The agents share findings with each other</li>
+          <li>They combine their analyses into a single executive briefing</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> A single AI model can only look at a problem from one angle. This demo shows how multiple specialised AI agents can collaborate — like a team of human analysts — each bringing a different lens to the same question. This is the future of complex research and decision-making.</div>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">🚀</span> Agentic Employee Onboarding <span class="demo-tag tag-swarm">Agentic Workflow</span></h3>
+      <p class="demo-desc">Chat with an AI onboarding coordinator powered by DeepSeek. 6 specialist agents run real LLM→tool→result loops, calling simulated IT systems (email, Slack, GitHub, inventory, contracts, VPN). Watch their reasoning live. Inject failures to test resilience. Onboarded employees are saved to a database.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>The AI coordinator (DeepSeek) greets you and asks for the new hire's details naturally — name, email, role, department, start date, location, manager</li>
+          <li>You can provide info one piece at a time or all at once — the AI adapts</li>
+          <li>You can use voice input (mic button) or type — voice auto-submits</li>
+          <li>Once collected, 6 specialist agents spin up: Identity &amp; Access, Hardware &amp; Assets, Documentation &amp; Compliance, Knowledge &amp; Training, Workspace Setup, and Orchestrator</li>
+          <li>Each agent runs a real agentic loop — the LLM decides which tool to call, reads the result, adapts, and decides the next step (not a scripted checklist)</li>
+          <li>Agents call 10 simulated IT system APIs: email provisioning, Slack invites, GitHub org access, hardware inventory, employment contracts, e-signature approvals, VPN configuration, compliance training, calendar scheduling, and asset registration</li>
+          <li>Agents share state with each other — Identity creates the email, Workspace uses it to configure VPN; Hardware assigns an asset tag, Orchestrator logs it in the final report</li>
+          <li>Some agents wait for others to finish (dependencies): Knowledge and Workspace wait for Identity; Orchestrator waits for all 5 others</li>
+          <li>Each agent panel shows a live reasoning log with timestamps — thinking (🤔), tool calls (🔧), results (📋), successes (✅), and warnings (⚠️)</li>
+          <li>Inject failures mid-workflow with the buttons at the top: laptop out of stock, email collision, approval delayed, VPN down — agents detect the failure and adapt (generate email variant, defer to Day 2, flag for procurement)</li>
+          <li>The Orchestrator validates all tasks, detects issues (e.g. duplicate training), and generates a personalized welcome packet with a first-week schedule</li>
+          <li>The employee is saved to a persistent database — type "review employees" or "list employees" in the chat to see everyone who's been onboarded</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> This demo shows the difference between a chatbot and an AI agent. A chatbot answers questions. An agent decides what to do, calls tools to do it, reads the results, adapts to failures, and coordinates with other agents — exactly like a human IT team would, but at machine speed. The simulated IT systems are realistic (inventory depletes, emails collide, approvals get delayed) so you can see how the agents handle real-world messiness. The failure injection feature lets you test resilience live — what happens when the laptop is out of stock or the VPN is down? The agent doesn't crash, it adapts.</div>
+    </div>
+  </div>
+
+  <div class="intro" style="margin-top: 2rem;">
+    <strong>Need help?</strong><br>
+    Each demo has instructions on screen. If you get stuck or want to see a specific capability, contact <a href="mailto:neil.bowden@dell.com">Neil Bowden</a>.
+  </div>
+
+</div>
+
+<div class="footer">
+  Powered by <a href="https://tensorx.ai" target="_blank">Tensorx</a> · Built by <a href="/">Pug</a>
+</div>
+
+</body>
+</html>

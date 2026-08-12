@@ -82,7 +82,7 @@ body {
   .main { grid-template-columns: 1fr; }
 }
 
-/* SIDEBAR — INPUTS */
+/* SIDEBAR */
 .sidebar {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -181,7 +181,31 @@ details.advanced summary:hover { color: var(--text); }
 details.advanced[open] summary { border-bottom: 1px solid var(--border); }
 details.advanced .adv-body { padding: 0.7rem; }
 
-/* CONTENT — RESULTS */
+/* SCENARIO CARDS */
+.scenario-info {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.scenario-info strong { color: var(--accent); }
+.scenario-info .tag {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-left: 0.3rem;
+}
+.tag-dev { background: rgba(83,216,251,0.15); color: var(--accent); }
+.tag-cs { background: rgba(52,211,153,0.15); color: var(--success); }
+.tag-agent { background: rgba(124,92,252,0.15); color: var(--accent2); }
+
+/* CONTENT */
 .content { display: flex; flex-direction: column; gap: 1rem; }
 
 /* KPI CARDS */
@@ -225,8 +249,8 @@ details.advanced .adv-body { padding: 0.7rem; }
   margin-bottom: 0.75rem;
   font-weight: 600;
 }
-.chart-wrap { position: relative; height: 320px; }
-.chart-wrap.short { height: 250px; }
+.chart-wrap { position: relative; height: 380px; }
+.chart-wrap.short { height: 280px; }
 
 /* TABLE */
 .table-card {
@@ -265,6 +289,29 @@ tr:hover td { background: rgba(83,216,251,0.03); }
 .verdict .highlight { color: var(--accent); font-weight: 700; }
 .verdict .savings { color: var(--success); font-weight: 700; font-size: 1.1rem; }
 
+/* PROVIDER LEGEND */
+.provider-section {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+.provider-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+.provider-chip .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+
 /* HELPERS */
 .hidden { display: none; }
 .badge {
@@ -278,6 +325,7 @@ tr:hover td { background: rgba(83,216,251,0.03); }
 }
 .badge.best { background: rgba(52,211,153,0.15); color: var(--success); }
 .badge.worst { background: rgba(248,113,113,0.15); color: var(--danger); }
+.note { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.3rem; }
 </style>
 </head>
 <body>
@@ -285,19 +333,22 @@ tr:hover td { background: rgba(83,216,251,0.03); }
 <div class="header">
   <div>
     <h1>AI Inference TCO Calculator</h1>
-    <p>On-Premise vs Cloud — 3-Year Total Cost of Ownership Comparison</p>
+    <p>On-Prem (Dell) vs Cloud (AWS, GCP, Azure) vs API (Anthropic, OpenAI, Gemini) — 3-Year TCO</p>
   </div>
   <div class="preset-row">
-    <button class="preset-btn" onclick="applyPreset('low')">Low Volume</button>
-    <button class="preset-btn active" onclick="applyPreset('medium')">Medium Volume</button>
-    <button class="preset-btn" onclick="applyPreset('high')">High Volume</button>
-    <button class="preset-btn" onclick="applyPreset('veryhigh')">Very High</button>
+    <button class="preset-btn" onclick="applyScenario('dev-team', this)">Large Dev Team</button>
+    <button class="preset-btn active" onclick="applyScenario('cs-chat', this)">Customer Service Chat</button>
+    <button class="preset-btn" onclick="applyScenario('agentic', this)">Agentic Workflow</button>
+    <button class="preset-btn" onclick="applyScenario('custom', this)">Custom</button>
   </div>
 </div>
 
 <div class="main">
   <!-- SIDEBAR -->
   <div class="sidebar">
+    <!-- Scenario Description -->
+    <div class="scenario-info" id="scenarioInfo"></div>
+
     <div class="input-section">
       <h3>Workload</h3>
       <div class="input-group">
@@ -307,11 +358,11 @@ tr:hover td { background: rgba(83,216,251,0.03); }
       <div class="input-row-2">
         <div class="input-group">
           <label>Input tokens/req <span class="val" id="lbl-inTok">500</span></label>
-          <input type="range" id="inTok" min="50" max="2000" step="10" value="500">
+          <input type="range" id="inTok" min="50" max="8000" step="10" value="500">
         </div>
         <div class="input-group">
           <label>Output tokens/req <span class="val" id="lbl-outTok">200</span></label>
-          <input type="range" id="outTok" min="10" max="1000" step="10" value="200">
+          <input type="range" id="outTok" min="10" max="4000" step="10" value="200">
         </div>
       </div>
       <div class="input-group">
@@ -321,29 +372,19 @@ tr:hover td { background: rgba(83,216,251,0.03); }
     </div>
 
     <div class="input-section">
-      <h3>Model & Hardware</h3>
+      <h3>On-Prem Model & Dell Hardware</h3>
       <div class="input-group">
-        <label>Model</label>
-        <select id="model">
-          <option value="llama70b">Llama 3 70B Instruct</option>
-          <option value="llama8b">Llama 3 8B Instruct</option>
-          <option value="mixtral">Mixtral 8x7B</option>
-          <option value="llama405b">Llama 3.1 405B</option>
-          <option value="qwen32b">Qwen3 32B</option>
-          <option value="dsv3">DeepSeek V3 (671B MoE)</option>
-          <option value="dsr1">DeepSeek R1 (671B MoE)</option>
-          <option value="glm4_9b">GLM-4-9B</option>
-          <option value="glm45">GLM-4.5 (355B MoE)</option>
-        </select>
-      </div>
-      <div class="input-group">
-        <label>On-prem GPU type</label>
-        <select id="gpuType" onchange="updateGpuDefaults()">
-          <option value="h100_80">NVIDIA H100 80GB SXM</option>
-          <option value="h200_141">NVIDIA H200 141GB</option>
-          <option value="a100_80">NVIDIA A100 80GB</option>
-          <option value="l40s_48">NVIDIA L40S 48GB</option>
-          <option value="rtx6000_96">RTX 6000 Pro 96GB</option>
+        <label>Model (Dell HF FP8 variants)</label>
+        <select id="model" onchange="updateModelDefaults()">
+          <option value="llama70b_fp8">Llama 3.1 70B FP8 (dell/Llama-3.1-70B-Instruct-FP8)</option>
+          <option value="llama8b_fp8">Llama 3.1 8B FP8 (dell/Llama-3.1-8B-Instruct-FP8)</option>
+          <option value="mixtral_fp8">Mixtral 8x7B FP8 (dell/Mixtral-8x7B-Instruct-FP8)</option>
+          <option value="qwen32b_fp8">Qwen2.5 32B FP8 (dell/Qwen2.5-32B-Instruct-FP8)</option>
+          <option value="dsv3_fp8">DeepSeek V3 FP8 (dell/DeepSeek-V3-FP8)</option>
+          <option value="dsr1_fp8">DeepSeek R1 FP8 (dell/DeepSeek-R1-FP8)</option>
+          <option value="llama405b_fp8">Llama 3.1 405B FP8 (dell/Llama-3.1-405B-Instruct-FP8)</option>
+          <option value="phi4_fp8">Phi-4 14B FP8 (dell/Phi-4-FP8)</option>
+          <option value="mistral_nemo_fp8">Mistral Nemo 12B FP8 (dell/Mistral-Nemo-12B-FP8)</option>
         </select>
       </div>
       <div class="input-group">
@@ -358,12 +399,22 @@ tr:hover td { background: rgba(83,216,251,0.03); }
           <option value="custom">Custom</option>
         </select>
       </div>
+      <div class="input-group">
+        <label>On-prem GPU type</label>
+        <select id="gpuType" onchange="updateGpuDefaults()">
+          <option value="h100_80">NVIDIA H100 80GB SXM</option>
+          <option value="h200_141">NVIDIA H200 141GB</option>
+          <option value="a100_80">NVIDIA A100 80GB</option>
+          <option value="l40s_48">NVIDIA L40S 48GB</option>
+          <option value="rtx6000_96">RTX 6000 Ada 96GB</option>
+        </select>
+      </div>
     </div>
 
     <div class="input-section">
       <h3>On-Prem Costs</h3>
       <div class="input-group">
-        <label>Hardware cost (EUR) <span class="val" id="lbl-hwCost">€320K</span></label>
+        <label>Hardware cost per server (EUR) <span class="val" id="lbl-hwCost">€320K</span></label>
         <input type="range" id="hwCost" min="20000" max="600000" step="5000" value="320000">
       </div>
       <div class="input-row-2">
@@ -416,10 +467,10 @@ tr:hover td { background: rgba(83,216,251,0.03); }
         <summary>GPU VRAM & quantization</summary>
         <div class="adv-body">
           <div class="input-group">
-            <label>Quantization</label>
+            <label>Quantization (Dell FP8 default)</label>
             <select id="quant">
               <option value="fp16">FP16 / BF16 (2 bytes/weight)</option>
-              <option value="fp8">FP8 (1 byte/weight)</option>
+              <option value="fp8" selected>FP8 (1 byte/weight) — Dell HF</option>
               <option value="int4">INT4 / GPTQ (0.5 bytes/weight)</option>
             </select>
           </div>
@@ -438,36 +489,72 @@ tr:hover td { background: rgba(83,216,251,0.03); }
     <div class="input-section">
       <h3>Cloud API Pricing (EUR / 1M tokens)</h3>
       <details class="advanced" open>
-        <summary>Managed API providers</summary>
+        <summary>Per-token API providers</summary>
         <div class="adv-body">
+          <!-- Anthropic -->
+          <div style="font-size:0.72rem;color:var(--accent);margin-bottom:0.3rem;font-weight:600;">Anthropic (Claude)</div>
           <div class="input-row-2">
             <div class="input-group">
-              <label>DeepInfra input</label>
-              <input type="number" id="di_in" step="0.01" value="0.092">
+              <label>Claude Sonnet 4 — input</label>
+              <input type="number" id="anthro_sonnet_in" step="0.01" value="2.50">
             </div>
             <div class="input-group">
-              <label>DeepInfra output</label>
-              <input type="number" id="di_out" step="0.01" value="0.294">
+              <label>Claude Sonnet 4 — output</label>
+              <input type="number" id="anthro_sonnet_out" step="0.01" value="10.00">
             </div>
           </div>
           <div class="input-row-2">
             <div class="input-group">
-              <label>Bedrock input</label>
-              <input type="number" id="bd_in" step="0.01" value="0.543">
+              <label>Claude Haiku 3.5 — input</label>
+              <input type="number" id="anthro_haiku_in" step="0.01" value="0.80">
             </div>
             <div class="input-group">
-              <label>Bedrock output</label>
-              <input type="number" id="bd_out" step="0.01" value="0.911">
+              <label>Claude Haiku 3.5 — output</label>
+              <input type="number" id="anthro_haiku_out" step="0.01" value="4.00">
+            </div>
+          </div>
+          <!-- OpenAI -->
+          <div style="font-size:0.72rem;color:var(--accent);margin-bottom:0.3rem;font-weight:600;margin-top:0.5rem;">OpenAI</div>
+          <div class="input-row-2">
+            <div class="input-group">
+              <label>GPT-4o — input</label>
+              <input type="number" id="openai_4o_in" step="0.01" value="2.06">
+            </div>
+            <div class="input-group">
+              <label>GPT-4o — output</label>
+              <input type="number" id="openai_4o_out" step="0.01" value="8.28">
             </div>
           </div>
           <div class="input-row-2">
             <div class="input-group">
-              <label>Together AI input</label>
-              <input type="number" id="tg_in" step="0.01" value="0.810">
+              <label>GPT-4o-mini — input</label>
+              <input type="number" id="openai_mini_in" step="0.01" value="0.15">
             </div>
             <div class="input-group">
-              <label>Together AI output</label>
-              <input type="number" id="tg_out" step="0.01" value="0.810">
+              <label>GPT-4o-mini — output</label>
+              <input type="number" id="openai_mini_out" step="0.01" value="0.60">
+            </div>
+          </div>
+          <!-- Gemini -->
+          <div style="font-size:0.72rem;color:var(--accent);margin-bottom:0.3rem;font-weight:600;margin-top:0.5rem;">Google Gemini</div>
+          <div class="input-row-2">
+            <div class="input-group">
+              <label>Gemini 2.0 Flash — input</label>
+              <input type="number" id="gemini_flash_in" step="0.01" value="0.10">
+            </div>
+            <div class="input-group">
+              <label>Gemini 2.0 Flash — output</label>
+              <input type="number" id="gemini_flash_out" step="0.01" value="0.40">
+            </div>
+          </div>
+          <div class="input-row-2">
+            <div class="input-group">
+              <label>Gemini 2.0 Pro — input</label>
+              <input type="number" id="gemini_pro_in" step="0.01" value="1.25">
+            </div>
+            <div class="input-group">
+              <label>Gemini 2.0 Pro — output</label>
+              <input type="number" id="gemini_pro_out" step="0.01" value="5.00">
             </div>
           </div>
         </div>
@@ -477,62 +564,79 @@ tr:hover td { background: rgba(83,216,251,0.03); }
     <div class="input-section">
       <h3>Cloud GPU Instances (EUR/hr)</h3>
       <details class="advanced" open>
-        <summary>Self-managed GPU VMs</summary>
+        <summary>Self-managed GPU VMs (AWS / GCP / Azure)</summary>
         <div class="adv-body">
+          <div style="font-size:0.72rem;color:var(--accent);margin-bottom:0.3rem;font-weight:600;">AWS</div>
           <div class="input-group">
-            <label>AWS p5.48xlarge (8× H100)</label>
+            <label>p5.48xlarge (8× H100) — EUR/hr</label>
             <input type="number" id="aws_p5" step="0.01" value="90.46">
           </div>
           <div class="input-group">
-            <label>AWS p4de.24xlarge (8× A100)</label>
+            <label>p4de.24xlarge (8× A100) — EUR/hr</label>
             <input type="number" id="aws_p4de" step="0.01" value="37.69">
           </div>
+          <div style="font-size:0.72rem;color:var(--accent);margin-bottom:0.3rem;font-weight:600;margin-top:0.5rem;">GCP</div>
           <div class="input-group">
-            <label>GCP a3-highgpu-8g (8× H100)</label>
+            <label>a3-highgpu-8g (8× H100) — EUR/hr</label>
             <input type="number" id="gcp_a3" step="0.01" value="72.68">
           </div>
           <div class="input-group">
-            <label>Azure ND H100 v5 (8× H100)</label>
+            <label>a2-ultragpu-8g (8× A100) — EUR/hr</label>
+            <input type="number" id="gcp_a2" step="0.01" value="35.24">
+          </div>
+          <div style="font-size:0.72rem;color:var(--accent);margin-bottom:0.3rem;font-weight:600;margin-top:0.5rem;">Azure</div>
+          <div class="input-group">
+            <label>ND H100 v5 (8× H100) — EUR/hr</label>
             <input type="number" id="azure_h100" step="0.01" value="90.53">
+          </div>
+          <div class="input-group">
+            <label>ND A100 v4 (8× A100) — EUR/hr</label>
+            <input type="number" id="azure_a100" step="0.01" value="27.20">
           </div>
         </div>
       </details>
     </div>
   </div>
 
-  <!-- CONTENT — RESULTS -->
+  <!-- CONTENT -->
   <div class="content">
     <!-- KPI ROW -->
     <div class="kpi-row" id="kpiRow"></div>
 
-    <!-- COST COMPARISON CHART -->
+    <!-- TCO CHART -->
     <div class="chart-card">
-      <h3>3-Year TCO Comparison by Deployment Model</h3>
+      <h3>3-Year TCO Comparison — All Deployment Models</h3>
       <div class="chart-wrap"><canvas id="tcoChart"></canvas></div>
+    </div>
+
+    <!-- COST BREAKDOWN BY YEAR -->
+    <div class="chart-card">
+      <h3>Annual Cost Breakdown — Year 1 vs Year 2-3</h3>
+      <div class="chart-wrap short"><canvas id="yearChart"></canvas></div>
     </div>
 
     <!-- COST PER TOKEN CHART -->
     <div class="chart-card">
-      <h3>Cost per 1M Tokens — On-Prem vs Utilization</h3>
+      <h3>Cost per 1M Tokens — On-Prem vs API Providers</h3>
       <div class="chart-wrap short"><canvas id="utilChart"></canvas></div>
     </div>
 
     <!-- BREAK-EVEN CHART -->
     <div class="chart-card">
-      <h3>Cumulative Cost Over Time — On-Prem vs Cloud API</h3>
+      <h3>Cumulative Cost Over 3 Years — On-Prem vs Cheapest API</h3>
       <div class="chart-wrap short"><canvas id="breakevenChart"></canvas></div>
     </div>
 
     <!-- SUMMARY TABLE -->
     <div class="table-card">
-      <h3>Detailed Cost Breakdown</h3>
+      <h3>Detailed Cost Breakdown — All Providers</h3>
       <table id="resultsTable">
         <thead>
           <tr>
             <th>Deployment Model</th>
             <th>Capex</th>
             <th>Opex/yr</th>
-            <th>Total Cost</th>
+            <th>3-Year Total</th>
             <th>Cost / 1M tok</th>
             <th>Servers/Instances</th>
           </tr>
@@ -550,17 +654,17 @@ tr:hover td { background: rgba(83,216,251,0.03); }
 </div>
 
 <script>
-// ====== MODEL SPECS ======
+// ====== MODEL SPECS (Dell HF FP8 variants) ======
 var MODELS = {
-  llama70b:  { name: 'Llama 3 70B', params: 70e9, layers: 80, kvHeads: 8, headDim: 128, tpsBase: 35 },
-  llama8b:   { name: 'Llama 3 8B', params: 8e9, layers: 32, kvHeads: 8, headDim: 128, tpsBase: 200 },
-  mixtral:   { name: 'Mixtral 8x7B', params: 46.7e9, layers: 32, kvHeads: 8, headDim: 128, tpsBase: 120 },
-  llama405b: { name: 'Llama 3.1 405B', params: 405e9, layers: 126, kvHeads: 8, headDim: 128, tpsBase: 10 },
-  qwen32b:   { name: 'Qwen3 32B', params: 32e9, layers: 64, kvHeads: 8, headDim: 128, tpsBase: 80 },
-  dsv3:      { name: 'DeepSeek V3', params: 671e9, layers: 61, kvHeads: 4, headDim: 128, tpsBase: 12, moe: true, activeParams: 37e9 },
-  dsr1:      { name: 'DeepSeek R1', params: 671e9, layers: 61, kvHeads: 4, headDim: 128, tpsBase: 10, moe: true, activeParams: 37e9 },
-  glm4_9b:   { name: 'GLM-4-9B', params: 9e9, layers: 40, kvHeads: 8, headDim: 128, tpsBase: 180 },
-  glm45:     { name: 'GLM-4.5', params: 355e9, layers: 93, kvHeads: 8, headDim: 128, tpsBase: 15, moe: true, activeParams: 32e9 },
+  llama70b_fp8:    { name: 'Llama 3.1 70B FP8', hfRepo: 'dell/Llama-3.1-70B-Instruct-FP8', params: 70e9, layers: 80, kvHeads: 8, headDim: 128, tpsBase: 35 },
+  llama8b_fp8:     { name: 'Llama 3.1 8B FP8', hfRepo: 'dell/Llama-3.1-8B-Instruct-FP8', params: 8e9, layers: 32, kvHeads: 8, headDim: 128, tpsBase: 200 },
+  mixtral_fp8:     { name: 'Mixtral 8x7B FP8', hfRepo: 'dell/Mixtral-8x7B-Instruct-FP8', params: 46.7e9, layers: 32, kvHeads: 8, headDim: 128, tpsBase: 120, moe: true, activeParams: 13e9 },
+  qwen32b_fp8:     { name: 'Qwen2.5 32B FP8', hfRepo: 'dell/Qwen2.5-32B-Instruct-FP8', params: 32e9, layers: 64, kvHeads: 8, headDim: 128, tpsBase: 80 },
+  dsv3_fp8:        { name: 'DeepSeek V3 FP8', hfRepo: 'dell/DeepSeek-V3-FP8', params: 671e9, layers: 61, kvHeads: 4, headDim: 128, tpsBase: 12, moe: true, activeParams: 37e9 },
+  dsr1_fp8:        { name: 'DeepSeek R1 FP8', hfRepo: 'dell/DeepSeek-R1-FP8', params: 671e9, layers: 61, kvHeads: 4, headDim: 128, tpsBase: 10, moe: true, activeParams: 37e9 },
+  llama405b_fp8:   { name: 'Llama 3.1 405B FP8', hfRepo: 'dell/Llama-3.1-405B-Instruct-FP8', params: 405e9, layers: 126, kvHeads: 8, headDim: 128, tpsBase: 10 },
+  phi4_fp8:        { name: 'Phi-4 14B FP8', hfRepo: 'dell/Phi-4-FP8', params: 14e9, layers: 40, kvHeads: 8, headDim: 128, tpsBase: 150 },
+  mistral_nemo_fp8:{ name: 'Mistral Nemo 12B FP8', hfRepo: 'dell/Mistral-Nemo-12B-FP8', params: 12e9, layers: 40, kvHeads: 8, headDim: 128, tpsBase: 160 },
 };
 
 // ====== GPU SPECS ======
@@ -569,29 +673,46 @@ var GPU_SPECS = {
   h200_141:   { name: 'H200 141GB', vram: 141, tpsFactor: 0.75, price: 36000 },
   a100_80:    { name: 'A100 80GB', vram: 80, tpsFactor: 0.50, price: 15000 },
   l40s_48:    { name: 'L40S 48GB', vram: 48, tpsFactor: 0.35, price: 7000 },
-  rtx6000_96:{ name: 'RTX 6000 Pro 96GB', vram: 96, tpsFactor: 0.50, price: 9000 },
+  rtx6000_96:{ name: 'RTX 6000 Ada 96GB', vram: 96, tpsFactor: 0.50, price: 9000 },
 };
 
-// ====== SERVER CONFIGS ======
+// ====== SERVER CONFIGS (Dell) ======
 var SERVER_CONFIGS = {
   xe9680_h100:    { hwCost: 320000, gpus: 8, gpuType: 'h100_80', power: 4.0, tps: 1000, vram: 80 },
   xe8640_h100:    { hwCost: 200000, gpus: 4, gpuType: 'h100_80', power: 2.3, tps: 1000, vram: 80 },
   r760xa_a100:    { hwCost: 160000, gpus: 4, gpuType: 'a100_80', power: 2.0, tps: 600, vram: 80 },
   r760xa_l40s:    { hwCost: 65000,  gpus: 4, gpuType: 'l40s_48', power: 1.2, tps: 300, vram: 48 },
-  xe9680_h200:   { hwCost: 420000, gpus: 8, gpuType: 'h200_141', power: 4.5, tps: 1100, vram: 141 },
-  xe7745_rtx:    { hwCost: 110000, gpus: 8, gpuType: 'rtx6000_96', power: 2.0, tps: 500, vram: 96 },
+  xe9680_h200:    { hwCost: 420000, gpus: 8, gpuType: 'h200_141', power: 4.5, tps: 1100, vram: 141 },
+  xe7745_rtx:     { hwCost: 110000, gpus: 8, gpuType: 'rtx6000_96', power: 2.0, tps: 500, vram: 96 },
 };
 
-// ====== PRESETS ======
-var PRESETS = {
-  low:      { reqMonth: 1000000, inTok: 300, outTok: 150, label: 'Low — Internal Assistant' },
-  medium:   { reqMonth: 10000000, inTok: 500, outTok: 200, label: 'Medium — Departmental AI' },
-  high:     { reqMonth: 100000000, inTok: 500, outTok: 200, label: 'High — Enterprise Platform' },
-  veryhigh: { reqMonth: 500000000, inTok: 800, outTok: 300, label: 'Very High — SaaS Scale' },
+// ====== SCENARIOS ======
+var SCENARIOS = {
+  'dev-team': {
+    label: 'Large Development Team',
+    tag: 'tag-dev',
+    description: '200 developers using AI coding assistant. ~500 requests/dev/day. Large input context (code files), moderate output (code completions, explanations). High volume, latency-tolerant.',
+    reqMonth: 3000000, inTok: 2000, outTok: 500,
+    model: 'llama70b_fp8', server: 'xe9680_h100',
+  },
+  'cs-chat': {
+    label: 'Customer Service Chat Assistant',
+    tag: 'tag-cs',
+    description: 'Customer-facing chatbot handling support queries. Moderate volume, low latency requirement (<2s). Short conversations, mix of input (customer query + system prompt) and output (response).',
+    reqMonth: 10000000, inTok: 500, outTok: 200,
+    model: 'llama70b_fp8', server: 'xe9680_h100',
+  },
+  'agentic': {
+    label: 'Agentic Workflow',
+    tag: 'tag-agent',
+    description: 'Multi-step AI agent performing research, tool calls, and synthesis. Each "request" triggers 5-10 LLM calls internally. Long input (accumulated context), long output (reasoning + tool calls). High token density per request.',
+    reqMonth: 2000000, inTok: 3000, outTok: 1000,
+    model: 'dsv3_fp8', server: 'xe9680_h200',
+  },
 };
 
 var HOURS_PER_YEAR = 8760;
-var tcoChart = null, utilChart = null, breakevenChart = null;
+var tcoChart = null, yearChart = null, utilChart = null, breakevenChart = null;
 
 // ====== STATE ======
 function getState() {
@@ -601,17 +722,14 @@ function getState() {
   var bytesPerWeight = quant === 'fp16' ? 2 : quant === 'fp8' ? 1 : 0.5;
 
   return {
-    // Workload
     reqMonth: parseFloat(document.getElementById('reqMonth').value),
     inTok: parseInt(document.getElementById('inTok').value),
     outTok: parseInt(document.getElementById('outTok').value),
     years: parseInt(document.getElementById('years').value),
-    // Model
     model: m,
-    // On-prem
     hwCost: parseFloat(document.getElementById('hwCost').value),
     gpusPerServer: parseInt(document.getElementById('gpusPerServer').value),
-    tps: parseFloat(document.getElementById('tps').value),  // per GPU
+    tps: parseFloat(document.getElementById('tps').value),
     power: parseFloat(document.getElementById('power').value),
     pue: parseFloat(document.getElementById('pue').value),
     elec: parseFloat(document.getElementById('elec').value),
@@ -623,18 +741,26 @@ function getState() {
     util: parseInt(document.getElementById('util').value) / 100,
     vram: parseInt(document.getElementById('vram').value),
     bytesPerWeight: bytesPerWeight,
-    // Cloud API
-    di_in: parseFloat(document.getElementById('di_in').value),
-    di_out: parseFloat(document.getElementById('di_out').value),
-    bd_in: parseFloat(document.getElementById('bd_in').value),
-    bd_out: parseFloat(document.getElementById('bd_out').value),
-    tg_in: parseFloat(document.getElementById('tg_in').value),
-    tg_out: parseFloat(document.getElementById('tg_out').value),
+    // API pricing
+    anthro_sonnet_in: parseFloat(document.getElementById('anthro_sonnet_in').value),
+    anthro_sonnet_out: parseFloat(document.getElementById('anthro_sonnet_out').value),
+    anthro_haiku_in: parseFloat(document.getElementById('anthro_haiku_in').value),
+    anthro_haiku_out: parseFloat(document.getElementById('anthro_haiku_out').value),
+    openai_4o_in: parseFloat(document.getElementById('openai_4o_in').value),
+    openai_4o_out: parseFloat(document.getElementById('openai_4o_out').value),
+    openai_mini_in: parseFloat(document.getElementById('openai_mini_in').value),
+    openai_mini_out: parseFloat(document.getElementById('openai_mini_out').value),
+    gemini_flash_in: parseFloat(document.getElementById('gemini_flash_in').value),
+    gemini_flash_out: parseFloat(document.getElementById('gemini_flash_out').value),
+    gemini_pro_in: parseFloat(document.getElementById('gemini_pro_in').value),
+    gemini_pro_out: parseFloat(document.getElementById('gemini_pro_out').value),
     // Cloud GPU
     aws_p5: parseFloat(document.getElementById('aws_p5').value),
     aws_p4de: parseFloat(document.getElementById('aws_p4de').value),
     gcp_a3: parseFloat(document.getElementById('gcp_a3').value),
+    gcp_a2: parseFloat(document.getElementById('gcp_a2').value),
     azure_h100: parseFloat(document.getElementById('azure_h100').value),
+    azure_a100: parseFloat(document.getElementById('azure_a100').value),
   };
 }
 
@@ -642,54 +768,50 @@ function getState() {
 function calcVRAM(s) {
   var modelWeights = s.model.params * s.bytesPerWeight;
   var kvPerToken = 2 * s.model.layers * s.model.kvHeads * s.model.headDim * s.bytesPerWeight;
-  var kvTotal = kvPerToken * 4096; // assume 4K context
+  var kvTotal = kvPerToken * 4096;
   var overhead = modelWeights * 0.10;
-  return (modelWeights + kvTotal + overhead) / 1e9; // GB
+  return (modelWeights + kvTotal + overhead) / 1e9;
 }
 
 function calcOnprem(s) {
   var reqPerSec = s.reqMonth / (30 * 24 * 3600);
   var outputTpsNeeded = reqPerSec * s.outTok;
   var serverTps = s.tps * s.gpusPerServer;
-  // Account for target utilization — don't run at 100%
   var sustainableTps = serverTps * s.util;
   var numServers = Math.max(1, Math.ceil(outputTpsNeeded / sustainableTps));
   
-  // VRAM check
   var vramNeeded = calcVRAM(s);
   var vramPerServer = s.vram * s.gpusPerServer;
   var minServersVram = Math.ceil(vramNeeded / vramPerServer);
   if (minServersVram > numServers) numServers = minServersVram;
 
-  // Costs
   var hardware = s.hwCost * numServers;
   var powerAnnual = s.power * numServers * s.pue * HOURS_PER_YEAR * s.elec;
   var coloAnnual = s.colo * 12 * numServers;
   var mlopsAnnual = s.salary * s.fte;
   var maintAnnual = s.maint;
   
-  // Multi-year: hardware upfront, opex per year, maint from year 2
   var year1 = hardware + powerAnnual + coloAnnual + mlopsAnnual + maintAnnual;
   var yearAfter = powerAnnual + coloAnnual + mlopsAnnual + maintAnnual;
   var totalCost = year1 + yearAfter * (s.years - 1);
   
-  // Token volume
   var annualInputTok = s.reqMonth * s.inTok * 12;
   var annualOutputTok = s.reqMonth * s.outTok * 12;
   var annualTotalTok = annualInputTok + annualOutputTok;
   var totalTokens = annualTotalTok * s.years;
-  
   var costPer1M = totalTokens > 0 ? totalCost / (totalTokens / 1e6) : Infinity;
   
-  // Actual utilization (output demand vs peak output capacity)
   var annualOutputTokens = s.reqMonth * s.outTok * 12;
   var maxAnnualOutput = serverTps * numServers * HOURS_PER_YEAR * 3600;
   var utilizationPct = annualOutputTokens / maxAnnualOutput * 100;
 
   return {
-    name: 'On-Prem (' + GPU_SPECS[document.getElementById('gpuType').value].name + ')',
+    name: 'On-Prem Dell (' + GPU_SPECS[document.getElementById('gpuType').value].name + ')',
+    shortName: 'On-Prem Dell',
     capex: hardware,
     opexAnnual: powerAnnual + coloAnnual + mlopsAnnual + maintAnnual,
+    year1: year1,
+    yearAfter: yearAfter,
     total: totalCost,
     costPer1M: costPer1M,
     units: numServers,
@@ -700,10 +822,12 @@ function calcOnprem(s) {
     utilization: utilizationPct,
     vramNeeded: vramNeeded,
     maxThroughput: maxAnnualOutput,
+    type: 'onprem',
+    color: 'rgba(124,92,252,0.8)',
   };
 }
 
-function calcCloudAPI(s, name, inPrice, outPrice) {
+function calcCloudAPI(s, name, shortName, inPrice, outPrice, color) {
   var annualInputTok = s.reqMonth * s.inTok * 12;
   var annualOutputTok = s.reqMonth * s.outTok * 12;
   var annualCost = (annualInputTok / 1e6 * inPrice) + (annualOutputTok / 1e6 * outPrice);
@@ -711,10 +835,10 @@ function calcCloudAPI(s, name, inPrice, outPrice) {
   var annualTotalTok = annualInputTok + annualOutputTok;
   var totalTokens = annualTotalTok * s.years;
   var costPer1M = totalTokens > 0 ? total / (totalTokens / 1e6) : Infinity;
-  return { name: name, capex: 0, opexAnnual: annualCost, total: total, costPer1M: costPer1M, units: 0 };
+  return { name: name, shortName: shortName, capex: 0, opexAnnual: annualCost, year1: annualCost, yearAfter: annualCost, total: total, costPer1M: costPer1M, units: 0, type: 'api', color: color };
 }
 
-function calcCloudGPU(s, name, priceHr, gpusPerInst, tpsPerGpu) {
+function calcCloudGPU(s, name, shortName, priceHr, gpusPerInst, tpsPerGpu, color) {
   var reqPerSec = s.reqMonth / (30 * 24 * 3600);
   var outputTpsNeeded = reqPerSec * s.outTok;
   var instTps = tpsPerGpu * gpusPerInst;
@@ -730,27 +854,31 @@ function calcCloudGPU(s, name, priceHr, gpusPerInst, tpsPerGpu) {
   var totalTokens = annualTotalTok * s.years;
   var costPer1M = totalTokens > 0 ? total / (totalTokens / 1e6) : Infinity;
   
-  return { name: name, capex: 0, opexAnnual: annualCost, total: total, costPer1M: costPer1M, units: numInstances };
+  return { name: name, shortName: shortName, capex: 0, opexAnnual: annualCost, year1: annualCost, yearAfter: annualCost, total: total, costPer1M: costPer1M, units: numInstances, type: 'cloud-gpu', color: color };
 }
 
 function computeAll() {
   var s = getState();
   var results = [];
   
-  // Cloud APIs
-  results.push(calcCloudAPI(s, 'DeepInfra API', s.di_in, s.di_out));
-  results.push(calcCloudAPI(s, 'AWS Bedrock API', s.bd_in, s.bd_out));
-  results.push(calcCloudAPI(s, 'Together AI API', s.tg_in, s.tg_out));
+  // API providers
+  results.push(calcCloudAPI(s, 'Anthropic Claude Sonnet 4', 'Claude Sonnet 4', s.anthro_sonnet_in, s.anthro_sonnet_out, 'rgba(217,119,87,0.8)'));
+  results.push(calcCloudAPI(s, 'Anthropic Claude Haiku 3.5', 'Claude Haiku 3.5', s.anthro_haiku_in, s.anthro_haiku_out, 'rgba(217,119,87,0.6)'));
+  results.push(calcCloudAPI(s, 'OpenAI GPT-4o', 'GPT-4o', s.openai_4o_in, s.openai_4o_out, 'rgba(52,211,153,0.8)'));
+  results.push(calcCloudAPI(s, 'OpenAI GPT-4o-mini', 'GPT-4o-mini', s.openai_mini_in, s.openai_mini_out, 'rgba(52,211,153,0.6)'));
+  results.push(calcCloudAPI(s, 'Google Gemini 2.0 Flash', 'Gemini 2.0 Flash', s.gemini_flash_in, s.gemini_flash_out, 'rgba(83,216,251,0.8)'));
+  results.push(calcCloudAPI(s, 'Google Gemini 2.0 Pro', 'Gemini 2.0 Pro', s.gemini_pro_in, s.gemini_pro_out, 'rgba(83,216,251,0.6)'));
   
   // On-prem
   results.push(calcOnprem(s));
   
   // Cloud GPU instances
-  var gpu = GPU_SPECS[document.getElementById('gpuType').value];
-  results.push(calcCloudGPU(s, 'AWS p5.48xlarge (8x H100)', s.aws_p5, 8, 1000));
-  results.push(calcCloudGPU(s, 'AWS p4de.24xlarge (8x A100)', s.aws_p4de, 8, 600));
-  results.push(calcCloudGPU(s, 'GCP a3-highgpu-8g (8x H100)', s.gcp_a3, 8, 1000));
-  results.push(calcCloudGPU(s, 'Azure ND H100 v5 (8x H100)', s.azure_h100, 8, 1000));
+  results.push(calcCloudGPU(s, 'AWS p5.48xlarge (8× H100)', 'AWS p5 H100', s.aws_p5, 8, 1000, 'rgba(249,83,186,0.8)'));
+  results.push(calcCloudGPU(s, 'AWS p4de.24xlarge (8× A100)', 'AWS p4de A100', s.aws_p4de, 8, 600, 'rgba(248,113,113,0.8)'));
+  results.push(calcCloudGPU(s, 'GCP a3-highgpu-8g (8× H100)', 'GCP a3 H100', s.gcp_a3, 8, 1000, 'rgba(52,211,153,0.8)'));
+  results.push(calcCloudGPU(s, 'GCP a2-ultragpu-8g (8× A100)', 'GCP a2 A100', s.gcp_a2, 8, 600, 'rgba(52,211,153,0.6)'));
+  results.push(calcCloudGPU(s, 'Azure ND H100 v5 (8× H100)', 'Azure H100', s.azure_h100, 8, 1000, 'rgba(6,182,212,0.8)'));
+  results.push(calcCloudGPU(s, 'Azure ND A100 v4 (8× A100)', 'Azure A100', s.azure_a100, 8, 600, 'rgba(6,182,212,0.6)'));
   
   return { results: results, state: s };
 }
@@ -784,10 +912,9 @@ function render() {
   var results = data.results;
   var s = data.state;
   
-  // Sort by total cost
   var sorted = results.slice().sort(function(a,b) { return a.total - b.total; });
   var cheapest = sorted[0];
-  var onprem = results.find(function(r) { return r.name.indexOf('On-Prem') >= 0; });
+  var onprem = results.find(function(r) { return r.type === 'onprem'; });
   
   // KPI cards
   var annualInputTok = s.reqMonth * s.inTok * 12;
@@ -795,20 +922,21 @@ function render() {
   var annualTotalTok = annualInputTok + annualOutputTok;
   
   var kpiHtml = '';
-  kpiHtml += '<div class="kpi-card green"><div class="label">Cheapest Option</div><div class="value">' + cheapest.name + '</div><div class="sub">' + fmtEURfull(cheapest.total) + ' over ' + s.years + ' years</div></div>';
+  kpiHtml += '<div class="kpi-card green"><div class="label">Cheapest Option</div><div class="value" style="font-size:1.1rem;">' + cheapest.shortName + '</div><div class="sub">' + fmtEURfull(cheapest.total) + ' over ' + s.years + ' years</div></div>';
   
   if (onprem) {
-    var cloudApi = results.filter(function(r) { return r.name.indexOf('API') >= 0; }).sort(function(a,b) { return a.total - b.total; })[0];
+    var cloudApis = results.filter(function(r) { return r.type === 'api'; }).sort(function(a,b) { return a.total - b.total; });
+    var cheapestApi = cloudApis[0];
     var savings = 0, savingsPct = 0;
     var label = '';
-    if (onprem.total < cloudApi.total) {
-      savings = cloudApi.total - onprem.total;
-      savingsPct = savings / cloudApi.total * 100;
-      label = 'On-prem saves ' + fmtEUR(savings) + ' (' + savingsPct.toFixed(0) + '%) vs cheapest cloud API';
+    if (onprem.total < cheapestApi.total) {
+      savings = cheapestApi.total - onprem.total;
+      savingsPct = savings / cheapestApi.total * 100;
+      label = 'On-prem saves ' + fmtEUR(savings) + ' (' + savingsPct.toFixed(0) + '%) vs cheapest API';
     } else {
-      savings = onprem.total - cloudApi.total;
+      savings = onprem.total - cheapestApi.total;
       savingsPct = savings / onprem.total * 100;
-      label = 'Cloud API saves ' + fmtEUR(savings) + ' (' + savingsPct.toFixed(0) + '%) vs on-prem';
+      label = 'API saves ' + fmtEUR(savings) + ' (' + savingsPct.toFixed(0) + '%) vs on-prem';
     }
     kpiHtml += '<div class="kpi-card orange"><div class="label">Cost Difference</div><div class="value">' + fmtEUR(savings) + '</div><div class="sub">' + label + '</div></div>';
   }
@@ -816,42 +944,24 @@ function render() {
   kpiHtml += '<div class="kpi-card"><div class="label">Annual Token Volume</div><div class="value">' + fmtTok(annualTotalTok) + '</div><div class="sub">' + fmtTok(s.reqMonth) + ' req/mo</div></div>';
   
   if (onprem) {
-    kpiHtml += '<div class="kpi-card purple"><div class="label">On-Prem Servers Needed</div><div class="value">' + onprem.numServers + '</div><div class="sub">' + onprem.utilization.toFixed(0) + '% peak utilization (' + (s.util*100).toFixed(0) + '% target)</div></div>';
+    kpiHtml += '<div class="kpi-card purple"><div class="label">On-Prem Servers Needed</div><div class="value">' + onprem.numServers + '</div><div class="sub">' + onprem.utilization.toFixed(0) + '% peak utilization</div></div>';
   }
   
   document.getElementById('kpiRow').innerHTML = kpiHtml;
   
-  // TCO Chart
   renderTCOChart(results);
-  
-  // Utilization chart
-  renderUtilChart(s);
-  
-  // Break-even chart
-  renderBreakevenChart(s, onprem);
-  
-  // Table
+  renderYearChart(results, s);
+  renderUtilChart(s, results);
+  renderBreakevenChart(s, onprem, results);
   renderTable(sorted, s);
-  
-  // Verdict
-  renderVerdict(sorted, onprem, s);
+  renderVerdict(sorted, onprem, s, results);
 }
 
 function renderTCOChart(results) {
-  var labels = results.map(function(r) { return r.name; });
+  var labels = results.map(function(r) { return r.shortName; });
   var totals = results.map(function(r) { return r.total; });
-  var colors = results.map(function(r) {
-    if (r.name.indexOf('On-Prem') >= 0) return 'rgba(124,92,252,0.8)';
-    if (r.name.indexOf('DeepInfra') >= 0) return 'rgba(83,216,251,0.8)';
-    if (r.name.indexOf('Bedrock') >= 0) return 'rgba(251,191,36,0.8)';
-    if (r.name.indexOf('Together') >= 0) return 'rgba(249,115,22,0.8)';
-    if (r.name.indexOf('p5') >= 0) return 'rgba(249,83,186,0.8)';
-    if (r.name.indexOf('p4de') >= 0) return 'rgba(248,113,113,0.8)';
-    if (r.name.indexOf('GCP') >= 0) return 'rgba(52,211,153,0.8)';
-    if (r.name.indexOf('Azure') >= 0) return 'rgba(6,182,212,0.8)';
-    return 'rgba(136,136,170,0.8)';
-  });
-  var borderColors = colors.map(function(c) { return c.replace('0.8', '1.0'); });
+  var colors = results.map(function(r) { return r.color; });
+  var borderColors = colors.map(function(c) { return c.replace('0.8', '1.0').replace('0.6', '1.0'); });
   
   if (tcoChart) tcoChart.destroy();
   var ctx = document.getElementById('tcoChart').getContext('2d');
@@ -866,19 +976,53 @@ function renderTCOChart(results) {
       },
       scales: {
         y: { ticks: { color: '#8888aa', callback: function(v) { return fmtEUR(v); } }, grid: { color: 'rgba(42,42,90,0.3)' } },
-        x: { ticks: { color: '#8888aa', font: { size: 10 }, maxRotation: 35, minRotation: 35 }, grid: { display: false } }
+        x: { ticks: { color: '#8888aa', font: { size: 9 }, maxRotation: 45, minRotation: 45 }, grid: { display: false } }
       }
     }
   });
 }
 
-function renderUtilChart(s) {
+function renderYearChart(results, s) {
+  var apis = results.filter(function(r) { return r.type !== 'onprem'; });
+  var onprem = results.find(function(r) { return r.type === 'onprem'; });
+  
+  // Show on-prem + top 3 cheapest API/GPU
+  var sorted = results.slice().sort(function(a,b) { return a.total - b.total; });
+  var show = sorted.slice(0, 6);
+  
+  var labels = show.map(function(r) { return r.shortName; });
+  var year1Data = show.map(function(r) { return r.year1; });
+  var yearAfterData = show.map(function(r) { return r.yearAfter * (s.years - 1); });
+  
+  if (yearChart) yearChart.destroy();
+  var ctx = document.getElementById('yearChart').getContext('2d');
+  yearChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'Year 1 (Capex + Opex)', data: year1Data, backgroundColor: 'rgba(124,92,252,0.8)', borderColor: 'rgba(124,92,252,1)', borderWidth: 1, borderRadius: 4 },
+        { label: 'Years 2-' + s.years + ' (Opex only)', data: yearAfterData, backgroundColor: 'rgba(83,216,251,0.6)', borderColor: 'rgba(83,216,251,1)', borderWidth: 1, borderRadius: 4 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#8888aa', font: { size: 11 } } },
+        tooltip: { callbacks: { label: function(c) { return c.dataset.label + ': ' + fmtEURfull(c.raw); } } }
+      },
+      scales: {
+        y: { stacked: true, ticks: { color: '#8888aa', callback: function(v) { return fmtEUR(v); } }, grid: { color: 'rgba(42,42,90,0.3)' } },
+        x: { stacked: true, ticks: { color: '#8888aa', font: { size: 9 }, maxRotation: 45, minRotation: 45 }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+function renderUtilChart(s, results) {
   var onprem = calcOnprem(s);
-  var hardware = s.hwCost * onprem.numServers;
-  var opexAnnual = onprem.opexAnnual;
-  var totalOpex = opexAnnual * s.years + s.maint * Math.max(0, s.years - 1);
-  var total3yr = hardware + opexAnnual * s.years;
   var serverTps = s.tps * s.gpusPerServer * onprem.numServers;
+  var total3yr = onprem.total;
   
   var utils = [10, 20, 30, 40, 50, 60, 70, 80, 90];
   var costs = utils.map(function(u) {
@@ -886,9 +1030,17 @@ function renderUtilChart(s) {
     return throughput > 0 ? total3yr / (throughput / 1e6) : 0;
   });
   
-  // Add reference lines
-  var diCost = s.di_in * 0.714 + s.di_out * 0.286;
-  var bdCost = s.bd_in * 0.714 + s.bd_out * 0.286;
+  // API reference lines
+  var apiLines = [];
+  var apis = results.filter(function(r) { return r.type === 'api'; });
+  apis.forEach(function(api) {
+    apiLines.push({
+      label: api.shortName,
+      data: utils.map(function() { return api.costPer1M; }),
+      borderColor: api.color.replace('0.8', '0.9').replace('0.6', '0.9'),
+      borderDash: [6,3], borderWidth: 1.5, pointRadius: 0,
+    });
+  });
   
   if (utilChart) utilChart.destroy();
   var ctx = document.getElementById('utilChart').getContext('2d');
@@ -897,14 +1049,12 @@ function renderUtilChart(s) {
     data: {
       labels: utils.map(function(u) { return u + '%'; }),
       datasets: [
-        { label: 'On-Prem', data: costs, borderColor: '#7c5cfc', backgroundColor: 'rgba(124,92,252,0.1)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 4 },
-        { label: 'DeepInfra API', data: utils.map(function() { return diCost; }), borderColor: '#53d8fb', borderDash: [8,4], borderWidth: 2, pointRadius: 0 },
-        { label: 'AWS Bedrock API', data: utils.map(function() { return bdCost; }), borderColor: '#fbbf24', borderDash: [8,4], borderWidth: 2, pointRadius: 0 },
-      ]
+        { label: 'On-Prem Dell', data: costs, borderColor: '#7c5cfc', backgroundColor: 'rgba(124,92,252,0.1)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 4 }
+      ].concat(apiLines)
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#8888aa', font: { size: 11 } } }, tooltip: { callbacks: { label: function(c) { return c.dataset.label + ': ' + fmtNum(c.raw) + '/1M tokens'; } } } },
+      plugins: { legend: { labels: { color: '#8888aa', font: { size: 10 } } }, tooltip: { callbacks: { label: function(c) { return c.dataset.label + ': ' + fmtNum(c.raw) + '/1M tokens'; } } } },
       scales: {
         y: { ticks: { color: '#8888aa', callback: function(v) { return '\u20AC' + v.toFixed(2); } }, grid: { color: 'rgba(42,42,90,0.3)' }, title: { display: true, text: 'EUR per 1M tokens', color: '#8888aa' } },
         x: { ticks: { color: '#8888aa' }, grid: { display: false }, title: { display: true, text: 'Server utilization', color: '#8888aa' } }
@@ -913,47 +1063,50 @@ function renderUtilChart(s) {
   });
 }
 
-function renderBreakevenChart(s, onprem) {
+function renderBreakevenChart(s, onprem, results) {
   if (!onprem) return;
   var annualInputTok = s.reqMonth * s.inTok * 12;
   var annualOutputTok = s.reqMonth * s.outTok * 12;
-  var annualTotalTok = annualInputTok + annualOutputTok;
   
-  // Cumulative cost month by month
+  // Find cheapest API and cheapest cloud GPU
+  var apis = results.filter(function(r) { return r.type === 'api'; }).sort(function(a,b) { return a.total - b.total; });
+  var cheapestApi = apis[0];
+  var cloudGpus = results.filter(function(r) { return r.type === 'cloud-gpu'; }).sort(function(a,b) { return a.total - b.total; });
+  var cheapestGpu = cloudGpus[0];
+  
   var months = [];
   var onpremCum = [];
-  var diCum = [];
-  var bdCum = [];
+  var apiCum = [];
+  var gpuCum = [];
   
   var onpremMonthly = onprem.opexAnnual / 12;
   var onpremUpfront = onprem.capex;
   
-  var diMonthly = (annualInputTok / 1e6 * s.di_in + annualOutputTok / 1e6 * s.di_out) / 12;
-  var bdMonthly = (annualInputTok / 1e6 * s.bd_in + annualOutputTok / 1e6 * s.bd_out) / 12;
+  var apiMonthly = cheapestApi ? cheapestApi.opexAnnual / 12 : 0;
+  var gpuMonthly = cheapestGpu ? cheapestGpu.opexAnnual / 12 : 0;
   
   var totalMonths = s.years * 12;
   var onpCum = onpremUpfront;
-  var diC = 0;
-  var bdC = 0;
+  var apiC = 0;
+  var gpuC = 0;
   
   for (var i = 1; i <= totalMonths; i++) {
     months.push('M' + i);
     onpCum += onpremMonthly;
-    diC += diMonthly;
-    bdC += bdMonthly;
+    apiC += apiMonthly;
+    gpuC += gpuMonthly;
     onpremCum.push(onpCum);
-    diCum.push(diC);
-    bdCum.push(bdC);
+    apiCum.push(apiC);
+    gpuCum.push(gpuC);
   }
   
-  // Sample every Nth month for performance
   var step = Math.max(1, Math.floor(totalMonths / 36));
-  var labels = [], onpData = [], diData = [], bdData = [];
+  var labels = [], onpData = [], apiData = [], gpuData = [];
   for (var i = 0; i < months.length; i += step) {
     labels.push(months[i]);
     onpData.push(onpremCum[i]);
-    diData.push(diCum[i]);
-    bdData.push(bdCum[i]);
+    apiData.push(apiCum[i]);
+    gpuData.push(gpuCum[i]);
   }
   
   if (breakevenChart) breakevenChart.destroy();
@@ -963,14 +1116,14 @@ function renderBreakevenChart(s, onprem) {
     data: {
       labels: labels,
       datasets: [
-        { label: 'On-Prem (cumulative)', data: onpData, borderColor: '#7c5cfc', backgroundColor: 'rgba(124,92,252,0.08)', fill: true, tension: 0.1, borderWidth: 2, pointRadius: 0 },
-        { label: 'DeepInfra API (cumulative)', data: diData, borderColor: '#53d8fb', tension: 0.1, borderWidth: 2, pointRadius: 0 },
-        { label: 'AWS Bedrock (cumulative)', data: bdData, borderColor: '#fbbf24', tension: 0.1, borderWidth: 2, pointRadius: 0 },
+        { label: 'On-Prem Dell (cumulative)', data: onpData, borderColor: '#7c5cfc', backgroundColor: 'rgba(124,92,252,0.08)', fill: true, tension: 0.1, borderWidth: 2, pointRadius: 0 },
+        { label: cheapestApi ? cheapestApi.shortName + ' (cumulative)' : 'API', data: apiData, borderColor: '#53d8fb', tension: 0.1, borderWidth: 2, pointRadius: 0 },
+        { label: cheapestGpu ? cheapestGpu.shortName + ' (cumulative)' : 'Cloud GPU', data: gpuData, borderColor: '#f953ba', tension: 0.1, borderWidth: 2, pointRadius: 0 },
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#8888aa', font: { size: 11 } } }, tooltip: { callbacks: { label: function(c) { return c.dataset.label + ': ' + fmtEURfull(c.raw); } } } },
+      plugins: { legend: { labels: { color: '#8888aa', font: { size: 10 } } }, tooltip: { callbacks: { label: function(c) { return c.dataset.label + ': ' + fmtEURfull(c.raw); } } } },
       scales: {
         y: { ticks: { color: '#8888aa', callback: function(v) { return fmtEUR(v); } }, grid: { color: 'rgba(42,42,90,0.3)' } },
         x: { ticks: { color: '#8888aa', font: { size: 9 }, maxTicksLimit: 12 }, grid: { display: false } }
@@ -987,10 +1140,9 @@ function renderTable(sorted, s) {
   for (var i = 0; i < sorted.length; i++) {
     var r = sorted[i];
     var isBest = r.total === minTotal;
-    var isWorst = r.total === maxTotal;
     var badge = isBest ? ' <span class="badge best">BEST</span>' : '';
     var cls = isBest ? 'best-row' : '';
-    var unitStr = r.units > 0 ? (r.name.indexOf('On-Prem') >= 0 ? r.units + ' servers' : r.units + ' instances') : '\u2014';
+    var unitStr = r.units > 0 ? (r.type === 'onprem' ? r.units + ' servers' : r.units + ' instances') : '\u2014';
     
     html += '<tr class="' + cls + '">';
     html += '<td>' + r.name + badge + '</td>';
@@ -1004,58 +1156,104 @@ function renderTable(sorted, s) {
   document.getElementById('tableBody').innerHTML = html;
 }
 
-function renderVerdict(sorted, onprem, s) {
+function renderVerdict(sorted, onprem, s, results) {
   var cheapest = sorted[0];
-  var cloudApis = sorted.filter(function(r) { return r.name.indexOf('API') >= 0; });
-  var cheapestApi = cloudApis[0] || sorted[0];
-  var cloudGpus = sorted.filter(function(r) { return r.name.indexOf('p5') >= 0 || r.name.indexOf('p4de') >= 0 || r.name.indexOf('GCP') >= 0 || r.name.indexOf('Azure') >= 0; });
+  var cloudApis = sorted.filter(function(r) { return r.type === 'api'; });
+  var cheapestApi = cloudApis[0];
+  var cloudGpus = sorted.filter(function(r) { return r.type === 'cloud-gpu'; });
   var cheapestGpu = cloudGpus[0];
   
   var html = '';
   
+  // On-prem vs cloud GPU
   if (onprem && cheapestGpu) {
     var gpuSavings = cheapestGpu.total - onprem.total;
     var gpuSavingsPct = gpuSavings / cheapestGpu.total * 100;
     if (gpuSavings > 0) {
-      html += '<p>On-premise saves <span class="savings">' + fmtEUR(gpuSavings) + ' (' + gpuSavingsPct.toFixed(0) + '%)</span> vs the cheapest cloud GPU instance (' + cheapestGpu.name + ') over ' + s.years + ' years.</p>';
+      html += '<p>On-premise Dell saves <span class="savings">' + fmtEUR(gpuSavings) + ' (' + gpuSavingsPct.toFixed(0) + '%)</span> vs the cheapest cloud GPU instance (' + cheapestGpu.name + ') over ' + s.years + ' years.</p>';
     } else {
-      html += '<p>Cloud GPU instances are currently cheaper than on-premise. Consider using spot instances or reserved capacity.</p>';
+      html += '<p>Cloud GPU instances (' + cheapestGpu.name + ') are currently <span class="highlight">' + fmtEUR(-gpuSavings) + '</span> cheaper than on-premise. Consider reserved capacity or spot pricing.</p>';
     }
   }
   
+  // On-prem vs API
   if (onprem && cheapestApi) {
     if (onprem.total < cheapestApi.total) {
       var apiSavings = cheapestApi.total - onprem.total;
       var apiSavingsPct = apiSavings / cheapestApi.total * 100;
-      html += '<p>On-premise is <span class="highlight">' + apiSavingsPct.toFixed(0) + '% cheaper</span> than ' + cheapestApi.name + ' at this volume. On-prem also provides data sovereignty, lower latency, and custom model hosting.</p>';
+      html += '<p>On-premise is <span class="highlight">' + apiSavingsPct.toFixed(0) + '% cheaper</span> than ' + cheapestApi.name + ' at this volume. On-prem also provides data sovereignty, lower latency, and custom model hosting (Dell HF FP8 optimised).</p>';
     } else {
       var overpay = onprem.total - cheapestApi.total;
       var overpayPct = overpay / onprem.total * 100;
       html += '<p>At this volume, ' + cheapestApi.name + ' is <span class="highlight">' + fmtEUR(overpay) + ' (' + overpayPct.toFixed(0) + '%) cheaper</span> than on-premise. ';
-      
       if (onprem.utilization < 30) {
         html += 'On-prem utilization is only ' + onprem.utilization.toFixed(0) + '% \u2014 hardware is underutilised. ';
       }
-      html += 'Consider managed APIs unless you need data sovereignty, sub-20ms latency, or custom fine-tuned models. ';
-      html += 'On-prem becomes cost-competitive at higher volumes or when utilization exceeds 50%.</p>';
+      html += 'Consider managed APIs unless you need data sovereignty, sub-20ms latency, or custom fine-tuned models. On-prem becomes cost-competitive at higher volumes or when utilization exceeds 50%.</p>';
     }
   }
   
-  html += '<p style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-dim);">VRAM needed: ' + onprem.vramNeeded.toFixed(1) + ' GB' + (s.model.moe ? ' | MoE: ' + (s.model.params/1e9).toFixed(0) + 'B total, ' + (s.model.activeParams/1e9).toFixed(0) + 'B active' : '') + ' | Annual tokens: ' + fmtTok(s.reqMonth * (s.inTok + s.outTok) * 12) + ' | Hardware: ' + onprem.numServers + ' server(s) at ' + fmtEUR(s.hwCost) + ' each</p>';
+  // Model info
+  var m = s.model;
+  html += '<p style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-dim);">';
+  html += 'Model: ' + m.name + ' (' + (m.hfRepo || 'N/A') + ') | ';
+  html += 'VRAM needed: ' + onprem.vramNeeded.toFixed(1) + ' GB';
+  if (m.moe) html += ' | MoE: ' + (m.params/1e9).toFixed(0) + 'B total, ' + (m.activeParams/1e9).toFixed(0) + 'B active';
+  html += ' | Annual tokens: ' + fmtTok(s.reqMonth * (s.inTok + s.outTok) * 12);
+  html += ' | Hardware: ' + onprem.numServers + ' Dell server(s) at ' + fmtEUR(s.hwCost) + ' each';
+  html += '</p>';
   
   document.getElementById('verdictText').innerHTML = html;
 }
 
-// ====== UI HELPERS ======
-function applyPreset(name) {
-  var p = PRESETS[name];
-  document.getElementById('reqMonth').value = p.reqMonth;
-  document.getElementById('inTok').value = p.inTok;
-  document.getElementById('outTok').value = p.outTok;
+// ====== SCENARIO PRESETS ======
+function applyScenario(name, btn) {
+  if (name === 'custom') {
+    document.querySelectorAll('.preset-btn').forEach(function(b) { b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    document.getElementById('scenarioInfo').innerHTML = '<strong>Custom</strong> — configure your own workload parameters.';
+    return;
+  }
+  var sc = SCENARIOS[name];
+  if (!sc) return;
+  
+  document.getElementById('reqMonth').value = sc.reqMonth;
+  document.getElementById('inTok').value = sc.inTok;
+  document.getElementById('outTok').value = sc.outTok;
+  document.getElementById('model').value = sc.model;
+  
+  // Apply server config
+  var cfg = SERVER_CONFIGS[sc.server];
+  if (cfg) {
+    document.getElementById('serverConfig').value = sc.server;
+    document.getElementById('hwCost').value = cfg.hwCost;
+    document.getElementById('gpusPerServer').value = cfg.gpus;
+    document.getElementById('gpuType').value = cfg.gpuType;
+    document.getElementById('tps').value = cfg.tps;
+    document.getElementById('power').value = cfg.power;
+    document.getElementById('vram').value = cfg.vram;
+  }
+  
+  // Update scenario info
+  document.getElementById('scenarioInfo').innerHTML = 
+    '<strong>' + sc.label + '</strong><span class="tag ' + sc.tag + '">' + name + '</span><br>' + sc.description;
   
   document.querySelectorAll('.preset-btn').forEach(function(b) { b.classList.remove('active'); });
-  event.target.classList.add('active');
+  if (btn) btn.classList.add('active');
   
+  updateModelDefaults();
+  updateLabels();
+  render();
+}
+
+// ====== UI HELPERS ======
+function updateModelDefaults() {
+  var m = MODELS[document.getElementById('model').value];
+  if (m && m.tpsBase) {
+    var gpu = GPU_SPECS[document.getElementById('gpuType').value];
+    var newTps = Math.round(m.tpsBase * (gpu ? gpu.tpsFactor : 1));
+    document.getElementById('tps').value = newTps;
+  }
   updateLabels();
   render();
 }
@@ -1073,6 +1271,7 @@ function applyServerConfig() {
   document.getElementById('power').value = cfg.power;
   document.getElementById('vram').value = cfg.vram;
   
+  updateModelDefaults();
   updateLabels();
   render();
 }
@@ -1081,8 +1280,7 @@ function updateGpuDefaults() {
   var gpu = GPU_SPECS[document.getElementById('gpuType').value];
   if (gpu) {
     document.getElementById('vram').value = gpu.vram;
-    updateLabels();
-    render();
+    updateModelDefaults();
   }
 }
 
@@ -1115,7 +1313,14 @@ function updateLabels() {
 }
 
 // ====== EVENT BINDING ======
-var inputIds = ['reqMonth','inTok','outTok','years','hwCost','gpusPerServer','tps','power','pue','elec','colo','fte','salary','maint','deprec','util','vram','model','gpuType','quant','di_in','di_out','bd_in','bd_out','tg_in','tg_out','aws_p5','aws_p4de','gcp_a3','azure_h100'];
+var inputIds = [
+  'reqMonth','inTok','outTok','years','hwCost','gpusPerServer','tps','power','pue','elec','colo','fte','salary','maint','deprec','util','vram',
+  'model','gpuType','quant','serverConfig',
+  'anthro_sonnet_in','anthro_sonnet_out','anthro_haiku_in','anthro_haiku_out',
+  'openai_4o_in','openai_4o_out','openai_mini_in','openai_mini_out',
+  'gemini_flash_in','gemini_flash_out','gemini_pro_in','gemini_pro_out',
+  'aws_p5','aws_p4de','gcp_a3','gcp_a2','azure_h100','azure_a100'
+];
 inputIds.forEach(function(id) {
   var el = document.getElementById(id);
   if (el) {
@@ -1125,8 +1330,7 @@ inputIds.forEach(function(id) {
 });
 
 // ====== INIT ======
-updateLabels();
-render();
+applyScenario('cs-chat');
 </script>
 </body>
 </html>
