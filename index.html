@@ -1918,14 +1918,6 @@
     .lg-btn-primary:hover { opacity: 0.85; }
     .lg-btn-event { background: var(--surface2); color: var(--accent7); border: 1px solid var(--accent7); padding: 0.35rem 0.7rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
     .lg-btn-event:hover { background: rgba(6,182,212,0.1); }
-    .lg-btn-grafana { background: var(--surface2); color: var(--accent); border: 1px solid var(--accent); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem; }
-    .lg-btn-grafana:hover { background: rgba(83,216,251,0.1); }
-    .lg-grafana-embed { margin-top: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-    .lg-grafana-embed-header { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.8rem; background: var(--surface2); border-bottom: 1px solid var(--border); }
-    .lg-grafana-embed-header h4 { font-size: 0.85rem; color: var(--accent); }
-    .lg-grafana-link { font-size: 0.75rem; color: var(--accent); text-decoration: none; }
-    .lg-grafana-link:hover { text-decoration: underline; }
-    .lg-grafana-embed iframe { display: block; background: #0a0a1a; }
     .lg-btn-reset { background: rgba(248,113,113,0.1); color: var(--danger); border: 1px solid var(--danger); padding: 0.35rem 0.7rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
     .lg-btn-reset:hover { background: rgba(248,113,113,0.2); }
 
@@ -3029,16 +3021,21 @@
             <div class="lg-asset-meta" id="lg-asset-meta"></div>
           </div>
           <div style="display:flex;gap:0.5rem;">
-            <a href="https://demos.bowdenneil.com/grafana/d/lineguard-ai/lineguard-ai-e28094-plant-floor-dashboard?kiosk=tv" target="_blank" class="btn lg-btn-grafana">📊 Open in Grafana</a>
             <button class="btn lg-btn-primary" onclick="lgStartInvestigation()">🔬 Start Investigation</button>
           </div>
         </div>
-        <div class="lg-grafana-embed" style="flex:1;display:flex;flex-direction:column;">
-          <div class="lg-grafana-embed-header">
-            <h4>📊 Live Plant Floor Telemetry — Grafana</h4>
-            <a href="https://demos.bowdenneil.com/grafana/d/lineguard-ai/lineguard-ai-e28094-plant-floor-dashboard?kiosk=tv" target="_blank" class="lg-grafana-link">Open full dashboard →</a>
+        <div class="lg-asset-body" style="flex:1;">
+          <div class="lg-asset-charts" id="lg-asset-charts"></div>
+          <div class="lg-asset-sidebar">
+            <div class="lg-sidebar-section">
+              <h4>🔧 Maintenance History</h4>
+              <div id="lg-maintenance-list"></div>
+            </div>
+            <div class="lg-sidebar-section">
+              <h4>📝 Operator Observations</h4>
+              <div id="lg-observations-list"></div>
+            </div>
           </div>
-          <iframe src="https://demos.bowdenneil.com/grafana/d/lineguard-ai/lineguard-ai-e28094-plant-floor-dashboard?kiosk=tv&from=now-1h&to=now&theme=dark" style="flex:1;min-height:700px;width:100%;border:none;" loading="lazy"></iframe>
         </div>
       </div>
 

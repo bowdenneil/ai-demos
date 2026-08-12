@@ -114,8 +114,9 @@ function lgStartTelemetryPoll() {
   LG_STATE.telemetryPoll = setInterval(async () => {
     if (LG_STATE.screen === 'overview') {
       await lgUpdateOverviewCards();
+    } else if (LG_STATE.screen === 'asset') {
+      await lgUpdateAssetCharts();
     }
-    // Asset screen uses Grafana iframe — no JS chart updates needed
   }, 3000);
 }
 
@@ -248,6 +249,40 @@ async function lgOpenAsset(assetId) {
   const asset = LG_STATE.assets[assetId];
   document.getElementById('lg-asset-title').textContent = asset.name;
   document.getElementById('lg-asset-meta').textContent = `${asset.manufacturer} ${asset.model} · ${asset.location} · Criticality: ${asset.criticality}`;
+
+  // Build chart cards for this asset's metrics
+  const chartsGrid = document.getElementById('lg-asset-charts');
+  const metrics = LG_STATE.metrics[asset.type] || [];
+  // Destroy old charts
+  Object.values(LG_STATE.charts).forEach(c => { try { c.destroy(); } catch(e) {} });
+  LG_STATE.charts = {};
+
+  chartsGrid.innerHTML = metrics.map(m => `
+    <div class="lg-chart-card">
+      <div class="lg-chart-header">
+        <span class="lg-chart-title">${LG_STATE.labels[m] || m}</span>
+        <span class="lg-chart-current" id="lg-current-${m}">—</span>
+      </div>
+      <div style="height:160px;"><canvas id="lg-canvas-${m}"></canvas></div>
+      <div class="lg-chart-baseline" id="lg-baseline-${m}"></div>
+    </div>
+  `).join('');
+
+  // Initial chart render
+  const baselines = asset.baselines || {};
+  const limits = asset.operating_limits || {};
+  for (const m of metrics) {
+    const series = await lgFetchSeries(assetId, m, 60);
+    if (series.length) {
+      lgCreateChart(m, series, baselines[m] ?? null, limits[m] || { warn: null, crit: null });
+      const blEl = document.getElementById('lg-baseline-' + m);
+      if (blEl && baselines[m] != null) blEl.textContent = `baseline ${baselines[m]} · warn ${limits[m]?.warn ?? '—'} · crit ${limits[m]?.crit ?? '—'}`;
+    }
+  }
+
+  // Sidebar data
+  lgLoadMaintenanceHistory(assetId);
+  lgLoadObservations(assetId);
 }
 
 async function lgFetchSeries(assetId, metric, points) {
