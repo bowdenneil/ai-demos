@@ -95,6 +95,13 @@ transition:all 0.2s; font-family:var(--font);
 .session-stat { text-align:center; padding:0.8rem; background:var(--surface2); border-radius:8px; }
 .session-stat .val { font-size:1.3rem; font-weight:700; }
 .session-stat .lbl { font-size:0.7rem; color:var(--text-dim); margin-top:0.2rem; }
+.session-cost-line { margin-top:1rem; padding:0.7rem 1rem; background:rgba(83,216,251,0.07); border:1px solid rgba(83,216,251,0.2); border-radius:8px; font-size:0.85rem; }
+.session-findings-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem; }
+@media (max-width:768px) { .session-findings-grid { grid-template-columns:1fr; } }
+.session-model-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:0.8rem 1rem; }
+.smc-name { font-size:0.9rem; font-weight:600; display:flex; align-items:center; gap:0.5rem; }
+.smc-stats { font-size:0.72rem; color:var(--text-dim); margin:0.3rem 0 0.5rem; }
+.smc-findings { font-size:0.8rem; line-height:1.5; color:var(--text); }
 
 /* Loading */
 .typing-cursor { display:inline-block; width:2px; height:1em; background:var(--accent); animation:blink 1s infinite; margin-left:2px; vertical-align:text-bottom; }
@@ -222,6 +229,7 @@ transition:all 0.2s; font-family:var(--font);
 <div class="session-summary" id="session-summary" style="display:none;">
 <h3>📋 Session Summary</h3>
 <div class="session-grid" id="session-grid"></div>
+<div id="session-compare"></div>
 </div>
 </div>
 
@@ -520,11 +528,13 @@ async function runModel(model, label) {
             STATE.results[label] = {
               model: evt.model,
               model_name: evt.model_name,
+              model_type: evt.model_type,
               tokens: evt.tokens,
               elapsed: evt.elapsed,
               cost: evt.cost,
               code_success: codeResult?.success,
-              has_forecast: codeResult?.success && codeResult?.output?.toLowerCase().includes('forecast'),
+              repaired: codeResult?.repaired || false,
+              findings: extractFindings(fullText, codeResult),
             };
             
             // Update session totals
@@ -651,25 +661,68 @@ function renderChart(label, chartData) {
 }
 
 // ─── SESSION SUMMARY ──────────────────────────────────────────────────────────
+// Pull a short findings summary out of a model's response: prefer the
+// structured chart_data (direction/outlook/forecast fields), fall back to
+// the first prose lines before the code block.
+function extractFindings(fullText, codeResult) {
+  const cd = codeResult?.chart_data;
+  if (cd && typeof cd === 'object') {
+    const bits = [];
+    for (const key of ['direction', 'outlook', 'curve_shape', 'signal', 'regime', 'forecast_direction', 'credit_outlook']) {
+      if (typeof cd[key] === 'string') bits.push(`${key.replace(/_/g, ' ')}: ${cd[key].replace(/_/g, ' ')}`);
+    }
+    if (Array.isArray(cd.key_drivers)) bits.push('drivers: ' + cd.key_drivers.slice(0, 3).join(', '));
+    if (bits.length) return bits.join(' · ');
+  }
+  // Fallback: first meaningful prose lines before any code fence
+  const prose = (fullText || '').split('```')[0]
+    .replace(/[#*_>`]/g, '')
+    .split('\n').map(l => l.trim()).filter(l => l.length > 30);
+  return prose.slice(0, 2).join(' ').slice(0, 220) || 'No summary available';
+}
+
 function renderSessionSummary() {
   const summary = document.getElementById('session-summary');
   const grid = document.getElementById('session-grid');
   summary.style.display = 'block';
-  
+
+  const A = STATE.results.A, B = STATE.results.B;
   const s = STATE.session;
-  const totalCost = s.totalCostA + s.totalCostB;
-  const totalTokens = s.totalTokensA + s.totalTokensB;
-  
-  // Get model names from last run
-  const nameA = STATE.results.A?.model_name || 'Model A';
-  const nameB = STATE.results.B?.model_name || 'Model B';
-  
+
+  const card = (r, fallbackName) => {
+    if (!r) return `<div class="session-model-card"><div class="smc-name">${fallbackName}</div><div class="smc-findings">No completed run</div></div>`;
+    const closed = /closed/i.test(r.model_type || '');
+    const status = r.code_success ? (r.repaired ? '🔧 Repaired' : '✅ Ran') : '❌ Failed';
+    return `<div class="session-model-card">
+      <div class="smc-name">${r.model_name}
+        <span class="model-tag ${closed ? 'tag-closed' : 'tag-open'}">${closed ? 'Closed' : 'Open-Weight'}</span>
+      </div>
+      <div class="smc-stats">€${(r.cost || 0).toFixed(4)} · ${r.tokens.toLocaleString()} tok · ${r.elapsed}s · ${status}</div>
+      <div class="smc-findings">${r.findings}</div>
+    </div>`;
+  };
+
+  // Cost comparison between the two actual runs
+  let costLine = '';
+  if (A && B && A.cost > 0 && B.cost > 0) {
+    const cheap = A.cost <= B.cost ? A : B;
+    const dear  = A.cost <= B.cost ? B : A;
+    const ratio = dear.cost / cheap.cost;
+    costLine = ratio >= 1.15
+      ? `<strong>${cheap.model_name}</strong> was <strong>${ratio.toFixed(1)}×</strong> cheaper than ${dear.model_name} on this run (€${cheap.cost.toFixed(4)} vs €${dear.cost.toFixed(4)})`
+      : `Costs were similar: €${A.cost.toFixed(4)} vs €${B.cost.toFixed(4)}`;
+  }
+
   grid.innerHTML = `
     <div class="session-stat"><div class="val">${s.runs}</div><div class="lbl">Comparisons Run</div></div>
-    <div class="session-stat"><div class="val">${totalTokens.toLocaleString()}</div><div class="lbl">Total Tokens</div></div>
-    <div class="session-stat"><div class="val">€${totalCost.toFixed(4)}</div><div class="lbl">Total Cost (Open-Weight)</div></div>
-    <div class="session-stat"><div class="val" style="color:var(--danger);">€${(totalTokens / 1000000 * 5).toFixed(2)}</div><div class="lbl">Equivalent on GPT-4o</div></div>
+    <div class="session-stat"><div class="val">€${(s.totalCostA + s.totalCostB).toFixed(4)}</div><div class="lbl">Session Total Cost</div></div>
+    <div class="session-stat"><div class="val">€${s.totalCostA.toFixed(4)}</div><div class="lbl">Model A Total</div></div>
+    <div class="session-stat"><div class="val">€${s.totalCostB.toFixed(4)}</div><div class="lbl">Model B Total</div></div>
   `;
+
+  document.getElementById('session-compare').innerHTML =
+    (costLine ? `<div class="session-cost-line">${costLine}</div>` : '') +
+    `<div class="session-findings-grid">${card(A, 'Model A')}${card(B, 'Model B')}</div>`;
 }
 
 // ─── START ────────────────────────────────────────────────────────────────────
