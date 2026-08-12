@@ -189,7 +189,18 @@ const ABCompare = {
       MODEL = savedModel;
       const elapsed = ((Date.now() - start) / 1000).toFixed(1);
       if (timeEl) timeEl.textContent = `${elapsed}s`;
-      if (contentEl) contentEl.innerHTML = formatMarkdown(fullText);
+      if (contentEl) {
+        // Per-model cost footer (token counts estimated at ~4 chars/token)
+        let footer = '';
+        if (typeof LLM_PRICES !== 'undefined' && fullText) {
+          const p = LLM_PRICES[model] || { inp: 0.50, out: 1.50 };
+          const inTok = Math.round(messages.reduce((n, m) => n + (m.content || '').length, 0) / 4);
+          const outTok = Math.round(fullText.length / 4);
+          const cost = (inTok * p.inp + outTok * p.out) / 1e6;
+          footer = `<div class="llm-cost-footer">💶 <strong>€${cost.toFixed(4)}</strong> (est.) · ${(inTok + outTok).toLocaleString()} tok · ${elapsed}s</div>`;
+        }
+        contentEl.innerHTML = formatMarkdown(fullText) + footer;
+      }
       return fullText;
     };
 

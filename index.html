@@ -1666,6 +1666,8 @@
     .ab-panel-label { font-size: 0.72rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; }
     .ab-panel-time { font-size: 0.68rem; color: var(--text-dim); }
     .ab-panel-content { padding: 0.75rem; font-size: 0.85rem; line-height: 1.6; overflow-y: auto; max-height: 600px; min-height: 200px; }
+    .llm-cost-footer { margin-top: 1rem; padding: 0.6rem 0.9rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; font-size: 0.78rem; color: var(--text-dim); }
+    .llm-cost-footer strong { color: var(--success); }
     .ab-panel-content .md-h1 { font-size: 1.1rem; font-weight: 700; margin: 0.75rem 0 0.4rem; color: var(--accent); }
     .ab-panel-content .md-h2 { font-size: 1rem; font-weight: 700; margin: 0.6rem 0 0.3rem; color: var(--text); }
     .ab-panel-content .md-h3 { font-size: 0.9rem; font-weight: 600; margin: 0.5rem 0 0.25rem; color: var(--accent2); }
@@ -3201,8 +3203,44 @@ async function saveApiKey() {
   showToast('API key verified — connected!');
 }
 
+// ─── LLM COST TRACKING ───
+// EUR per 1M tokens (input/output) — mirrors quant_data.py MODEL_COSTS
+const LLM_PRICES = {
+  'deepseek/deepseek-v4-flash-0731': { inp: 0.14, out: 0.28 },
+  'deepseek/deepseek-v4-pro':        { inp: 0.55, out: 2.19 },
+  'deepseek/deepseek-v3.2':          { inp: 0.25, out: 0.85 },
+  'deepseek/deepseek-r1-0528':       { inp: 0.50, out: 2.15 },
+  'z-ai/glm-5.2':                    { inp: 0.20, out: 0.80 },
+  'z-ai/glm-4.6':                    { inp: 0.35, out: 1.55 },
+  'qwen/qwen3-235b-a22b-2507':       { inp: 0.20, out: 0.60 },
+  'anthropic/claude-sonnet-5':       { inp: 3.00, out: 15.00 },
+  'anthropic/claude-opus-5':         { inp: 12.00, out: 60.00 },
+  'anthropic/claude-haiku-4-5-20251001': { inp: 0.80, out: 4.00 },
+  'anthropic/claude-opus-4-5-20251101':  { inp: 12.00, out: 60.00 },
+};
+let LAST_LLM_RUN = null;  // { model, inTok, outTok, cost, elapsed, estimated }
+
+function llmRecordRun(model, inTok, outTok, elapsedMs, estimated) {
+  const p = LLM_PRICES[model] || { inp: 0.50, out: 1.50 };
+  const cost = (inTok * p.inp + outTok * p.out) / 1e6;
+  LAST_LLM_RUN = { model, inTok, outTok, cost, elapsed: (elapsedMs / 1000).toFixed(1), estimated };
+  return LAST_LLM_RUN;
+}
+
+// Footer appended below demo output — real run economics, not hypotheticals
+function llmCostFooter() {
+  const r = LAST_LLM_RUN;
+  if (!r) return '';
+  const modelName = (document.querySelector(`#modelSelect option[value="${r.model}"]`) || {}).textContent || r.model.split('/').pop();
+  const est = r.estimated ? ' (est.)' : '';
+  return `<div class="llm-cost-footer">💶 This run: <strong>€${r.cost.toFixed(4)}</strong>${est} · ${modelName} · ${(r.inTok + r.outTok).toLocaleString()} tokens (${r.inTok.toLocaleString()} in / ${r.outTok.toLocaleString()} out) · ${r.elapsed}s</div>`;
+}
+
 async function callLLM(messages, onChunk) {
   if (!API_KEY) { showToast('Enter your API key first', true); throw new Error('No API key'); }
+
+  const t0 = performance.now();
+  const promptChars = messages.reduce((n, m) => n + (m.content || '').length, 0);
 
   // Try streaming first, fall back to non-streaming
   for (const stream of [true, false]) {
@@ -3221,9 +3259,14 @@ async function callLLM(messages, onChunk) {
       }
 
       if (!stream) {
-        // Non-streaming fallback
+        // Non-streaming fallback — usage is authoritative
         const data = await res.json();
         const content = data.choices?.[0]?.message?.content || '';
+        const u = data.usage || {};
+        llmRecordRun(MODEL,
+          u.prompt_tokens ?? Math.round(promptChars / 4),
+          u.completion_tokens ?? Math.round(content.length / 4),
+          performance.now() - t0, !u.prompt_tokens);
         if (onChunk) onChunk(content);
         return content;
       }
@@ -3233,6 +3276,7 @@ async function callLLM(messages, onChunk) {
       const decoder = new TextDecoder();
       let full = '';
       let buffer = '';
+      let usage = null;
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -3244,6 +3288,7 @@ async function callLLM(messages, onChunk) {
           if (!trimmed.startsWith('data: ') || trimmed === 'data: [DONE]') continue;
           try {
             const j = JSON.parse(trimmed.slice(6));
+            if (j.usage) usage = j.usage;  // some providers send usage in final chunk
             const delta = j.choices?.[0]?.delta;
             // Handle both content and reasoning_content (GLM models use reasoning_content)
             const t = delta?.content || '';
@@ -3254,6 +3299,10 @@ async function callLLM(messages, onChunk) {
           } catch {}
         }
       }
+      llmRecordRun(MODEL,
+        usage?.prompt_tokens ?? Math.round(promptChars / 4),
+        usage?.completion_tokens ?? Math.round(full.length / 4),
+        performance.now() - t0, !usage?.prompt_tokens);
       return full;
     } catch (e) {
       if (!stream) throw e; // Non-streaming also failed — rethrow
@@ -4270,7 +4319,7 @@ ${webResults.length ? `\nWeb Search Results (use for benchmarks, recent news, ma
         fullText = text;
         output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
       });
-      output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
+      output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText)) + llmCostFooter();
     }
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
@@ -4459,7 +4508,7 @@ Provide:
         fullText = text;
         output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
       });
-      output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
+      output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText)) + llmCostFooter();
     }
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
@@ -4675,7 +4724,7 @@ Provide:
         fullText = text;
         output.innerHTML = discoveryBanner + formatMarkdown(text) + '<span class="typing-cursor"></span>';
       });
-      output.innerHTML = discoveryBanner + postProcessLLMOutput(formatMarkdown(fullText));
+      output.innerHTML = discoveryBanner + postProcessLLMOutput(formatMarkdown(fullText)) + llmCostFooter();
     }
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
@@ -4876,7 +4925,7 @@ Provide:
         fullText = text;
         output.innerHTML = formatMarkdown(text) + '<span class="typing-cursor"></span>';
       });
-      output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText));
+      output.innerHTML = postProcessLLMOutput(formatMarkdown(fullText)) + llmCostFooter();
     }
   } catch (e) {
     output.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
