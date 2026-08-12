@@ -25,13 +25,13 @@ from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
 
 API_BASE = 'https://api.tensorx.ai/v1'
-API_KEY = os.environ.get('TENSORX_API_KEY', '') or os.environ.get('TENSORIX_API_KEY', '') or 'sk-HLWfQlZdr2Lb1LstBfoK0g'
+API_KEY = os.environ.get('TENSORX_API_KEY', '') or os.environ.get('TENSORIX_API_KEY', '')
 ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
 ANTHROPIC_BASE = 'https://api.anthropic.com/v1'
-BRAVE_KEY = os.environ.get('BRAVE_SEARCH_KEY', '') or 'BSAezzPy7F1dgfj5TSSTQRWve35pO8H'
+BRAVE_KEY = os.environ.get('BRAVE_SEARCH_KEY', '')
 
 # PiAPI for icon generation
-PIAPI_KEY = '9a0588af7e500eba894f58c2c37a4d9fb011da7c1f6e3eccb561416a6b060be3'
+PIAPI_KEY = os.environ.get('PIAPI_KEY', '')
 ICON_DIR = Path(__file__).parent / 'icons'
 ICON_PROMPTS = {
     'rag': 'Minimalist flat icon of an open book with digital data particles floating out, dark navy background, cyan glowing accents, simple clean vector style',

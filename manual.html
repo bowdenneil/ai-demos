@@ -481,7 +481,7 @@
   <!-- ADVANCED -->
   <div class="section">
     <div class="section-header">
-      <span class="cat-icon">🤖</span> Agentic Demos <span class="cat-count">2</span>
+      <span class="cat-icon">🤖</span> Agentic Demos <span class="cat-count">4</span>
     </div>
 
     <div class="demo-entry">
@@ -498,6 +498,42 @@
         </ul>
       </div>
       <div class="demo-why"><strong>Why it matters:</strong> A single AI model can only look at a problem from one angle. This demo shows how multiple specialised AI agents can collaborate — like a team of human analysts — each bringing a different lens to the same question. This is the future of complex research and decision-making.</div>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">🏭</span> LineGuard AI <span class="demo-tag tag-swarm">Agentic Workflow</span></h3>
+      <p class="demo-desc">Agentic predictive maintenance for a 5-asset manufacturing production line. AI agents monitor live telemetry, investigate anomalies, diagnose faults, assess business impact, and generate prioritised work orders — with human approval gates before action.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>A simulated production line runs live: Stamping Press, Welding Robot, Conveyor Belt, Quality Camera, and Assembly Station — each with real-time telemetry (vibration, temperature, pressure, cycle time)</li>
+          <li>When an anomaly is detected, a 5-stage agentic pipeline fires: Signal Analysis → Failure Diagnosis → Business Impact Assessment → Action Planner → Work Order Generator</li>
+          <li>Each stage is a real LLM call with tool access — agents read sensor data, cross-reference maintenance history, calculate downtime cost, and decide corrective actions</li>
+          <li>The Orchestrator coordinates agents, sets priority, and asks for human approval before raising a work order</li>
+          <li>Approve or reject work orders in the UI — rejected orders get re-planned</li>
+          <li>Live charts show vibration, temperature, pressure, and cycle time per asset</li>
+          <li>You can inject failures manually to trigger the investigation pipeline</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> Unplanned downtime costs manufacturers €260B/year. This demo shows how AI agents can replace manual alarm triage — detecting, diagnosing, and acting on faults before production stops. The human-in-the-loop approval gate shows responsible AI deployment: the agent recommends, the human decides. Built on Dell infrastructure with open-weight models running on-prem.</div>
+    </div>
+
+    <div class="demo-entry">
+      <h3><span class="demo-icon">📊</span> Quant Arena <span class="demo-tag tag-swarm">A/B Model Comparison</span></h3>
+      <p class="demo-desc">Capital markets forecasting with side-by-side AI model comparison. Two models analyse the same financial scenario (yield curve, credit spreads, FX), each generating and executing their own Python quantitative model, with results compared in real time.</p>
+      <div class="demo-how">
+        <strong>How it works:</strong>
+        <ul>
+          <li>Select a financial scenario: Yield Curve Analysis, Credit Spread Forecasting, or FX Volatility Modelling</li>
+          <li>Select two AI models — open-weight (DeepSeek V4, GLM-5.2, Qwen3 235B, DeepSeek R1) or commercial (Claude Sonnet 5, Claude Haiku 4.5, Claude Opus 4.5)</li>
+          <li>Each model receives the same market data and is asked to write and execute a quantitative Python model</li>
+          <li>The generated code runs in a sandboxed Python environment — only numpy, pandas, scipy, and statsmodels are available</li>
+          <li>Results stream back in real time: the LLM reasoning, the generated code, the execution output, and any charts</li>
+          <li>Cost, latency, and token counts are tracked per model so you can compare efficiency alongside quality</li>
+          <li>Supports admin-only access — guests don't see this demo</li>
+        </ul>
+      </div>
+      <div class="demo-why"><strong>Why it matters:</strong> Capital markets teams need AI that can write correct quantitative code, not just prose. This demo forces models to actually execute their output — wrong code fails visibly. The A/B comparison is the key insight: different models make different modelling choices, catch different risks, and produce different forecasts from the same data. That divergence is exactly what quant teams need to see before deploying a model in production.</div>
     </div>
 
     <div class="demo-entry">
