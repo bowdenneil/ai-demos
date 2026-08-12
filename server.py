@@ -1593,9 +1593,11 @@ class DemoHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_json_response(200, lg.estimate_downtime_impact(asset_id, duration))
             elif path == '/api/lg/work-orders':
                 self.send_json_response(200, {'work_orders': lg.get_work_orders()})
+            elif path == '/api/lg/scenario':
+                self.send_json_response(200, {'scenario': lg.get_active_scenario()})
             elif path == '/api/lg/reset':
-                lg.reset_state()
-                self.send_json_response(200, {'success': True, 'message': 'LineGuard state reset'})
+                new_asset = lg.reset_state()
+                self.send_json_response(200, {'success': True, 'message': 'LineGuard state reset', 'new_anomaly_asset': new_asset})
             else:
                 self.send_json_response(404, {'error': f'Unknown endpoint: {path}'})
 
@@ -1613,6 +1615,9 @@ class DemoHandler(http.server.SimpleHTTPRequestHandler):
             elif path == '/api/lg/event/delay-part':
                 lg.delay_part(data.get('part_number', 'BR-500-A'))
                 self.send_json_response(200, {'success': True, 'message': f"Part {data.get('part_number', 'BR-500-A')} marked as delayed"})
+            elif path == '/api/lg/event/escalate':
+                boost = lg.escalate_anomaly()
+                self.send_json_response(200, {'success': True, 'escalation_boost': boost, 'message': f'Anomaly ramp accelerated (+{boost:.2f})'})
             elif path == '/api/lg/event/reset':
                 lg.reset_state()
                 self.send_json_response(200, {'success': True, 'message': 'All events reset'})

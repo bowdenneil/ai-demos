@@ -92,24 +92,79 @@ METRIC_LABELS = {
 }
 
 # ─── TELEMETRY SIMULATOR ─────────────────────────────────────────────────────
-# Demo clock — starts 4 hours ago, advances in real-time after init
-DEMO_START_OFFSET_HOURS = 4  # Press-02 anomaly started 4 hours ago
+# Demo clock — anomaly starts 4 hours ago, advances in real-time after init
+DEMO_START_OFFSET_HOURS = 4
 TELEMETRY_INTERVAL_S = 5  # seconds between readings
 
-# Anomaly ramp for PRESS-02 — gets worse over the 4-hour window
-# Phase: normal (hours -7 to -4) → emerging (hours -4 to -2) → escalating (-2 to now)
+# ─── FAILURE SCENARIOS ───────────────────────────────────────────────────────
+# One scenario per asset. A random one is active per session (reset re-rolls).
+# primary ramps hardest; secondary ramps gently; fluctuate oscillates with
+# growing variance. This gives each asset a distinct, plausible failure story.
+FAILURE_SCENARIOS = {
+    'CONVEYOR-01': {
+        'name': 'Belt misalignment / motor overload',
+        'primary': 'current_a', 'secondary': ['temperature_c'], 'fluctuate': ['vibration_mm_s'],
+        'part': 'BELT-101-T', 'skill': 'conveyor_alignment',
+        'doc_query': 'belt tracking motor current', 'history_query': 'belt alignment',
+    },
+    'ROBOT-01': {
+        'name': 'Joint 3 gearbox backlash',
+        'primary': 'cycle_time_s', 'secondary': ['vibration_mm_s'], 'fluctuate': [],
+        'part': 'GBX-4600-J3', 'skill': 'robot_calibration',
+        'doc_query': 'gearbox backlash joint calibration', 'history_query': 'gearbox',
+    },
+    'PRESS-02': {
+        'name': 'Hydraulic press bearing degradation',
+        'primary': 'vibration_mm_s', 'secondary': ['temperature_c', 'cycle_time_s'], 'fluctuate': ['pressure_bar'],
+        'part': 'BR-500-A', 'skill': 'bearing_replacement',
+        'doc_query': 'bearing vibration', 'history_query': 'bearing',
+    },
+    'PUMP-03': {
+        'name': 'Pump cavitation / impeller wear',
+        'primary': 'flow_rate_l_min', 'secondary': ['vibration_mm_s', 'temperature_c'], 'fluctuate': [],
+        'part': 'IMP-NB65-S', 'skill': 'pump_overhaul',
+        'doc_query': 'cavitation impeller flow', 'history_query': 'impeller',
+    },
+    'PACK-04': {
+        'name': 'Sealing head wear / jam risk',
+        'primary': 'cycle_time_s', 'secondary': ['temperature_c'], 'fluctuate': ['vibration_mm_s'],
+        'part': 'SEAL-PK4-H', 'skill': 'packaging_service',
+        'doc_query': 'sealing head cycle time', 'history_query': 'sealing',
+    },
+}
+
+# Mutable anomaly state — random asset per server start, re-rolled on reset
+_anomaly_state = {
+    'asset_id': random.choice(list(FAILURE_SCENARIOS.keys())),
+    'started_at': time.time() - DEMO_START_OFFSET_HOURS * 3600,
+    'escalation_boost': 0.0,   # added by the Escalate demo button
+}
+
+def get_active_scenario():
+    """The currently active failure scenario."""
+    aid = _anomaly_state['asset_id']
+    return {'asset_id': aid, **FAILURE_SCENARIOS[aid]}
+
+def escalate_anomaly():
+    """Demo button: visibly accelerate the ramp. Stacks up to +0.45."""
+    _anomaly_state['escalation_boost'] = min(0.45, _anomaly_state['escalation_boost'] + 0.15)
+    return _anomaly_state['escalation_boost']
+
+def reroll_anomaly():
+    """Reset: pick a fresh random asset and restart the 4h ramp."""
+    _anomaly_state['asset_id'] = random.choice(list(FAILURE_SCENARIOS.keys()))
+    _anomaly_state['started_at'] = time.time() - DEMO_START_OFFSET_HOURS * 3600
+    _anomaly_state['escalation_boost'] = 0.0
+    return _anomaly_state['asset_id']
+
 def _anomaly_factor(timestamp, asset_id):
-    """Return 0.0 (normal) to 1.0 (severe) based on time into demo."""
-    if asset_id != 'PRESS-02':
+    """Return 0.0 (normal) to 1.0 (severe) for the active anomaly asset."""
+    if asset_id != _anomaly_state['asset_id']:
         return 0.0
-    now = time.time()
-    elapsed = now - timestamp  # seconds ago
-    # Anomaly started 4 hours ago
-    anomaly_age = (4 * 3600) - elapsed  # 0 at start, 4h now
+    anomaly_age = timestamp - _anomaly_state['started_at']
     if anomaly_age <= 0:
         return 0.0
-    # 0 to 1 over 4 hours
-    factor = anomaly_age / (4 * 3600)
+    factor = anomaly_age / (4 * 3600) + _anomaly_state['escalation_boost']
     return min(max(factor, 0.0), 1.0)
 
 def _add_noise(base, amplitude, seed_offset=0):
@@ -128,39 +183,34 @@ def generate_telemetry(asset_id, metric, timestamp=None):
     limits = asset['operating_limits'].get(metric, {})
     warn = limits.get('warn', baseline * 1.5)
     crit = limits.get('crit', baseline * 2.0)
-    
+
     anomaly = _anomaly_factor(timestamp, asset_id)
-    
-    # Different metrics ramp differently for press-02 anomaly
-    if asset_id == 'PRESS-02' and anomaly > 0:
-        if metric == 'vibration_mm_s':
-            # Main indicator — ramps from 3.2 to ~6.5
-            value = baseline + (warn - baseline) * 0.4 * anomaly + (crit - baseline) * 0.7 * anomaly * anomaly
-        elif metric == 'temperature_c':
-            # Secondary — ramps from 48 to ~62
+
+    value = baseline
+    if anomaly > 0:
+        sc = FAILURE_SCENARIOS[asset_id]
+        # flow_rate degrades DOWNWARD (cavitation starves flow); everything else ramps up
+        if metric == sc['primary']:
+            if metric == 'flow_rate_l_min':
+                value = baseline - (baseline - (limits.get('warn', baseline * 0.8))) * 0.5 * anomaly - baseline * 0.15 * anomaly * anomaly
+            else:
+                value = baseline + (warn - baseline) * 0.4 * anomaly + (crit - baseline) * 0.7 * anomaly * anomaly
+        elif metric in sc['secondary']:
             value = baseline + (warn - baseline) * 0.5 * anomaly
-        elif metric == 'pressure_bar':
-            # Fluctuation — baseline +/- growing variance
+        elif metric in sc['fluctuate']:
             value = baseline + math.sin(timestamp * 0.05) * (2 + 8 * anomaly) + (random.random() - 0.5) * (1 + 3 * anomaly)
-        elif metric == 'cycle_time_s':
-            # Slight increase — from 7.2 to ~8.3
-            value = baseline + (warn - baseline) * 0.3 * anomaly
-        else:
-            value = baseline
-    else:
-        value = baseline
-    
+
     # Add noise
     noise_amp = (crit - baseline) * 0.03
     value = _add_noise(value, noise_amp, hash(asset_id + metric) % 100)
-    
-    # Determine status
-    if value >= crit:
-        status = 'critical'
-    elif value >= warn:
-        status = 'warning'
+
+    # Status: flow_rate is a lower-is-bad metric
+    if metric == 'flow_rate_l_min':
+        low_warn = limits.get('warn', baseline * 0.85)
+        low_crit = limits.get('crit', baseline * 0.7)
+        status = 'critical' if value <= low_crit else 'warning' if value <= low_warn else 'normal'
     else:
-        status = 'normal'
+        status = 'critical' if value >= crit else 'warning' if value >= warn else 'normal'
     
     return {
         'asset_id': asset_id,
@@ -265,6 +315,42 @@ MAINTENANCE_HISTORY = [
         'technician': 'L. Bauer', 'parts_used': ['Grease Mobilux EP2 — 2kg'],
         'outcome': 'All axes within tolerance. No anomalies detected.',
     },
+    {
+        'id': 'WO-2025-0611', 'asset_id': 'ROBOT-01',
+        'date': '2025-10-14', 'type': 'corrective',
+        'description': 'Joint 3 gearbox replaced after backlash exceeded 0.4mm. Path repeatability degraded, cycle time drifting up.',
+        'root_cause': 'Gearbox wear — backlash beyond spec',
+        'downtime_hours': 5.5, 'cost_eur': 3200,
+        'technician': 'L. Bauer', 'parts_used': ['Gearbox assembly GBX-4600-J3'],
+        'outcome': 'Repeatability restored to ±0.05mm. Cycle time back to 10.5s baseline.',
+    },
+    {
+        'id': 'WO-2025-0733', 'asset_id': 'CONVEYOR-01',
+        'date': '2025-12-02', 'type': 'corrective',
+        'description': 'Belt re-tracked and tensioned after edge fraying. Motor current elevated 15% before fix.',
+        'root_cause': 'Belt misalignment increasing motor load',
+        'downtime_hours': 2.0, 'cost_eur': 450,
+        'technician': 'L. Bauer', 'parts_used': ['Tracking rollers x2'],
+        'outcome': 'Current returned to 8.5A baseline. Belt wear within limits.',
+    },
+    {
+        'id': 'WO-2025-0902', 'asset_id': 'PUMP-03',
+        'date': '2026-02-18', 'type': 'corrective',
+        'description': 'Impeller replaced after cavitation damage. Flow rate had dropped 20% with rising vibration.',
+        'root_cause': 'Cavitation — suction line restriction from partially closed valve',
+        'downtime_hours': 3.0, 'cost_eur': 780,
+        'technician': 'M. Schneider', 'parts_used': ['Impeller + wear ring set IMP-NB65-S'],
+        'outcome': 'Flow restored to 145 L/min. Suction valve interlock added to prevent recurrence.',
+    },
+    {
+        'id': 'WO-2026-0104', 'asset_id': 'PACK-04',
+        'date': '2026-04-09', 'type': 'corrective',
+        'description': 'Sealing head serviced after intermittent film jams. Cycle time had crept from 4.2s to 5.1s.',
+        'root_cause': 'Sealing head wear — heater band degradation',
+        'downtime_hours': 1.5, 'cost_eur': 320,
+        'technician': 'A. Kowalski', 'parts_used': ['Sealing head service kit SEAL-PK4-H'],
+        'outcome': 'Cycle time restored. Recommended 6-month head service interval.',
+    },
 ]
 
 def search_maintenance_history(asset_id, query=''):
@@ -343,6 +429,77 @@ QUALIFICATIONS:
 - Lockout/tagout authorization required""",
         'sections': ['Symptom Matrix', 'Failure Mode Analysis', 'Maintenance Window', 'Parts Required', 'Qualifications'],
     },
+    {
+        'id': 'DOC-CV-001', 'title': 'Conveyor Motor M-101 — Belt & Motor Service Guide',
+        'asset_id': 'CONVEYOR-01',
+        'content': """CONVEYOR M-101 SERVICE GUIDE
+
+SYMPTOM MATRIX:
+| Symptom | Likely Cause | Action |
+|---------|-------------|--------|
+| Rising motor current | Belt misalignment or over-tension | Re-track belt, check tension |
+| Rising temperature | Motor overload from belt drag | Reduce load, inspect belt path |
+| Squealing under load | Belt slip or edge fraying | Inspect belt edges, re-track |
+
+BELT RE-TRACKING: 30-45 minutes. Requires conveyor_alignment skill.
+PARTS: BELT-101-T (belt + tracking kit) for full replacement (90 min).
+Motor current above 13A sustained indicates urgent intervention — thermal
+trip at 15A will hard-stop the line.""",
+        'sections': ['Symptom Matrix', 'Re-tracking', 'Parts'],
+    },
+    {
+        'id': 'DOC-RB-001', 'title': 'IRB-4600 Joint Gearbox — Backlash Diagnosis',
+        'asset_id': 'ROBOT-01',
+        'content': """ABB IRB-4600 GEARBOX DIAGNOSIS
+
+SYMPTOMS OF GEARBOX BACKLASH:
+- Cycle time drift upward (controller compensates with slower moves)
+- Vibration during high-speed arcs
+- Placement repeatability degradation (>±0.1mm)
+- Clicking noise at direction reversals
+
+MEASUREMENT: Dial test on J3 flange. Spec < 0.15mm. Replace gearbox > 0.3mm.
+REPLACEMENT: GBX-4600-J3 assembly, 4-6 hours, robot_calibration skill +
+post-replacement calibration routine (mastering + repeatability test).
+HISTORY NOTE: J3 gearbox on this unit replaced 2025-10 (WO-2025-0611) —
+premature re-wear may indicate load/duty-cycle issue, consider duty review.""",
+        'sections': ['Symptoms', 'Measurement', 'Replacement'],
+    },
+    {
+        'id': 'DOC-PM-001', 'title': 'NB-65 Pump — Cavitation & Impeller Wear Guide',
+        'asset_id': 'PUMP-03',
+        'content': """GRUNDFOS NB-65 CAVITATION GUIDE
+
+CAVITATION SIGNATURE:
+- Falling flow rate with rattling/gravel noise
+- Rising vibration at pump inlet
+- Elevated bearing temperature (secondary)
+
+CAUSES: Suction restriction (valve, strainer), low NPSH, air ingress.
+CHECK FIRST: Suction valve position and strainer — 15 min, no parts.
+IMPELLER REPLACEMENT: IMP-NB65-S set, 2.5-3 hours, pump_overhaul skill.
+HISTORY NOTE: Cavitation event 2026-02 (WO-2025-0902) traced to partially
+closed suction valve — interlock added; verify interlock before tear-down.""",
+        'sections': ['Signature', 'Causes', 'Replacement'],
+    },
+    {
+        'id': 'DOC-PK-001', 'title': 'Variopac Sealing Head — Wear & Jam Prevention',
+        'asset_id': 'PACK-04',
+        'content': """KRONES VARIOPAC SEALING HEAD GUIDE
+
+WEAR PROGRESSION:
+- Cycle time creep (head dwell compensation)
+- Intermittent film jams
+- Weak/incomplete seals on random packs
+- Heater band temperature instability
+
+SERVICE: SEAL-PK4-H kit (head plates + heater bands + film guides),
+60-90 minutes, packaging_service skill.
+INTERVAL: 6 months recommended (see WO-2026-0104 outcome).
+JAM RISK: Cycle time above 5.5s correlates with jam probability >30% —
+schedule service before that threshold.""",
+        'sections': ['Wear Progression', 'Service', 'Jam Risk'],
+    },
 ]
 
 def search_technical_documents(asset_id, query=''):
@@ -408,6 +565,30 @@ INVENTORY = [
         'lead_time_days': 2, 'cost_eur': 120,
         'compatible_assets': ['PRESS-02', 'PUMP-03'],
     },
+    {
+        'part_number': 'BELT-101-T', 'description': 'Conveyor belt + tracking kit — SIMOTICS M-101',
+        'quantity': 2, 'location': 'Spare parts store — Shelf A-04',
+        'lead_time_days': 3, 'cost_eur': 210,
+        'compatible_assets': ['CONVEYOR-01'],
+    },
+    {
+        'part_number': 'GBX-4600-J3', 'description': 'Joint 3 gearbox assembly — ABB IRB-4600',
+        'quantity': 1, 'location': 'Spare parts store — Shelf E-02',
+        'lead_time_days': 21, 'cost_eur': 1450,
+        'compatible_assets': ['ROBOT-01'],
+    },
+    {
+        'part_number': 'IMP-NB65-S', 'description': 'Impeller + wear ring set — Grundfos NB-65',
+        'quantity': 1, 'location': 'Spare parts store — Shelf D-07',
+        'lead_time_days': 10, 'cost_eur': 520,
+        'compatible_assets': ['PUMP-03'],
+    },
+    {
+        'part_number': 'SEAL-PK4-H', 'description': 'Sealing head service kit — Krones Variopac',
+        'quantity': 3, 'location': 'Spare parts store — Shelf F-11',
+        'lead_time_days': 4, 'cost_eur': 175,
+        'compatible_assets': ['PACK-04'],
+    },
 ]
 
 # Track delayed parts (can be modified during demo)
@@ -440,19 +621,19 @@ def reset_delays():
 # ─── TECHNICIANS ─────────────────────────────────────────────────────────────
 TECHNICIANS = [
     {
-        'id': 'TECH-001', 'name': 'Marcus Schneider', 'skills': ['hydraulic_systems', 'bearing_replacement', 'lockout_tagout'],
+        'id': 'TECH-001', 'name': 'Marcus Schneider', 'skills': ['hydraulic_systems', 'bearing_replacement', 'lockout_tagout', 'pump_overhaul'],
         'certification_level': 3, 'available': True,
         'shift_end': '22:00', 'current_location': 'Line 03 — Zone C (nearby)',
         'next_available': 'now', 'estimated_travel_min': 2,
     },
     {
-        'id': 'TECH-002', 'name': 'Lukas Bauer', 'skills': ['robotic_systems', 'electrical'],
+        'id': 'TECH-002', 'name': 'Lukas Bauer', 'skills': ['robotic_systems', 'robot_calibration', 'electrical', 'conveyor_alignment'],
         'certification_level': 2, 'available': True,
         'shift_end': '22:00', 'current_location': 'Line 02 — Zone A',
         'next_available': 'now', 'estimated_travel_min': 10,
     },
     {
-        'id': 'TECH-003', 'name': 'Anna Kowalski', 'skills': ['hydraulic_systems', 'welding'],
+        'id': 'TECH-003', 'name': 'Anna Kowalski', 'skills': ['hydraulic_systems', 'welding', 'packaging_service'],
         'certification_level': 2, 'available': False,
         'shift_end': '18:00', 'current_location': 'Off-site — training',
         'next_available': 'tomorrow 06:00', 'estimated_travel_min': 60,
@@ -474,32 +655,55 @@ def get_technician_availability(skill=None, window=None):
     return results
 
 # ─── OPERATOR OBSERVATIONS ───────────────────────────────────────────────────
-OPERATOR_OBSERVATIONS = [
-    {
-        'id': 'OBS-001', 'asset_id': 'PRESS-02', 'operator': 'T. Müller',
-        'timestamp': (datetime.now() - timedelta(hours=1)).strftime('%Y-%m-%d %H:%M'),
-        'observation': 'Press motor sounds different — higher pitch whine than usual. Started about an hour ago.',
-        'severity': 'noted', 'acknowledged': True,
-    },
-    {
-        'id': 'OBS-002', 'asset_id': 'PRESS-02', 'operator': 'T. Müller',
-        'timestamp': (datetime.now() - timedelta(minutes=30)).strftime('%Y-%m-%d %H:%M'),
-        'observation': 'Noticed slight hydraulic fluid smell near the press motor area. No visible leaks.',
-        'severity': 'noted', 'acknowledged': True,
-    },
-]
+# Scenario-specific observations — served for whichever asset has the anomaly
+_SCENARIO_OBSERVATIONS = {
+    'CONVEYOR-01': [
+        'Belt looks like it\'s tracking slightly off-centre near the drive pulley. Some squealing under load.',
+        'Motor housing feels warmer than usual to the touch. No burning smell yet.',
+    ],
+    'ROBOT-01': [
+        'Robot seems slower on the reach-and-place move. Occasional judder at the end of the arc.',
+        'Heard a faint clicking from the arm during fast moves. Repeatability seems off — parts placed a few mm out.',
+    ],
+    'PRESS-02': [
+        'Press motor sounds different — higher pitch whine than usual. Started about an hour ago.',
+        'Noticed slight hydraulic fluid smell near the press motor area. No visible leaks.',
+    ],
+    'PUMP-03': [
+        'Pump sounds like it\'s gargling — rattling noise that comes and goes. Flow gauge reading lower than this morning.',
+        'Pipework near the pump inlet is vibrating more than usual.',
+    ],
+    'PACK-04': [
+        'Film feed jammed twice this shift — had to clear it manually. Sealing looks weaker on some packs.',
+        'Packaging unit is running noticeably slower. Queue building up ahead of it.',
+    ],
+}
+
+def _build_observations():
+    """Observations for the active anomaly asset."""
+    aid = _anomaly_state['asset_id']
+    texts = _SCENARIO_OBSERVATIONS.get(aid, [])
+    return [
+        {
+            'id': f'OBS-{i+1:03d}', 'asset_id': aid, 'operator': 'T. Müller',
+            'timestamp': (datetime.now() - timedelta(minutes=60 - i * 30)).strftime('%Y-%m-%d %H:%M'),
+            'observation': text, 'severity': 'noted', 'acknowledged': True,
+        }
+        for i, text in enumerate(texts)
+    ]
 
 # Can add new observations during demo
 _new_observations = []
 
 def get_operator_observations(asset_id, time_window='4h'):
     """Get operator observations for an asset."""
-    return OPERATOR_OBSERVATIONS + [o for o in _new_observations if o['asset_id'] == asset_id]
+    base = [o for o in _build_observations() if o['asset_id'] == asset_id]
+    return base + [o for o in _new_observations if o['asset_id'] == asset_id]
 
 def add_operator_observation(asset_id, observation, operator='Demo Presenter'):
     """Add a new operator observation (for demo event injection)."""
     obs = {
-        'id': f'OBS-{len(OPERATOR_OBSERVATIONS) + len(_new_observations) + 1:03d}',
+        'id': f'OBS-{100 + len(_new_observations) + 1:03d}',
         'asset_id': asset_id, 'operator': operator,
         'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M'),
         'observation': observation, 'severity': 'reported', 'acknowledged': False,
@@ -585,8 +789,9 @@ def get_work_orders():
     return _work_orders
 
 def reset_state():
-    """Reset all mutable state for a fresh demo."""
+    """Reset all mutable state for a fresh demo. Re-rolls the anomaly asset."""
     _work_orders.clear()
     _approval_requests.clear()
     _new_observations.clear()
     reset_delays()
+    return reroll_anomaly()

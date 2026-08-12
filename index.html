@@ -1711,6 +1711,15 @@
     }
     .lg-nav-item:hover { color: var(--text); }
     .lg-nav-item.active { color: var(--accent5); border-bottom-color: var(--accent5); }
+    .lg-nav-right { margin-left: auto; display: flex; align-items: center; gap: 0.6rem; padding-bottom: 0.4rem; }
+    .lg-model-select { background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 0.3rem 0.5rem; font-size: 0.75rem; cursor: pointer; }
+    .lg-llm-badge { font-size: 0.7rem; color: var(--text-dim); background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 0.25rem 0.6rem; white-space: nowrap; }
+    .lg-llm-badge-live { color: var(--success); border-color: rgba(74,222,128,0.4); }
+    .lg-pipeline-error { text-align: center; padding: 1.5rem 1rem; background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.25); border-radius: 8px; margin-top: 0.5rem; }
+    .lg-exec-briefings { margin-top: 1rem; background: var(--surface2); border-radius: 8px; padding: 1rem; }
+    .lg-briefing-row { display: flex; gap: 0.8rem; margin-top: 0.6rem; align-items: baseline; }
+    .lg-briefing-role { flex: 0 0 110px; font-size: 0.75rem; font-weight: 600; color: var(--accent5); }
+    .lg-briefing-text { font-size: 0.82rem; line-height: 1.5; }
 
     .lg-screen { width: 100%; gap: 1rem; }
 
@@ -2995,8 +3004,18 @@
     <div class="lg-navbar">
       <div class="lg-nav-item active" id="lg-nav-overview" onclick="lgShowScreen('overview'); lgRenderOverview();">📊 Line Overview</div>
       <div class="lg-nav-item" id="lg-nav-asset" onclick="lgNavAsset()">🏭 Asset Health</div>
-      <div class="lg-nav-item" id="lg-nav-investigation" onclick="lgShowScreen('investigation')">🔬 Investigation</div>
+      <div class="lg-nav-item" id="lg-nav-investigation" onclick="lgNavInvestigation()">🔬 Investigation</div>
       <div class="lg-nav-item" id="lg-nav-executive" onclick="lgNavExecutive()">📈 Executive</div>
+      <div class="lg-nav-right">
+        <select class="lg-model-select" id="lg-model-select" onchange="LG_STATE.model = this.value;" title="Model used by the diagnosis/planning agents">
+          <option value="deepseek/deepseek-v4-flash-0731">DeepSeek V4 Flash</option>
+          <option value="z-ai/glm-5.2">GLM-5.2</option>
+          <option value="qwen/qwen3-235b-a22b-2507">Qwen3 235B</option>
+          <option value="anthropic/claude-sonnet-5">Claude Sonnet 5</option>
+          <option value="anthropic/claude-haiku-4-5-20251001">Claude Haiku 4.5</option>
+        </select>
+        <span class="lg-llm-badge" id="lg-llm-badge">⚪ no LLM calls yet</span>
+      </div>
     </div>
 
     <div class="demo-body" style="min-height: 700px;">
@@ -3096,7 +3115,7 @@
   </div>
 </div>
 
-<script src="/lineguard.js?v=3"></script>
+<script src="/lineguard.js?v=5"></script>
 
 <script>
 // ─── CHART.JS DEFAULTS ───

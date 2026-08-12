@@ -23,6 +23,8 @@ const LG_STATE = {
   agentTrace: [],
   llmBusy: false,
   chatHistory: [],
+  model: 'deepseek/deepseek-v4-flash-0731',   // diagnosing model (user-selectable)
+  llmStats: { calls: 0, tokens: 0 },          // live LLM badge counters
   demoMode: 'anomaly',        // normal | anomaly | escalating
   auditLog: [],
 };
@@ -89,16 +91,18 @@ async function lgInit() {
   LG_STATE.demoMode = 'anomaly';
   LG_STATE.auditLog = [];
 
-  // Reset server state
+  // Reset server state (re-rolls which asset has the anomaly)
   try { await fetch('/api/lg/reset'); } catch(e) {}
 
-  // Load assets
+  // Load assets + active failure scenario
   try {
     const res = await fetch('/api/lg/assets');
     const data = await res.json();
     LG_STATE.assets = data.assets;
     LG_STATE.metrics = data.metrics;
     LG_STATE.labels = data.labels;
+    const scRes = await fetch('/api/lg/scenario');
+    LG_STATE.scenario = (await scRes.json()).scenario;
   } catch(e) {
     console.error('Failed to load assets:', e);
   }
@@ -140,12 +144,29 @@ function lgShowScreen(screen) {
   if (navEl) navEl.classList.add('active');
 }
 
-// Nav: Asset Health — needs an asset. Default to the anomalous press, else first asset.
+// Nav: Asset Health — needs an asset. Default to the anomalous asset, else first.
 function lgNavAsset() {
+  const scAsset = (LG_STATE.scenario || {}).asset_id;
   const assetId = LG_STATE.selectedAsset
-    || (LG_STATE.assets['PRESS-02'] ? 'PRESS-02' : Object.keys(LG_STATE.assets)[0]);
+    || (scAsset && LG_STATE.assets[scAsset] ? scAsset : Object.keys(LG_STATE.assets)[0]);
   if (assetId) lgOpenAsset(assetId);
   else lgShowScreen('asset');
+}
+
+// Nav: Investigation — show workspace if one is running, else a guided empty state.
+function lgNavInvestigation() {
+  lgShowScreen('investigation');
+  if (LG_STATE.investigation) return;
+  const el = document.getElementById('lg-invest-signals');
+  const others = ['lg-invest-hypotheses', 'lg-invest-recommendation', 'lg-invest-trace'];
+  if (el) el.innerHTML = `
+    <div style="text-align:center;padding:2rem 1rem;color:var(--text-dim);">
+      <div style="font-size:2rem;margin-bottom:0.8rem;">🔬</div>
+      <h4 style="color:var(--text);margin-bottom:0.5rem;">No investigation running</h4>
+      <p style="font-size:0.85rem;margin-bottom:1rem;">Open an asset and press Start Investigation to launch the agent pipeline.</p>
+      <button class="btn lg-btn-primary" onclick="lgNavAsset()">🏭 Open Asset Health</button>
+    </div>`;
+  others.forEach(id => { const o = document.getElementById(id); if (o) o.innerHTML = ''; });
 }
 
 // Nav: Executive — render from investigation if one exists, else show a hint.
@@ -430,7 +451,7 @@ async function lgLoadObservations(assetId) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 async function lgStartInvestigation() {
-  const assetId = LG_STATE.selectedAsset || 'PRESS-02';
+  const assetId = LG_STATE.selectedAsset || (LG_STATE.scenario || {}).asset_id || Object.keys(LG_STATE.assets)[0];
   LG_STATE.selectedAsset = assetId;
   lgShowScreen('investigation');
 
@@ -491,12 +512,15 @@ async function lgRunAgentPipeline(assetId) {
   lgLogAgent('diagnosis', 'Correlating telemetry with maintenance history...', 'thinking');
   lgSetPanelStatus('hypotheses', 'Forming hypotheses...');
 
-  const maintenanceHistory = await lgToolCall('search_maintenance_history', { asset_id: assetId, query: 'bearing' });
-  const techDocs = await lgToolCall('search_technical_documents', { asset_id: assetId, query: 'bearing vibration' });
+  // No pre-baked queries — fetch the asset's full history/docs and let the
+  // LLM reason over them. Works identically for any asset/failure mode.
+  const maintenanceHistory = await lgToolCall('search_maintenance_history', { asset_id: assetId, query: '' });
+  const techDocs = await lgToolCall('search_technical_documents', { asset_id: assetId, query: '' });
   const observations = await lgToolCall('get_operator_observations', { asset_id: assetId });
 
   // LLM diagnosis
   const diagnosis = await lgRunDiagnosisLLM(assetId, snapshot, series, anomalies, maintenanceHistory, techDocs, observations);
+  if (!diagnosis) return lgPipelineFailed('diagnosis');
   lgRenderHypothesesPanel(diagnosis);
   lgLogAgent('diagnosis', `Leading hypothesis: ${diagnosis.leading_hypothesis} (confidence: ${diagnosis.confidence})`, 'result');
 
@@ -514,15 +538,19 @@ async function lgRunAgentPipeline(assetId) {
   const downtimeImpact = await lgToolCall('estimate_downtime_impact', { asset_id: assetId, duration: 55 });
 
   const impactAssessment = await lgRunImpactLLM(assetId, diagnosis, downtimeImpact, schedule);
+  if (!impactAssessment) return lgPipelineFailed('impact');
   lgLogAgent('impact', `Downtime exposure: €${downtimeImpact.comparison.run_to_failure.revenue_lost_eur} if run to failure`, 'result');
 
   // ── Step 4: Maintenance Planner Agent ── (LLM-driven)
   lgLogAgent('planner', 'Planning maintenance window...', 'thinking');
 
-  const inventory = await lgToolCall('get_inventory', { part_number: 'BR-500-A' });
-  const technicians = await lgToolCall('get_technician_availability', { skill: 'bearing_replacement' });
+  // Diagnosis drives sourcing: full inventory filtered to this asset,
+  // technicians filtered by the skill the diagnosis LLM identified.
+  const inventory = await lgToolCall('get_inventory', { part_number: '' });
+  const technicians = await lgToolCall('get_technician_availability', { skill: diagnosis.required_skill || '' });
 
   const plan = await lgRunPlannerLLM(assetId, diagnosis, schedule, inventory, technicians, techDocs);
+  if (!plan) return lgPipelineFailed('planner');
   lgRenderRecommendationPanel(diagnosis, impactAssessment, plan, downtimeImpact);
   lgLogAgent('planner', `Recommended window: ${plan.window} (${plan.duration_minutes} min)`, 'result');
 
@@ -538,7 +566,7 @@ async function lgRunAgentPipeline(assetId) {
     asset_id: assetId,
     asset_name: asset.name,
     problem: diagnosis.leading_hypothesis,
-    description: diagnosis.summary || `Bearing degradation detected on ${asset.name}. Vibration and temperature trending above warning thresholds. Historical pattern matches prior failure (WO-2025-0847).`,
+    description: diagnosis.summary || `${diagnosis.leading_hypothesis} detected on ${asset.name}. See evidence and agent trace for details.`,
     priority: 'high',
     evidence: diagnosis.evidence || [],
     estimated_duration_minutes: plan.duration_minutes,
@@ -549,8 +577,8 @@ async function lgRunAgentPipeline(assetId) {
     investigation_id: LG_STATE.investigation.investigation_id,
   };
 
-  const workOrder = await lgToolCall('draft_work_order', woPayload);
-  const approval = await lgToolCall('send_approval_request', { work_order_id: workOrder.id, ...woPayload });
+  const workOrder = (await lgToolCall('draft_work_order', woPayload)).work_order || {};
+  const approval = (await lgToolCall('send_approval_request', { work_order_id: workOrder.id, ...woPayload })).approval || {};
 
   LG_STATE.investigation.approval = { required: true, status: 'pending', approver_role: 'maintenance_supervisor', id: approval.id };
   lgLogAgent('action', `Work order ${workOrder.id} drafted — awaiting approval`, 'warning');
@@ -634,35 +662,17 @@ Respond with ONLY a JSON object (no markdown, no code blocks):
   "evidence": ["evidence 1 with source", "evidence 2 with source", ...],
   "contradictions": ["any contradicting evidence"],
   "recommended_validation": "how to confirm the diagnosis",
+  "required_skill": "technician skill needed, e.g. bearing_replacement, pump_overhaul, robot_calibration, conveyor_alignment, packaging_service",
+  "suggested_parts": ["part numbers from the technical documents, if identifiable"],
   "summary": "2-3 sentence clinical summary"
 }`;
 
   try {
     const result = await lgCallLLM([{ role: 'system', content: sys }, { role: 'user', content: 'Diagnose the failure mode based on available evidence.' }]);
-    let cleaned = result.trim();
-    if (cleaned.startsWith('```')) cleaned = cleaned.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
-    const jsonStart = cleaned.indexOf('{'), jsonEnd = cleaned.lastIndexOf('}');
-    if (jsonStart >= 0 && jsonEnd > jsonStart) cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
-    return JSON.parse(cleaned);
+    return lgParseJSON(result);
   } catch(e) {
     console.error('Diagnosis LLM failed:', e);
-    // Fallback — deterministic diagnosis based on seeded data
-    return {
-      leading_hypothesis: 'Hydraulic press bearing degradation',
-      confidence: 0.82,
-      severity: 'high',
-      failure_probability: 0.78,
-      evidence: [
-        'Vibration trending from 3.2 to 5.8 mm/s over 4 hours (above warn threshold of 4.5) — Source: telemetry',
-        'Temperature rising from 48°C to 58°C — Source: telemetry',
-        'Cycle time increased from 7.2s to 8.1s — Source: telemetry',
-        'Prior bearing failure 11 months ago (WO-2025-0847) with same symptom pattern — Source: maintenance history',
-        'Operator reported unusual motor whine and hydraulic fluid smell — Source: operator observations',
-      ],
-      contradictions: ['Pressure fluctuation currently below critical threshold (within normal range)'],
-      recommended_validation: 'Inspect bearing housing during changeover — check for spalling on outer race',
-      summary: 'Bearing degradation on hydraulic press motor. Vibration and temperature trends match prior failure pattern (WO-2025-0847). Confidence is high due to multiple corroborating signals.',
-    };
+    return null; // honest failure — no canned diagnosis
   }
 }
 
@@ -686,19 +696,10 @@ Respond with ONLY a JSON object:
 
   try {
     const result = await lgCallLLM([{ role: 'system', content: sys }, { role: 'user', content: 'Assess the business impact.' }]);
-    let cleaned = result.trim();
-    if (cleaned.startsWith('```')) cleaned = cleaned.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
-    const jsonStart = cleaned.indexOf('{'), jsonEnd = cleaned.lastIndexOf('}');
-    if (jsonStart >= 0 && jsonEnd > jsonStart) cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
-    return JSON.parse(cleaned);
+    return lgParseJSON(result);
   } catch(e) {
-    return {
-      downtime_exposure_eur: downtimeImpact.comparison.run_to_failure.revenue_lost_eur,
-      avoided_downtime_eur: downtimeImpact.comparison.run_to_failure.revenue_lost_eur,
-      risk_if_ignored: 'Bearing failure could cause unplanned line stoppage of 4+ hours, potential secondary damage to hydraulic system',
-      recommendation: 'schedule_during_changeover',
-      business_summary: `Scheduling maintenance during the upcoming changeover avoids €${downtimeImpact.comparison.run_to_failure.revenue_lost_eur} in unplanned downtime costs while requiring zero production loss.`,
-    };
+    console.error('Impact LLM failed:', e);
+    return null; // honest failure
   }
 }
 
@@ -720,7 +721,8 @@ ${parts.map(p => `- ${p.part_number}: ${p.description} (qty: ${p.quantity}, stat
 Technicians available:
 ${techs.map(t => `- ${t.name} (Level ${t.certification_level}, skills: ${t.skills.join(', ')}, travel: ${t.estimated_travel_min} min)`).join('\n')}
 
-Technical docs indicate estimated time: 55 minutes for bearing replacement.
+Use the technical documentation excerpts to estimate intervention time and steps:
+${(docs.documents || []).map(d => `- ${d.title}: ${d.content.substring(0, 300)}`).join('\n')}
 
 Respond with ONLY a JSON object:
 {
@@ -736,32 +738,37 @@ Respond with ONLY a JSON object:
 
   try {
     const result = await lgCallLLM([{ role: 'system', content: sys }, { role: 'user', content: 'Plan the maintenance intervention.' }]);
-    let cleaned = result.trim();
-    if (cleaned.startsWith('```')) cleaned = cleaned.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
-    const jsonStart = cleaned.indexOf('{'), jsonEnd = cleaned.lastIndexOf('}');
-    if (jsonStart >= 0 && jsonEnd > jsonStart) cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
-    return JSON.parse(cleaned);
+    return lgParseJSON(result);
   } catch(e) {
-    return {
-      window: `${changeover.start}-${changeover.end}`,
-      duration_minutes: 55,
-      technician: techs[0]?.name || 'M. Schneider',
-      parts: [{ part_number: 'BR-500-A', quantity: 1 }, { part_number: 'SK-220', quantity: 1 }],
-      steps: [
-        'Lockout/tagout hydraulic press — verify zero residual pressure',
-        'Remove motor housing cover (4x M10 bolts)',
-        'Inspect bearing races for spalling/pitting',
-        'Measure radial play with dial indicator (spec: <0.05mm)',
-        'Replace bearing kit BR-500-A if degraded',
-        'Replace seal kit SK-220',
-        'Reassemble and torque bolts to 45 Nm cross pattern',
-        'Run unloaded test for 5 minutes — verify vibration < 3.5 mm/s',
-      ],
-      loto_required: true,
-      missing_info: [],
-      summary: `Schedule bearing replacement during ${changeover.start}-${changeover.end} changeover. ${techs[0]?.name || 'M. Schneider'} is qualified and nearby. Parts BR-500-A and SK-220 are in stock.`,
-    };
+    console.error('Planner LLM failed:', e);
+    return null; // honest failure
   }
+}
+
+// ── SHARED LLM HELPERS ───────────────────────────────────────────────────────
+function lgParseJSON(result) {
+  let cleaned = result.trim();
+  if (cleaned.startsWith('```')) cleaned = cleaned.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+  const jsonStart = cleaned.indexOf('{'), jsonEnd = cleaned.lastIndexOf('}');
+  if (jsonStart >= 0 && jsonEnd > jsonStart) cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
+  return JSON.parse(cleaned);
+}
+
+// Honest pipeline failure — no canned theatre. Show the error, offer retry.
+function lgPipelineFailed(stage) {
+  const stageNames = { diagnosis: 'Failure Diagnosis', impact: 'Impact Analysis', planner: 'Maintenance Planner' };
+  lgLogAgent('supervisor', `❌ ${stageNames[stage] || stage} agent failed — the LLM call did not return a valid response. No fabricated results will be shown.`, 'error');
+  lgSetPanelStatus('hypotheses', '');
+  lgSetPanelStatus('recommendation', '');
+  const el = document.getElementById(stage === 'diagnosis' ? 'lg-invest-hypotheses' : 'lg-invest-recommendation');
+  if (el) el.innerHTML = `
+    <div class="lg-pipeline-error">
+      <div style="font-size:1.5rem;">⚠️</div>
+      <div><strong>${stageNames[stage] || stage} failed</strong></div>
+      <div style="font-size:0.8rem;color:var(--text-dim);margin:0.4rem 0 0.8rem;">The ${lgModelName(LG_STATE.model)} call failed or returned unparseable output. This demo shows real model output only — nothing is faked.</div>
+      <button class="btn lg-btn-primary" onclick="lgStartInvestigation()">🔄 Retry Investigation</button>
+    </div>`;
+  lgAuditLog('Pipeline failed', `Stage: ${stage}, model: ${LG_STATE.model}`);
 }
 
 // ── RENDERING: SIGNALS PANEL ─────────────────────────────────────────────────
@@ -972,19 +979,85 @@ function lgApproveWorkOrder(woId) {
   }
 }
 
-function lgRejectWorkOrder(woId) {
+async function lgRejectWorkOrder(woId) {
   LG_STATE.investigation.approval.status = 'rejected';
   lgAuditLog('Work order rejected', woId);
-  lgLogAgent('action', `Work order ${woId} rejected. Investigation will continue.`, 'warning');
+  lgLogAgent('action', `Work order ${woId} rejected by supervisor.`, 'warning');
+  lgLogAgent('planner', 'Rejection received. Drafting alternative plan with different risk trade-offs...', 'thinking');
 
   const prompt = document.getElementById('lg-approval-prompt');
   if (prompt) {
     prompt.innerHTML = `
       <div class="lg-approval-result lg-rejected">
         <span class="lg-approval-icon">❌</span>
-        <div class="lg-approval-text">Work order ${woId} rejected. The system will not proceed with maintenance.</div>
+        <div class="lg-approval-text">Work order ${woId} rejected. The Maintenance Planner is drafting an alternative...</div>
+      </div>`;
+  }
+
+  // Planner reacts to the human decision — drafts plan B
+  const inv = LG_STATE.investigation;
+  const sys = `You are the Maintenance Planner Agent for LineGuard AI.
+Your recommended work order was REJECTED by the human maintenance supervisor.
+Original plan: ${inv.recommended_window} — ${escapeHtml(inv.leading_hypothesis || '')}
+
+Draft an ALTERNATIVE plan that respects the rejection. Options to consider:
+- Defer to the weekend maintenance window (lower production impact, higher failure risk in the interim)
+- Minimal temporary mitigation now (inspection/adjustment only) + full repair later
+- Enhanced monitoring with defined escalation thresholds instead of intervention
+
+Respond with ONLY a JSON object:
+{
+  "alternative": "short name of the chosen alternative",
+  "rationale": "why this respects the supervisor's rejection",
+  "interim_risk": "what could go wrong while waiting, with failure probability estimate",
+  "monitoring": "what will be watched and the escalation threshold",
+  "revised_window": "when the full fix would now happen",
+  "summary": "2-3 sentences for the audit trail"
+}`;
+
+  try {
+    const result = await lgCallLLM([{ role: 'system', content: sys }, { role: 'user', content: 'The supervisor rejected the work order. Propose the alternative plan.' }]);
+    const alt = lgParseJSON(result);
+    if (prompt) {
+      prompt.innerHTML += `
+        <div class="lg-plan-revision">
+          <div class="lg-revision-header">🔄 Alternative Plan — ${escapeHtml(alt.alternative || 'Plan B')}</div>
+          <div class="lg-revised-plan">
+            <div><strong>Rationale:</strong> ${escapeHtml(alt.rationale || '')}</div>
+            <div><strong>Interim risk:</strong> ${escapeHtml(alt.interim_risk || '')}</div>
+            <div><strong>Monitoring:</strong> ${escapeHtml(alt.monitoring || '')}</div>
+            <div><strong>Revised window:</strong> ${escapeHtml(alt.revised_window || '')}</div>
+          </div>
+          <div class="lg-approval-buttons" style="margin-top:0.8rem;">
+            <button class="btn lg-btn-approve" onclick="lgApproveAlternative()">✓ Approve Alternative</button>
+            <button class="btn lg-btn-exec" onclick="lgShowExecutive()">View Executive Summary →</button>
+          </div>
+          <div class="lg-revision-note">Both the rejected plan and this alternative are preserved in the audit trail.</div>
+        </div>`;
+    }
+    LG_STATE.investigation.alternative_plan = alt;
+    lgLogAgent('planner', `Alternative drafted: ${alt.alternative}. Awaiting decision.`, 'result');
+    lgAuditLog('Alternative plan drafted', alt.summary || alt.alternative || '');
+  } catch(e) {
+    console.error('Alternative plan LLM failed:', e);
+    lgLogAgent('planner', '❌ Failed to draft alternative plan — LLM call failed.', 'error');
+    if (prompt) prompt.innerHTML += `<div class="lg-pipeline-error"><div><strong>Alternative planning failed</strong></div><button class="btn lg-btn-primary" onclick="lgRejectWorkOrder('${woId}')">🔄 Retry</button></div>`;
+  }
+}
+
+function lgApproveAlternative() {
+  LG_STATE.investigation.approval.status = 'approved_alternative';
+  const alt = LG_STATE.investigation.alternative_plan || {};
+  lgAuditLog('Alternative plan approved', alt.alternative || '');
+  lgLogAgent('action', `Alternative plan approved: ${alt.alternative || 'plan B'}. Monitoring configured.`, 'success');
+  const prompt = document.getElementById('lg-approval-prompt');
+  if (prompt) {
+    prompt.innerHTML = `
+      <div class="lg-approval-result lg-approved">
+        <span class="lg-approval-icon">✅</span>
+        <div class="lg-approval-text">Alternative approved: ${escapeHtml(alt.alternative || 'plan B')}. ${escapeHtml(alt.monitoring || '')}</div>
       </div>
-    `;
+      <button class="btn lg-btn-exec" onclick="lgShowExecutive()">View Executive Summary →</button>`;
   }
 }
 
@@ -1009,13 +1082,18 @@ async function lgShowExecutive() {
   const el = document.getElementById('lg-exec-content');
   if (!el) return;
 
-  const downtimeAvoided = inv.business_impact?.comparison?.run_to_failure?.revenue_lost_eur || 0;
+  // Real delta: run-to-failure exposure vs planned-maintenance cost
+  const cmp = inv.business_impact?.comparison || {};
+  const exposure = cmp.run_to_failure?.revenue_lost_eur || 0;
+  const plannedCost = cmp.maintain_now_during_changeover?.revenue_lost_eur || 0;
+  const avoided = exposure - plannedCost;
+  const approvalLabel = { approved: '✅ Approved', rejected: '❌ Rejected', approved_alternative: '✅ Alternative Approved' }[inv.approval.status] || '⏳ Pending';
 
   el.innerHTML = `
     <div class="lg-exec-card">
       <div class="lg-exec-header">
         <h2>Executive Outcome Summary</h2>
-        <div class="lg-exec-investigation">Investigation ${inv.investigation_id}</div>
+        <div class="lg-exec-investigation">Investigation ${inv.investigation_id} · ${lgModelName(LG_STATE.model)}</div>
       </div>
       <div class="lg-exec-grid">
         <div class="lg-exec-item">
@@ -1028,25 +1106,34 @@ async function lgShowExecutive() {
           <div class="lg-exec-sub">Failure probability (24h): ${(inv.risk.failure_probability_24h * 100).toFixed(0)}%</div>
         </div>
         <div class="lg-exec-item">
-          <div class="lg-exec-label">Recommended Intervention</div>
-          <div class="lg-exec-value">${escapeHtml(inv.leading_hypothesis || 'Bearing replacement')}</div>
+          <div class="lg-exec-label">Diagnosis</div>
+          <div class="lg-exec-value">${escapeHtml(inv.leading_hypothesis || '—')}</div>
           <div class="lg-exec-sub">Confidence: ${(inv.risk.confidence * 100).toFixed(0)}%</div>
         </div>
         <div class="lg-exec-item">
-          <div class="lg-exec-label">Estimated Downtime Exposure</div>
-          <div class="lg-exec-value lg-impact-cost">€${downtimeAvoided.toLocaleString()}</div>
-          <div class="lg-exec-sub">If run to failure (unplanned)</div>
+          <div class="lg-exec-label">Run-to-Failure Exposure</div>
+          <div class="lg-exec-value lg-impact-cost">€${exposure.toLocaleString()}</div>
+          <div class="lg-exec-sub">Unplanned stop, emergency repair</div>
         </div>
         <div class="lg-exec-item">
-          <div class="lg-exec-label">Estimated Avoided Downtime</div>
-          <div class="lg-exec-value lg-impact-saved">€${downtimeAvoided.toLocaleString()}</div>
-          <div class="lg-exec-sub">By scheduling during changeover</div>
+          <div class="lg-exec-label">Planned Maintenance Cost</div>
+          <div class="lg-exec-value">€${plannedCost.toLocaleString()}</div>
+          <div class="lg-exec-sub">During changeover window</div>
+        </div>
+        <div class="lg-exec-item">
+          <div class="lg-exec-label">Net Avoided Cost</div>
+          <div class="lg-exec-value lg-impact-saved">€${avoided.toLocaleString()}</div>
+          <div class="lg-exec-sub">Exposure minus planned cost</div>
         </div>
         <div class="lg-exec-item">
           <div class="lg-exec-label">Human Decision</div>
-          <div class="lg-exec-value">${inv.approval.status === 'approved' ? '✅ Approved' : inv.approval.status === 'rejected' ? '❌ Rejected' : '⏳ Pending'}</div>
-          <div class="lg-exec-sub">Audit status: ${inv.investigation_id}</div>
+          <div class="lg-exec-value">${approvalLabel}</div>
+          <div class="lg-exec-sub">Audit: ${inv.investigation_id}</div>
         </div>
+      </div>
+      <div class="lg-exec-briefings" id="lg-exec-briefings">
+        <div class="lg-exec-scale-title">💬 Role-Specific Briefings</div>
+        <div class="lg-panel-loading">Communications agent drafting briefings...</div>
       </div>
       <div class="lg-exec-scale">
         <div class="lg-exec-scale-title">📈 Scale Opportunity</div>
@@ -1058,6 +1145,43 @@ async function lgShowExecutive() {
       </div>
     </div>
   `;
+
+  // Communications agent — generates the 3 role briefings live
+  lgRunCommsAgent(inv, asset, exposure, avoided);
+}
+
+async function lgRunCommsAgent(inv, asset, exposure, avoided) {
+  const el = document.getElementById('lg-exec-briefings');
+  if (!el) return;
+  const sys = `You are the Communications Agent for LineGuard AI.
+Investigation ${inv.investigation_id}: ${inv.leading_hypothesis} on ${asset.name}.
+Severity ${inv.risk.severity}, failure probability ${(inv.risk.failure_probability_24h * 100).toFixed(0)}%, decision: ${inv.approval.status}.
+Run-to-failure exposure €${exposure}, net avoided €${avoided}.
+
+Write three SHORT role-specific briefings (2 sentences each, different tone and focus per role).
+Respond with ONLY a JSON object:
+{
+  "operator": "practical: what to watch, what changes on the floor",
+  "architect": "technical: root cause, system behaviour, monitoring config",
+  "executive": "business: cost avoided, risk posture, scaling implication"
+}`;
+
+  try {
+    const result = await lgCallLLM([{ role: 'system', content: sys }, { role: 'user', content: 'Draft the three briefings.' }]);
+    const b = lgParseJSON(result);
+    el.innerHTML = `
+      <div class="lg-exec-scale-title">💬 Role-Specific Briefings <span style="font-size:0.7rem;color:var(--text-dim);">(Communications agent, live)</span></div>
+      <div class="lg-briefing-row"><span class="lg-briefing-role">👷 Operator</span><span class="lg-briefing-text">${escapeHtml(b.operator || '')}</span></div>
+      <div class="lg-briefing-row"><span class="lg-briefing-role">🏗️ Architect</span><span class="lg-briefing-text">${escapeHtml(b.architect || '')}</span></div>
+      <div class="lg-briefing-row"><span class="lg-briefing-role">📊 Executive</span><span class="lg-briefing-text">${escapeHtml(b.executive || '')}</span></div>`;
+    lgAuditLog('Briefings generated', 'Operator, architect, executive');
+  } catch(e) {
+    console.error('Comms LLM failed:', e);
+    el.innerHTML = `
+      <div class="lg-exec-scale-title">💬 Role-Specific Briefings</div>
+      <div class="lg-pipeline-error"><div><strong>Briefing generation failed</strong> — LLM call failed.</div>
+      <button class="btn lg-btn-primary" onclick="lgShowExecutive()">🔄 Retry</button></div>`;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1142,29 +1266,37 @@ function lgRemoveChatTyping() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 async function lgInjectEvent(type) {
+  const sc = LG_STATE.scenario || {};
+  const scPart = sc.part || 'BR-500-A';
+  const scAsset = sc.asset_id || 'PRESS-02';
   switch(type) {
     case 'delay_part':
-      await fetch('/api/lg/event/delay-part', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ part_number: 'BR-500-A' }) });
-      lgToast('📦 Bearing kit BR-500-A marked as delayed (+2 hours)');
-      lgAuditLog('Event injected', 'Part BR-500-A delayed by 2 hours');
+      await fetch('/api/lg/event/delay-part', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ part_number: scPart }) });
+      lgToast(`📦 Part ${scPart} marked as delayed (+2 hours)`);
+      lgAuditLog('Event injected', `Part ${scPart} delayed by 2 hours`);
       if (LG_STATE.screen === 'investigation') {
-        lgLogAgent('planner', '⚠ Bearing kit BR-500-A is now delayed. Revising plan...', 'warning');
+        lgLogAgent('planner', `⚠ Part ${scPart} is now delayed. Revising plan...`, 'warning');
         await lgRevisePlan();
       }
       break;
     case 'operator_obs':
-      await fetch('/api/lg/observation/add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ asset_id: 'PRESS-02', observation: 'Operator noticed increased vibration through the floor near Press 02. More noticeable in last 15 minutes.', operator: 'T. Müller' }) });
+      await fetch('/api/lg/observation/add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ asset_id: scAsset, observation: `Operator noticed the issue on ${(LG_STATE.assets[scAsset] || {}).name || scAsset} getting more noticeable in the last 15 minutes.`, operator: 'T. Müller' }) });
       lgToast('📝 New operator observation added');
-      lgAuditLog('Event injected', 'New operator observation: increased vibration felt through floor');
+      lgAuditLog('Event injected', 'New operator observation added');
       if (LG_STATE.screen === 'investigation') {
         lgLogAgent('diagnosis', '📝 New operator observation received. Updating evidence...', 'thinking');
       }
       break;
-    case 'escalate':
-      lgToast('⚠ Telemetry escalating — anomaly factor increasing');
-      lgAuditLog('Event injected', 'Telemetry escalation mode activated');
-      // The simulator already ramps — this is a visual cue
+    case 'escalate': {
+      const res = await fetch('/api/lg/event/escalate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+      const data = await res.json();
+      lgToast(`⚠ Anomaly ramp accelerated (+${(data.escalation_boost * 100).toFixed(0)}%) — watch the charts`);
+      lgAuditLog('Event injected', `Telemetry escalation boost now +${(data.escalation_boost * 100).toFixed(0)}%`);
+      if (LG_STATE.screen === 'investigation') {
+        lgLogAgent('signal', `⚠ Telemetry escalating — anomaly severity boosted. Readings will visibly worsen.`, 'warning');
+      }
       break;
+    }
     case 'reset':
       await lgResetDemo();
       break;
@@ -1172,8 +1304,9 @@ async function lgInjectEvent(type) {
 }
 
 async function lgRevisePlan() {
-  const inventory = await lgToolCall('get_inventory', { part_number: 'BR-500-A' });
-  const part = (inventory.inventory || []).find(p => p.part_number === 'BR-500-A');
+  const scPart = (LG_STATE.scenario || {}).part || 'BR-500-A';
+  const inventory = await lgToolCall('get_inventory', { part_number: scPart });
+  const part = (inventory.inventory || []).find(p => p.part_number === scPart);
 
   if (part && part.status === 'delayed') {
     const el = document.getElementById('lg-invest-recommendation');
@@ -1182,11 +1315,11 @@ async function lgRevisePlan() {
         <div class="lg-plan-revision">
           <div class="lg-revision-header">🔄 Plan Revised — Part Delayed</div>
           <div class="lg-revision-text">
-            Bearing kit BR-500-A shipment is delayed by ~2 hours. The Maintenance Planner agent has revised the recommendation:
+            Part ${scPart} shipment is delayed by ~2 hours. The Maintenance Planner agent has revised the recommendation:
           </div>
           <div class="lg-revised-plan">
-            <div><strong>Original plan:</strong> Full bearing replacement during changeover</div>
-            <div><strong>Revised plan:</strong> Temporary inspection during changeover (45 min) + full replacement when part arrives</div>
+            <div><strong>Original plan:</strong> Full repair during changeover</div>
+            <div><strong>Revised plan:</strong> Temporary inspection during changeover (45 min) + full repair when part arrives</div>
             <div><strong>Risk adjustment:</strong> Failure probability increased from ${(LG_STATE.investigation.risk.failure_probability_24h * 100).toFixed(0)}% to ${Math.min(95, LG_STATE.investigation.risk.failure_probability_24h * 100 + 10).toFixed(0)}%</div>
             <div><strong>Mitigation:</strong> Increased monitoring frequency, operator alert issued, technician on standby</div>
           </div>
@@ -1195,8 +1328,8 @@ async function lgRevisePlan() {
       `;
       el.innerHTML += revisionHtml;
     }
-    lgLogAgent('planner', 'Plan revised: temporary inspection + deferred full replacement. Risk escalated.', 'warning');
-    lgAuditLog('Plan revised', 'Bearing kit delayed — temporary inspection recommended instead');
+    lgLogAgent('planner', 'Plan revised: temporary inspection + deferred full repair. Risk escalated.', 'warning');
+    lgAuditLog('Plan revised', `Part ${scPart} delayed — temporary inspection recommended instead`);
   }
 }
 
@@ -1263,21 +1396,39 @@ async function lgResetDemo() {
 }
 
 // ── LLM CALL HELPER ──────────────────────────────────────────────────────────
-async function lgCallLLM(messages) {
-  const body = {
-    model: window.MODEL || 'deepseek/deepseek-v4-flash-0731',
-    messages: messages,
-    temperature: 0.3,
-    stream: false,
-  };
+const LG_MODELS = [
+  { key: 'deepseek/deepseek-v4-flash-0731', name: 'DeepSeek V4 Flash' },
+  { key: 'z-ai/glm-5.2', name: 'GLM-5.2' },
+  { key: 'qwen/qwen3-235b-a22b-2507', name: 'Qwen3 235B' },
+  { key: 'anthropic/claude-sonnet-5', name: 'Claude Sonnet 5' },
+  { key: 'anthropic/claude-haiku-4-5-20251001', name: 'Claude Haiku 4.5' },
+];
 
+function lgModelName(key) {
+  return (LG_MODELS.find(m => m.key === key) || {}).name || key.split('/').pop();
+}
+
+async function lgCallLLM(messages) {
+  const model = LG_STATE.model || 'deepseek/deepseek-v4-flash-0731';
+  const t0 = performance.now();
   const res = await fetch('/api/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ model, messages, temperature: 0.3, stream: false }),
   });
 
   if (!res.ok) throw new Error(`LLM API error: ${res.status}`);
   const data = await res.json();
+  const elapsed = ((performance.now() - t0) / 1000).toFixed(1);
+  const tokens = data.usage?.total_tokens || 0;
+
+  // Live LLM badge — server-truth proof the model actually ran
+  LG_STATE.llmStats.calls += 1;
+  LG_STATE.llmStats.tokens += tokens;
+  const badge = document.getElementById('lg-llm-badge');
+  if (badge) {
+    badge.textContent = `🟢 ${lgModelName(model)} · ${LG_STATE.llmStats.calls} calls · ${LG_STATE.llmStats.tokens.toLocaleString()} tok · last ${elapsed}s`;
+    badge.classList.add('lg-llm-badge-live');
+  }
   return data.choices?.[0]?.message?.content || '';
 }
